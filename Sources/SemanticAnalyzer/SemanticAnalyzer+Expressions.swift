@@ -119,17 +119,17 @@ extension SemanticAnalyzer {
       case .matchedGlobalFunction:
         break
 
-    case .matchedFunctionWithoutCaller(let matchingFunctions):
-      // The function declaration is found, but caller is incorrect
-      if !functionCall.isAttempted || matchingFunctions.count > 1 {
-        // If function call is not attempted, or there are multiple matching functions
-        diagnostics.append(.noTryForFunctionCall(functionCall, contextCallerProtections: callerProtections, stateProtections: typeStates, candidates: matchingFunctions))
-      }
+      case .matchedFunctionWithoutCaller(let matchingFunctions):
+        // The function declaration is found, but caller is incorrect
+        if !functionCall.isAttempted || matchingFunctions.count > 1 {
+          // If function call is not attempted, or there are multiple matching functions
+          diagnostics.append(.noTryForFunctionCall(functionCall, contextCallerProtections: callerProtections, stateProtections: typeStates, candidates: matchingFunctions))
+        }
 
-    case .failure(let candidates):
-      // A matching function declaration couldn't be found.
-      diagnostics.append(.noMatchingFunctionForFunctionCall(functionCall, candidates: candidates))
-    }
+      case .failure(let candidates):
+        // A matching function declaration couldn't be found.
+        diagnostics.append(.noMatchingFunctionForFunctionCall(functionCall, candidates: candidates))
+      }
     } else if case .failure(let candidates) = environment.matchEventCall(functionCall, enclosingType: enclosingType, scopeContext: passContext.scopeContext ?? ScopeContext()) {
       // Event call has failed to match but has candidates
       if !candidates.isEmpty {

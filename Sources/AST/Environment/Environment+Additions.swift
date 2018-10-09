@@ -58,10 +58,8 @@ extension Environment {
       addFunction(functionDeclaration, enclosingType: structDeclaration.identifier.name, states: [], callerProtections: [])
     }
 
-    for specialDeclaration in structDeclaration.specialDeclarations {
-      if specialDeclaration.isInit {
-        addInitializer(specialDeclaration, enclosingType: structDeclaration.identifier.name)
-      }
+    for specialDeclaration in structDeclaration.specialDeclarations where specialDeclaration.isInit {
+      addInitializer(specialDeclaration, enclosingType: structDeclaration.identifier.name)
     }
   }
 

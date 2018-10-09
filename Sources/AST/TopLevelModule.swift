@@ -93,43 +93,43 @@ public struct TopLevelModule: ASTNode {
 
   func getProperty(identifier: Identifier, variableType: Type, sourceLocation: SourceLocation) -> ([Parameter], Expression, Type)? {
     switch variableType.rawType {
-      case .basicType:
-        return ([], .identifier(identifier), variableType)
-      case .arrayType(let type), .fixedSizeArrayType(let type, _):
-        var identifiers = [Identifier]()
-        var currentType: RawType = type
-        let avaliableIdentifiers = "ijklmnopqrstuvwxyzabcdefgh"
-        var index = avaliableIdentifiers.startIndex
+    case .basicType:
+      return ([], .identifier(identifier), variableType)
+    case .arrayType(let type), .fixedSizeArrayType(let type, _):
+      var identifiers = [Identifier]()
+      var currentType: RawType = type
+      let avaliableIdentifiers = "ijklmnopqrstuvwxyzabcdefgh"
+      var index = avaliableIdentifiers.startIndex
 
-        while index != avaliableIdentifiers.endIndex {
-          index = avaliableIdentifiers.index(index, offsetBy: 1)
-          let name = avaliableIdentifiers[index].description
-          identifiers.append(Identifier(identifierToken: Token(kind: .identifier(name), sourceLocation: sourceLocation)))
+      while index != avaliableIdentifiers.endIndex {
+        index = avaliableIdentifiers.index(index, offsetBy: 1)
+        let name = avaliableIdentifiers[index].description
+        identifiers.append(Identifier(identifierToken: Token(kind: .identifier(name), sourceLocation: sourceLocation)))
 
-          if case .arrayType(let type) = currentType {
-            currentType = type
-            continue
-          }
-          if case .fixedSizeArrayType(let type, _) = currentType {
-            currentType = type
-            continue
-          }
-          break
+        if case .arrayType(let type) = currentType {
+          currentType = type
+          continue
         }
+        if case .fixedSizeArrayType(let type, _) = currentType {
+          currentType = type
+          continue
+        }
+        break
+      }
 
-        let parameters = identifiers.map { Parameter(identifier: $0, type: Type(inferredType: .basicType(.int), identifier: $0), implicitToken: nil) }
-        let subscriptExpression = identifiers.reduce(.identifier(identifier), { (currentExpression, identifier) -> Expression in
-          return .subscriptExpression(SubscriptExpression(baseExpression: currentExpression, indexExpression: .identifier(identifier), closeSquareBracketToken: Token(kind: .punctuation(.closeSquareBracket), sourceLocation: sourceLocation)))
-        })
+      let parameters = identifiers.map { Parameter(identifier: $0, type: Type(inferredType: .basicType(.int), identifier: $0), implicitToken: nil) }
+      let subscriptExpression = identifiers.reduce(.identifier(identifier), { (currentExpression, identifier) -> Expression in
+        return .subscriptExpression(SubscriptExpression(baseExpression: currentExpression, indexExpression: .identifier(identifier), closeSquareBracketToken: Token(kind: .punctuation(.closeSquareBracket), sourceLocation: sourceLocation)))
+      })
 
-        return (parameters, subscriptExpression, Type(inferredType: currentType, identifier: identifier))
-      case .dictionaryType(let key, let value):
-        let keyIdentifier = Identifier(identifierToken: Token(kind: .identifier("key"), sourceLocation: sourceLocation))
-        let keyParameter = Parameter(identifier: keyIdentifier, type: Type(inferredType: key, identifier: identifier), implicitToken: nil)
-        let subExpression = SubscriptExpression(baseExpression: .identifier(identifier), indexExpression: .identifier(keyIdentifier), closeSquareBracketToken: Token(kind: .punctuation(.closeSquareBracket), sourceLocation: sourceLocation))
-        return ([keyParameter], .subscriptExpression(subExpression), Type(inferredType: value, identifier: identifier))
-      case .stdlibType, .rangeType, .userDefinedType, .inoutType, .functionType, .any, .errorType:
-        return nil
+      return (parameters, subscriptExpression, Type(inferredType: currentType, identifier: identifier))
+    case .dictionaryType(let key, let value):
+      let keyIdentifier = Identifier(identifierToken: Token(kind: .identifier("key"), sourceLocation: sourceLocation))
+      let keyParameter = Parameter(identifier: keyIdentifier, type: Type(inferredType: key, identifier: identifier), implicitToken: nil)
+      let subExpression = SubscriptExpression(baseExpression: .identifier(identifier), indexExpression: .identifier(keyIdentifier), closeSquareBracketToken: Token(kind: .punctuation(.closeSquareBracket), sourceLocation: sourceLocation))
+      return ([keyParameter], .subscriptExpression(subExpression), Type(inferredType: value, identifier: identifier))
+    case .stdlibType, .rangeType, .userDefinedType, .inoutType, .functionType, .any, .errorType:
+      return nil
     }
   }
 

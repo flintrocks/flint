@@ -28,21 +28,27 @@ struct IRCallerProtectionChecks {
 
       let type = environment.type(of: callerProtection.identifier.name, enclosingType: enclosingType)
       let offset = environment.propertyOffset(for: callerProtection.name, enclosingType: enclosingType)
-      let functionContext = FunctionContext(environment: environment, scopeContext: ScopeContext(), enclosingTypeName: enclosingType, isInStructFunction: false)
+      let functionContext = FunctionContext(environment: environment, scopeContext: ScopeContext(),
+                                            enclosingTypeName: enclosingType, isInStructFunction: false)
 
       switch type {
       case .functionType(parameters: [], result: .basicType(.address)):
         var identifier = callerProtection.identifier
         let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [], enclosingType: enclosingType)
         identifier.identifierToken.kind = .identifier(name)
+        // swiftlint:disable line_length
         let functionCall = IRFunctionCall(functionCall: FunctionCall(identifier: identifier, arguments: [], closeBracketToken: .init(kind: .punctuation(.closeBracket), sourceLocation: .DUMMY), isAttempted: false))
+        // swiftlint:enable line_length
         let check = "eq(caller(), \(functionCall.rendered(functionContext: functionContext)))"
         return "\(variableName) := add(\(variableName), \(check))"
       case .functionType(parameters: [.basicType(.address)], result: .basicType(.bool)):
         var identifier = callerProtection.identifier
-        let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [.basicType(.address)], enclosingType: enclosingType)
+        let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [.basicType(.address)],
+                                              enclosingType: enclosingType)
         identifier.identifierToken.kind = .identifier(name)
+        // swiftlint:disable line_length
         let functionCall = IRFunctionCall(functionCall: FunctionCall(identifier: identifier, arguments: [FunctionArgument(.rawAssembly("caller()", resultType: .basicType(.address)))], closeBracketToken: .init(kind: .punctuation(.closeBracket), sourceLocation: .DUMMY), isAttempted: false))
+        // swiftlint:enable line_length
         let check = "\(functionCall.rendered(functionContext: functionContext))"
         return "\(variableName) := add(\(variableName), \(check))"
       case .fixedSizeArrayType(_, let size):

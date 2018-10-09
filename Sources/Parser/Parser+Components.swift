@@ -15,12 +15,12 @@ extension Parser {
       throw raise(.expectedIdentifier(at: latestSource))
     }
     switch token.kind {
-      case .identifier, .self:
-        currentIndex += 1
-        consumeNewLines()
-        return Identifier(identifierToken: token)
-      default:
-        throw raise(.expectedIdentifier(at: latestSource))
+    case .identifier, .self:
+      currentIndex += 1
+      consumeNewLines()
+      return Identifier(identifierToken: token)
+    default:
+      throw raise(.expectedIdentifier(at: latestSource))
     }
 
   }

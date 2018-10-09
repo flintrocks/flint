@@ -34,12 +34,15 @@ var fileCheckExecutableLocation: URL {
 }
 
 func runParserTests() -> Bool {
-  let allPassed = try! runLite(substitutions: [("flintc", "\(flintcExecutableLocation.path)"), ("FileCheck", "\"\(fileCheckExecutableLocation.path)\"")],
-                              pathExtensions: ["flint"],
-                              testDirPath: "Tests/ParserTests",
-                              testLinePrefix: "//",
-                              parallelismLevel: .automatic,
-                              successMessage: "Parser tests passed.")
+  let allPassed = try! runLite(substitutions: [
+        ("flintc", "\(flintcExecutableLocation.path)"),
+        ("FileCheck", "\"\(fileCheckExecutableLocation.path)\"")
+    ],
+    pathExtensions: ["flint"],
+    testDirPath: "Tests/ParserTests",
+    testLinePrefix: "//",
+    parallelismLevel: .automatic,
+    successMessage: "Parser tests passed.")
   return allPassed
 }
 

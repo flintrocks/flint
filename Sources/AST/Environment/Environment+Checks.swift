@@ -175,10 +175,8 @@ extension Environment {
         if conforming.isEmpty {
           notImplemented.append(contentsOf: typeInfo.allFunctions[name]!)
         }
-        for conform in conforming {
-          if conform.declaration.signature != signature.declaration.signature {
-            notImplemented.append(conform)
-          }
+        for conform in conforming where conform.declaration.signature != signature.declaration.signature {
+          notImplemented.append(conform)
         }
       }
     }

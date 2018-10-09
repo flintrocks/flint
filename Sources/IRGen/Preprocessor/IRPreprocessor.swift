@@ -64,7 +64,7 @@ public struct IRPreprocessor: ASTPass {
   public func process(variableDeclaration: VariableDeclaration, passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
     var passContext = passContext
 
-    if let _ = passContext.functionDeclarationContext {
+    if passContext.functionDeclarationContext != nil {
       // We're in a function. Record the local variable declaration.
       passContext.scopeContext?.localVariables += [variableDeclaration]
     }

@@ -233,12 +233,12 @@ extension Parser {
     }
 
     switch first {
-      case .event:
-        return .eventDeclaration(try parseEventDeclaration())
-      case .self, .identifier:
-        return .contractBehaviourDeclaration(try parseContractBehaviorDeclaration())
-      default:
-        break
+    case .event:
+      return .eventDeclaration(try parseEventDeclaration())
+    case .self, .identifier:
+      return .contractBehaviourDeclaration(try parseContractBehaviorDeclaration())
+    default:
+      break
     }
 
     let attrs = try parseAttributes()
@@ -276,12 +276,12 @@ extension Parser {
 
     while let first = currentToken?.kind {
       switch first {
-        case .func, .init, .fallback, .public, .visible, .mutating, .punctuation(.at):
-          members.append(try parseContractBehaviorMember(enclosingType: contractIdentifier))
-        case .punctuation(.closeBrace):
-          return members
-        default:
-          throw raise(.badMember(in: "contract behaviour", at: latestSource))
+      case .func, .init, .fallback, .public, .visible, .mutating, .punctuation(.at):
+        members.append(try parseContractBehaviorMember(enclosingType: contractIdentifier))
+      case .punctuation(.closeBrace):
+        return members
+      default:
+        throw raise(.badMember(in: "contract behaviour", at: latestSource))
       }
     }
     throw raise(.unexpectedEOF())

@@ -13,9 +13,12 @@ import Source
 /// Verifies the diagnostics emitted by a program matches exactly what was expected.
 /// The expected diagnostics are specified inline in the source file.
 public struct DiagnosticsVerifier {
-  private let diagnosticRegex = try! NSRegularExpression(pattern: "//\\s*expected-(error|note|warning)\\s*\\s+\\{\\{(.*)\\}\\}")
-  private let diagnosticLineRegex = try! NSRegularExpression(pattern: "//\\s*expected-(error|note|warning)\\s*@(\\d+)\\s+\\{\\{(.*)\\}\\}")
-  private let diagnosticOffsetRegex = try! NSRegularExpression(pattern: "//\\s*expected-(error|note|warning)\\s*@(-|\\+)(\\d+)\\s+\\{\\{(.*)\\}\\}")
+  private let diagnosticRegex =
+    try! NSRegularExpression(pattern: "//\\s*expected-(error|note|warning)\\s*\\s+\\{\\{(.*)\\}\\}")
+  private let diagnosticLineRegex =
+    try! NSRegularExpression(pattern: "//\\s*expected-(error|note|warning)\\s*@(\\d+)\\s+\\{\\{(.*)\\}\\}")
+  private let diagnosticOffsetRegex =
+    try! NSRegularExpression(pattern: "//\\s*expected-(error|note|warning)\\s*@(-|\\+)(\\d+)\\s+\\{\\{(.*)\\}\\}")
 
   private let sourceContext: SourceContext
 
@@ -49,19 +52,36 @@ public struct DiagnosticsVerifier {
           // 0 line locations do not exist - specifying 0 matches diagnostics with nil sourceLocation.
           equalLineLocation = expectation.line == 0
         }
-        return diagnostic.message == expectation.message && diagnostic.severity == expectation.severity && equalLineLocation
+
+        return diagnostic.message == expectation.message &&
+            diagnostic.severity == expectation.severity &&
+            equalLineLocation
       })
 
       if let index = index {
         producedDiagnostics.remove(at: index)
       } else {
-        let sourceLocation = expectation.line == 0 ? nil : SourceLocation(line: expectation.line, column: 0, length: 0, file: sourceFile)
-        verifyDiagnostics.append(Diagnostic(severity: .error, sourceLocation: sourceLocation, message: "Verify: Should have produced \(expectation.severity) \"\(expectation.message)\""))
+        let sourceLocation: SourceLocation?
+        if expectation.line == 0 {
+            sourceLocation = nil
+        } else {
+            sourceLocation = SourceLocation(line: expectation.line, column: 0, length: 0, file: sourceFile)
+        }
+
+        let diagnostic =
+            Diagnostic(severity: .error,
+                       sourceLocation: sourceLocation,
+                       message: "Verify: Should have produced \(expectation.severity) \"\(expectation.message)\"")
+        verifyDiagnostics.append(diagnostic)
       }
     }
 
     for producedDiagnostic in producedDiagnostics where producedDiagnostic.severity != .note {
-      verifyDiagnostics.append(Diagnostic(severity: .error, sourceLocation: producedDiagnostic.sourceLocation, message: "Verify: Unexpected \(producedDiagnostic.severity) \"\(producedDiagnostic.message)\""))
+        let diagnostic =
+            Diagnostic(severity: .error,
+                       sourceLocation: producedDiagnostic.sourceLocation,
+                       message: "Verify: Unexpected \(producedDiagnostic.severity) \"\(producedDiagnostic.message)\"")
+        verifyDiagnostics.append(diagnostic)
     }
 
     let output = DiagnosticsFormatter(diagnostics: verifyDiagnostics, sourceContext: sourceContext).rendered()
@@ -90,7 +110,8 @@ public struct DiagnosticsVerifier {
   }
 
   func parseExpectation(sourceLine: String, line: Int) -> Expectation? {
-    if let match = diagnosticRegex.matches(in: sourceLine, range: NSRange(sourceLine.startIndex..., in: sourceLine)).first {
+    let range = NSRange(sourceLine.startIndex..., in: sourceLine)
+    if let match = diagnosticRegex.matches(in: sourceLine, range: range).first {
       let severityRange = Range(match.range(at: 1), in: sourceLine)!
       let severity = String(sourceLine[severityRange])
 
@@ -98,7 +119,9 @@ public struct DiagnosticsVerifier {
       let message = String(sourceLine[messageRange])
 
       return Expectation(severity: Diagnostic.Severity(rawValue: severity)!, message: message, line: line)
-    } else if let match = diagnosticLineRegex.matches(in: sourceLine, range: NSRange(sourceLine.startIndex..., in: sourceLine)).first {
+    }
+
+    if let match = diagnosticLineRegex.matches(in: sourceLine, range: range).first {
       let severityRange = Range(match.range(at: 1), in: sourceLine)!
       let severity = String(sourceLine[severityRange])
 
@@ -109,7 +132,9 @@ public struct DiagnosticsVerifier {
       let message = String(sourceLine[messageRange])
 
       return Expectation(severity: Diagnostic.Severity(rawValue: severity)!, message: message, line: line)
-    } else if let match = diagnosticOffsetRegex.matches(in: sourceLine, range: NSRange(sourceLine.startIndex..., in: sourceLine)).first {
+    }
+
+    if let match = diagnosticOffsetRegex.matches(in: sourceLine, range: range).first {
       let severityRange = Range(match.range(at: 1), in: sourceLine)!
       let severity = String(sourceLine[severityRange])
 
@@ -127,6 +152,7 @@ public struct DiagnosticsVerifier {
 
       return Expectation(severity: Diagnostic.Severity(rawValue: severity)!, message: message, line: line)
     }
+
     return nil
   }
 }

@@ -205,10 +205,10 @@ public struct ASTVisitor {
     var processResult = pass.process(contractMember: contractMember, passContext: passContext)
 
     switch processResult.element {
-      case .variableDeclaration(let variableDeclaration):
-        processResult.element = .variableDeclaration(processResult.combining(visit(variableDeclaration, passContext: processResult.passContext)))
-      case .eventDeclaration(let eventDeclaration):
-        processResult.element = .eventDeclaration(processResult.combining(visit(eventDeclaration, passContext: processResult.passContext)))
+    case .variableDeclaration(let variableDeclaration):
+      processResult.element = .variableDeclaration(processResult.combining(visit(variableDeclaration, passContext: processResult.passContext)))
+    case .eventDeclaration(let eventDeclaration):
+      processResult.element = .eventDeclaration(processResult.combining(visit(eventDeclaration, passContext: processResult.passContext)))
     }
 
     let postProcessResult = pass.postProcess(contractMember: processResult.element, passContext: processResult.passContext)

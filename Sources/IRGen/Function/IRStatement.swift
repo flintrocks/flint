@@ -14,12 +14,18 @@ struct IRStatement {
 
   func rendered(functionContext: FunctionContext) -> String {
     switch statement {
-    case .expression(let expression): return IRExpression(expression: expression, asLValue: false).rendered(functionContext: functionContext)
-    case .ifStatement(let ifStatement): return IRIfStatement(ifStatement: ifStatement).rendered(functionContext: functionContext)
-    case .returnStatement(let returnStatement): return IRReturnStatement(returnStatement: returnStatement).rendered(functionContext: functionContext)
-    case .becomeStatement(let becomeStatement): return IRBecomeStatement(becomeStatement: becomeStatement).rendered(functionContext: functionContext)
-    case .emitStatement(let emitStatement): return IREmitStatement(emitStatement: emitStatement).rendered(functionContext: functionContext)
-    case .forStatement(let forStatement): return IRForStatement(forStatement: forStatement).rendered(functionContext: functionContext)
+    case .expression(let expression):
+      return IRExpression(expression: expression, asLValue: false).rendered(functionContext: functionContext)
+    case .ifStatement(let ifStatement):
+      return IRIfStatement(ifStatement: ifStatement).rendered(functionContext: functionContext)
+    case .returnStatement(let returnStatement):
+      return IRReturnStatement(returnStatement: returnStatement).rendered(functionContext: functionContext)
+    case .becomeStatement(let becomeStatement):
+      return IRBecomeStatement(becomeStatement: becomeStatement).rendered(functionContext: functionContext)
+    case .emitStatement(let emitStatement):
+      return IREmitStatement(emitStatement: emitStatement).rendered(functionContext: functionContext)
+    case .forStatement(let forStatement):
+      return IRForStatement(forStatement: forStatement).rendered(functionContext: functionContext)
     }
   }
 }
@@ -120,10 +126,10 @@ struct IRForStatement {
       let arrayElementOffset = IRRuntimeFunction.storageArrayOffset(arrayOffset: offset, index: "\(prefix)i")
       loadArrLen = IRRuntimeFunction.load(address: offset, inMemory: false)
       switch forStatement.variable.type.rawType {
-        case .arrayType, .fixedSizeArrayType:
-          toAssign = String(arrayElementOffset)
-        default:
-          toAssign = IRRuntimeFunction.load(address: arrayElementOffset, inMemory: false)
+      case .arrayType, .fixedSizeArrayType:
+        toAssign = String(arrayElementOffset)
+      default:
+        toAssign = IRRuntimeFunction.load(address: arrayElementOffset, inMemory: false)
       }
 
     case .fixedSizeArrayType:

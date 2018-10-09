@@ -102,12 +102,12 @@ extension SemanticAnalyzer {
     if passContext.traitDeclarationContext == nil {
       contractBehaviorDeclaration.members.forEach { member in
         switch member {
-          case .functionDeclaration, .specialDeclaration:
-            break
-          case .functionSignatureDeclaration(let decl):
-            diagnostics.append(.signatureInContract(at: decl.sourceLocation))
-          case .specialSignatureDeclaration(let decl):
-            diagnostics.append(.signatureInContract(at: decl.sourceLocation))
+        case .functionDeclaration, .specialDeclaration:
+          break
+        case .functionSignatureDeclaration(let decl):
+          diagnostics.append(.signatureInContract(at: decl.sourceLocation))
+        case .specialSignatureDeclaration(let decl):
+          diagnostics.append(.signatureInContract(at: decl.sourceLocation))
         }
       }
     }

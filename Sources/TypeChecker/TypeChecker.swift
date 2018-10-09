@@ -49,7 +49,7 @@ public class TypeChecker: ASTPass {
     var passContext = passContext
     var diagnostics = [Diagnostic]()
 
-    if let _ = passContext.functionDeclarationContext {
+    if passContext.functionDeclarationContext != nil {
       // We're in a function. Record the local variable declaration.
       passContext.scopeContext?.localVariables += [variableDeclaration]
     }
