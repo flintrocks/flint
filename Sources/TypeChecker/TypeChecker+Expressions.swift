@@ -87,7 +87,7 @@ extension TypeChecker {
     var expectedType: RawType = .errorType
 
     switch identifierType {
-    case .arrayType (_), .fixedSizeArrayType(_): expectedType = .basicType(.int)
+    case .arrayType, .fixedSizeArrayType: expectedType = .basicType(.int)
     case .dictionaryType(let keyType, _): expectedType = keyType
     default:
       diagnostics.append(.incompatibleSubscript(actualType: identifierType, expression: subscriptExpression.baseExpression))

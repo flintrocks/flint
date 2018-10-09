@@ -118,7 +118,6 @@ extension Environment {
     return conflictingDeclaration(of: event, in: declaredEvents + declaredStructs + declaredContracts + declaredEnums)
   }
 
-
   /// Attempts to find a conflicting declaration of the given function declaration
   public func conflictingFunctionDeclaration(for function: FunctionDeclaration, in type: RawTypeIdentifier) -> Identifier? {
     var contractFunctions = [Identifier]()
@@ -153,11 +152,11 @@ extension Environment {
   }
 
   // If the number of functions is greater than 1 (the signature of the trait) then there must be a conflict
-  public func conflictingTraitSignatures(for type: RawTypeIdentifier) -> [String : [FunctionInformation]] {
+  public func conflictingTraitSignatures(for type: RawTypeIdentifier) -> [String: [FunctionInformation]] {
     guard let typeInfo = types[type] else {
       return [:]
     }
-    return typeInfo.traitFunctions.filter{ (name, functions) in
+    return typeInfo.traitFunctions.filter { (_, functions) in
       functions.count > 1 && functions.contains(where: { $0.declaration.signature != functions.first!.declaration.signature})
     }
   }

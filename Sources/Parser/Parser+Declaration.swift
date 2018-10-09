@@ -44,7 +44,7 @@ extension Parser {
       case .enum:
         let enumDeclaration = try parseEnumDeclaration()
         declarations.append(.enumDeclaration(enumDeclaration))
-      case .identifier(_), .self:
+      case .identifier, .self:
         let contractBehaviorDeclaration = try parseContractBehaviorDeclaration()
         declarations.append(.contractBehaviorDeclaration(contractBehaviorDeclaration))
       default:
@@ -136,10 +136,10 @@ extension Parser {
     let contractIdentifier = try parseIdentifier()
 
     var states: [TypeState] = []
-    var callerBinding: Identifier? = nil
+    var callerBinding: Identifier?
 
     if currentToken?.kind == .punctuation(.at) {
-      let _ = try consume(.punctuation(.at), or: .dummy())
+      _ = try consume(.punctuation(.at), or: .dummy())
       states = try parseTypeStateGroup()
     }
 
@@ -206,9 +206,9 @@ extension Parser {
     let caseToken = try consume(.case, or: .expectedEnumDeclarationCaseMember(at: latestSource))
     var identifier = try parseIdentifier()
     identifier.enclosingType = enumIdentifier.name
-    var hiddenValue: Expression? = nil
+    var hiddenValue: Expression?
     if currentToken?.kind == .punctuation(.equal) {
-      let _ = try consume(.punctuation(.equal), or: .dummy())
+      _ = try consume(.punctuation(.equal), or: .dummy())
       hiddenValue = try parseExpression(upTo: indexOfFirstAtCurrentDepth([.newline])!)
     }
     return EnumMember(caseToken: caseToken, identifier: identifier, type: Type(identifier: enumIdentifier), hiddenValue: hiddenValue, hiddenType: hiddenType)
@@ -235,7 +235,7 @@ extension Parser {
     switch first {
       case .event:
         return .eventDeclaration(try parseEventDeclaration())
-      case .self, .identifier(_):
+      case .self, .identifier:
         return .contractBehaviourDeclaration(try parseContractBehaviorDeclaration())
       default:
         break
@@ -363,8 +363,7 @@ extension Parser {
         }
         let decl = try parseVariableDeclaration(modifiers: modifiers, enclosingType: enclosingType, upTo: newLine)
         variableDeclarations.append(decl)
-      }
-      else {
+      } else {
         break
       }
     }
@@ -400,7 +399,7 @@ extension Parser {
     } else if currentToken?.kind == .punctuation(.equal) {
       // If we are parsing a state property defined in a type, and it has been assigned a default value, parse it otherwise leave it to binary expression
       if asTypeProperty {
-        let _ = try consume(.punctuation(.equal), or: .expectedValidOperator(at: latestSource))
+        _ = try consume(.punctuation(.equal), or: .expectedValidOperator(at: latestSource))
         assignedExpression = try parseExpression(upTo: upTo)
       } else {
         assignedExpression = nil

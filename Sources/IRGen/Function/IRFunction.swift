@@ -125,7 +125,7 @@ struct IRFunctionBody {
     return "\(callerBindingDeclaration)\(body)"
   }
 
-  func renderBody<S : RandomAccessCollection & RangeReplaceableCollection>(_ statements: S, functionContext: FunctionContext) -> String where S.Element == AST.Statement, S.Index == Int {
+  func renderBody<S: RandomAccessCollection & RangeReplaceableCollection>(_ statements: S, functionContext: FunctionContext) -> String where S.Element == AST.Statement, S.Index == Int {
     guard !statements.isEmpty else { return "" }
     var statements = statements
     let first = statements.removeFirst()

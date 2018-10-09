@@ -210,7 +210,7 @@ extension Parser {
 
     if currentToken?.kind == .punctuation(.colon) {
       /// The dictionary literal doesn't contain any elements.
-      let _ = try consume(.punctuation(.colon), or: .dummy())
+      _ = try consume(.punctuation(.colon), or: .dummy())
       closeSquareBracket = try consume(.punctuation(.closeSquareBracket), or: .expectedCloseSquareDictionaryLiteral(at: latestSource))
       return AST.DictionaryLiteral(openSquareBracketToken: openSquareBracket, elements: elements, closeSquareBracketToken: closeSquareBracket)
     }

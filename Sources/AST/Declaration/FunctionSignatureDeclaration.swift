@@ -21,7 +21,7 @@ public struct FunctionSignatureDeclaration: ASTNode, Equatable {
   public var closeBracketToken: Token
   public var resultType: Type?
 
-  public var mangledIdentifier: String? = nil
+  public var mangledIdentifier: String?
 
   /// The raw type of the function's return type.
   public var rawType: RawType {

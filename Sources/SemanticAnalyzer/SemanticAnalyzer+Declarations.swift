@@ -27,10 +27,9 @@ extension SemanticAnalyzer {
     }
 
     let conflictingSignatures = environment.conflictingTraitSignatures(for: contractDeclaration.identifier.name)
-    conflictingSignatures.forEach { (functionName, functions) in
+    conflictingSignatures.forEach { (_, functions) in
       diagnostics.append(.traitsAreIncompatible(contractDeclaration, functions))
     }
-
 
     return ASTPassResult(element: contractDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
@@ -56,7 +55,7 @@ extension SemanticAnalyzer {
     }
 
     let conflictingSignatures = environment.conflictingTraitSignatures(for: structDeclaration.identifier.name)
-    conflictingSignatures.forEach { (functionName, functions) in
+    conflictingSignatures.forEach { (_, functions) in
       diagnostics.append(.traitsAreIncompatible(structDeclaration, functions))
     }
 
@@ -78,7 +77,6 @@ extension SemanticAnalyzer {
     }
     return ASTPassResult(element: structDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
-
 
   func isConformanceRepeated(_ conformances: [Conformance]) -> Bool {
     return conformances.reduce(into: [String: [Conformance]]()) {
@@ -104,7 +102,7 @@ extension SemanticAnalyzer {
     if passContext.traitDeclarationContext == nil {
       contractBehaviorDeclaration.members.forEach { member in
         switch member {
-          case .functionDeclaration(_), .specialDeclaration(_):
+          case .functionDeclaration, .specialDeclaration:
             break
           case .functionSignatureDeclaration(let decl):
             diagnostics.append(.signatureInContract(at: decl.sourceLocation))
@@ -181,8 +179,7 @@ extension SemanticAnalyzer {
 
     if enumCase.hiddenValue == nil {
       diagnostics.append(.cannotInferHiddenValue(enumCase.identifier, enumCase.hiddenType))
-    }
-    else if case .literal(_)? = enumCase.hiddenValue {} else {
+    } else if case .literal(_)? = enumCase.hiddenValue {} else {
       diagnostics.append(.invalidHiddenValue(enumCase))
     }
 
@@ -191,10 +188,10 @@ extension SemanticAnalyzer {
 
   func isContractTraitMember(member: TraitMember) -> Bool {
     switch member {
-    case .contractBehaviourDeclaration(_), .eventDeclaration(_):
+    case .contractBehaviourDeclaration, .eventDeclaration:
       return true
-    case .functionDeclaration(_), .specialDeclaration(_),
-         .functionSignatureDeclaration(_), .specialSignatureDeclaration(_):
+    case .functionDeclaration, .specialDeclaration,
+         .functionSignatureDeclaration, .specialSignatureDeclaration:
       return false
     }
   }
@@ -202,7 +199,6 @@ extension SemanticAnalyzer {
   func isStructTraitMember(member: TraitMember) -> Bool {
     return !isContractTraitMember(member: member)
   }
-
 
   // MARK: Variable
   public func process(variableDeclaration: VariableDeclaration, passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
@@ -214,8 +210,7 @@ extension SemanticAnalyzer {
      if variableDeclaration.isMutating {
        if variableDeclaration.isConstant {
           diagnostics.append(.mutatingConstant(variableDeclaration))
-       }
-       else if variableDeclaration.isVariable {
+       } else if variableDeclaration.isVariable {
           diagnostics.append(.mutatingVariable(variableDeclaration))
        }
      }
@@ -253,7 +248,7 @@ extension SemanticAnalyzer {
 
       if let contractStateDeclarationContext = passContext.contractStateDeclarationContext {
         isInitializerDeclared = environment.publicInitializer(forContract: contractStateDeclarationContext.contractIdentifier.name) != nil
-      } else if let structName = passContext.structDeclarationContext?.structIdentifier.name{
+      } else if let structName = passContext.structDeclarationContext?.structIdentifier.name {
         isInitializerDeclared = environment.initializers(in: structName).count > 0
       } else {
         isInitializerDeclared = false
@@ -393,7 +388,6 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: functionDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
-
   // MARK: Special
   public func process(specialDeclaration: SpecialDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration> {
     let enclosingType = passContext.enclosingTypeIdentifier!.name
@@ -440,20 +434,20 @@ extension SemanticAnalyzer {
           return false
         }
         return true
-      case .identifier(_), .inoutExpression(_), .literal(_), .arrayLiteral(_),
-           .dictionaryLiteral(_), .self(_), .variableDeclaration(_), .bracketedExpression(_),
-           .subscriptExpression(_),  .range(_):
+      case .identifier, .inoutExpression, .literal, .arrayLiteral,
+           .dictionaryLiteral, .self, .variableDeclaration, .bracketedExpression,
+           .subscriptExpression, .range:
         return false
-      case .rawAssembly(_), .sequence(_):
+      case .rawAssembly, .sequence:
         return true
-      case .attemptExpression(_):
+      case .attemptExpression:
         return true
       }
-    case .ifStatement(_):
+    case .ifStatement:
       return false
-    case .returnStatement(_), .forStatement(_), .becomeStatement(_):
+    case .returnStatement, .forStatement, .becomeStatement:
       return true
-    case .emitStatement(_):
+    case .emitStatement:
       return false
     }
     return true
@@ -506,7 +500,6 @@ extension SemanticAnalyzer {
       }
     }
 
-
     // Check all the properties in the type have been assigned.
     if specialDeclaration.isInit, let unassignedProperties = passContext.unassignedProperties {
 
@@ -520,7 +513,6 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: specialDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 }
-
 
 extension ASTPassContext {
   /// The list of unassigned properties in a type.

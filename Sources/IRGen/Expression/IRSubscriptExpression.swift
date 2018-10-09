@@ -28,18 +28,18 @@ struct IRSubscriptExpression {
     let runtimeFunc: (String, String) -> String
 
     switch type {
-    case .arrayType(_):
+    case .arrayType:
       runtimeFunc = IRRuntimeFunction.storageArrayOffset
-    case .fixedSizeArrayType(_):
+    case .fixedSizeArrayType:
       let typeSize = functionContext.environment.size(of: type)
       runtimeFunc = {IRRuntimeFunction.storageFixedSizeArrayOffset(arrayOffset: $0, index: $1, arraySize: typeSize)}
-    case .dictionaryType(_):
+    case .dictionaryType:
       runtimeFunc = IRRuntimeFunction.storageDictionaryOffsetForKey
     default: fatalError("Invalid type")
     }
 
     switch subExpr.baseExpression {
-    case .identifier(_):
+    case .identifier:
       return runtimeFunc(String(baseOffset), indexExpressionCode)
     case .subscriptExpression(let newBase):
       return runtimeFunc(nestedStorageOffset(subExpr: newBase, baseOffset: baseOffset, functionContext: functionContext), indexExpressionCode)
@@ -59,10 +59,8 @@ struct IRSubscriptExpression {
 
     if asLValue {
       return memLocation
-    }
-    else {
+    } else {
       return "sload(\(memLocation))"
     }
   }
 }
-

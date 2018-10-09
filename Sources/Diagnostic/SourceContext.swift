@@ -13,7 +13,7 @@ public struct SourceContext {
     return try! String(contentsOf: sourceFile)
   }
 
-  public init(sourceFiles: [URL]){
+  public init(sourceFiles: [URL]) {
     self.sourceFiles = sourceFiles
   }
 }

@@ -32,8 +32,7 @@ struct IRFunctionSelector {
   func renderFallback() -> String {
     if let fallbackDeclaration = fallback {
       return IRContractFallback(fallbackDeclaration: fallbackDeclaration, typeIdentifier: enclosingType, environment: environment).rendered()
-    }
-    else {
+    } else {
       return "revert(0, 0)"
     }
   }

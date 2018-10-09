@@ -220,12 +220,12 @@ extension IRPreprocessor {
       let declaration = initializerInformation.declaration
       let parameterTypes = declaration.signature.parameters.map { $0.type.rawType }
       return Mangler.mangleInitializerName(functionCall.identifier.name, parameterTypes: parameterTypes)
-    case .matchedFallback(_):
+    case .matchedFallback:
       return Mangler.mangleInitializerName(functionCall.identifier.name, parameterTypes: [])
     case .matchedGlobalFunction(let functionInformation):
       let parameterTypes = functionInformation.declaration.signature.parameters.map { $0.type.rawType }
       return Mangler.mangleFunctionName(functionCall.identifier.name, parameterTypes: parameterTypes, enclosingType: Environment.globalFunctionStructName)
-    case .failure(_):
+    case .failure:
       return nil
     }
   }

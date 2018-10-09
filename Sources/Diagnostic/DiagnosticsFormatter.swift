@@ -14,7 +14,7 @@ public struct DiagnosticsFormatter {
   var diagnostics: [Diagnostic]
   var sourceContext: SourceContext?
 
-  public init(diagnostics: [Diagnostic], sourceContext: SourceContext?){
+  public init(diagnostics: [Diagnostic], sourceContext: SourceContext?) {
     self.diagnostics = diagnostics
     self.sourceContext = sourceContext
   }

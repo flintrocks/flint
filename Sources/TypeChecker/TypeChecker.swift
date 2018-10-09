@@ -63,9 +63,9 @@ public class TypeChecker: ASTPass {
       let rhsType: RawType?
 
       switch assignedExpression {
-      case .arrayLiteral(_):
+      case .arrayLiteral:
         rhsType = RawType.arrayType(.any)
-      case .dictionaryLiteral(_):
+      case .dictionaryLiteral:
         rhsType = RawType.dictionaryType(key: .any, value: .any)
       default:
         rhsType = environment.type(of: assignedExpression, enclosingType: passContext.enclosingTypeIdentifier!.name, scopeContext: ScopeContext())

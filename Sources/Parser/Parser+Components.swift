@@ -15,7 +15,7 @@ extension Parser {
       throw raise(.expectedIdentifier(at: latestSource))
     }
     switch token.kind {
-      case .identifier(_), .self:
+      case .identifier, .self:
         currentIndex += 1
         consumeNewLines()
         return Identifier(identifierToken: token)
@@ -76,8 +76,7 @@ extension Parser {
     while let first = currentToken?.kind {
       if modifierTokens.contains(first) {
         modifiers.append(try consume(anyOf: modifierTokens, or: .expectedModifier(at: latestSource)))
-      }
-      else {
+      } else {
         break
       }
     }
@@ -128,7 +127,7 @@ extension Parser {
     }
 
     while currentIndex < closingIndex {
-      var implicitToken: Token? = nil
+      var implicitToken: Token?
       if currentToken?.kind == .implicit {
         implicitToken = try consume(.implicit, or: .dummy())
       }

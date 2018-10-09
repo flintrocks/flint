@@ -18,10 +18,10 @@ struct IRInterface {
         switch member {
         case .functionDeclaration(let functionDeclaration):
           return render(functionDeclaration)
-        case .specialDeclaration(_):
+        case .specialDeclaration:
           return ""
           // Rendering initializers/fallback is not supported yet.
-        case .functionSignatureDeclaration(_), .specialSignatureDeclaration(_):
+        case .functionSignatureDeclaration, .specialSignatureDeclaration:
           fatalError("No signatures in contract body")
         }
       }

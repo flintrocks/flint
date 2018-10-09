@@ -32,7 +32,7 @@ extension Environment {
           return .errorType
         }
         return functionInformation.resultType
-      case .matchedInitializer(_):
+      case .matchedInitializer:
         let name = functionCall.identifier.name
         if let stdlibType = RawType.StdlibType(rawValue: name) {
           return .stdlibType(stdlibType)
@@ -43,7 +43,7 @@ extension Environment {
         switch eventMatch {
           case .matchedEvent(let event):
             return .userDefinedType(event.declaration.identifier.name)
-          case .failure(_):
+          case .failure:
             return .errorType
         }
     }
@@ -53,10 +53,10 @@ extension Environment {
   public func type(ofLiteralToken literalToken: Token) -> RawType {
     guard case .literal(let literal) = literalToken.kind else { fatalError() }
     switch literal {
-    case .boolean(_): return .basicType(.bool)
-    case .decimal(.integer(_)): return .basicType(.int)
-    case .string(_): return .basicType(.string)
-    case .address(_): return .basicType(.address)
+    case .boolean: return .basicType(.bool)
+    case .decimal(.integer): return .basicType(.int)
+    case .string: return .basicType(.string)
+    case .address: return .basicType(.address)
     default: fatalError()
     }
   }
@@ -94,7 +94,6 @@ extension Environment {
     return .rangeType(elementType)
   }
 
-
   // The type of a dictionary literal.
   public func type(ofDictionaryLiteral dictionaryLiteral: DictionaryLiteral, enclosingType: RawTypeIdentifier, scopeContext: ScopeContext) -> RawType {
     var keyType: RawType?
@@ -131,7 +130,7 @@ extension Environment {
      return .basicType(.bool)
     }
     let functionCall = attemptExpression.functionCall
-    return type(of: functionCall, enclosingType: functionCall.identifier.enclosingType ?? enclosingType, typeStates: typeStates, callerProtections: callerProtections , scopeContext: scopeContext) ?? .errorType
+    return type(of: functionCall, enclosingType: functionCall.identifier.enclosingType ?? enclosingType, typeStates: typeStates, callerProtections: callerProtections, scopeContext: scopeContext) ?? .errorType
   }
 
   /// The type of an expression.
@@ -156,19 +155,19 @@ extension Environment {
 
       if binaryExpression.opToken == .dot {
         switch type(of: binaryExpression.lhs, enclosingType: enclosingType, typeStates: typeStates, callerProtections: callerProtections, scopeContext: scopeContext) {
-        case .arrayType(_):
+        case .arrayType:
           if case .identifier(let identifier) = binaryExpression.rhs, identifier.name == "size" {
             return .basicType(.int)
           } else {
             fatalError()
           }
-        case .fixedSizeArrayType(_):
+        case .fixedSizeArrayType:
           if case .identifier(let identifier) = binaryExpression.rhs, identifier.name == "size" {
             return .basicType(.int)
           } else {
             fatalError()
           }
-        case .dictionaryType(_):
+        case .dictionaryType:
           if case .identifier(let identifier) = binaryExpression.rhs, identifier.name == "size" {
             return .basicType(.int)
           } else {
@@ -197,7 +196,7 @@ extension Environment {
       }
       return type(of: identifier.name, enclosingType: identifier.enclosingType ?? enclosingType, scopeContext: scopeContext)
 
-    case .self(_): return .userDefinedType(enclosingType)
+    case .self: return .userDefinedType(enclosingType)
     case .variableDeclaration(let variableDeclaration):
       return variableDeclaration.type.rawType
     case .subscriptExpression(let subscriptExpression):
@@ -218,7 +217,7 @@ extension Environment {
        return type(of: attemptExpression, enclosingType: enclosingType, typeStates: typeStates, callerProtections: callerProtections, scopeContext: scopeContext)
     case .dictionaryLiteral(let dictionaryLiteral):
       return type(ofDictionaryLiteral: dictionaryLiteral, enclosingType: enclosingType, scopeContext: scopeContext)
-    case .sequence(_): fatalError()
+    case .sequence: fatalError()
     case .rawAssembly(_, let resultType): return resultType!
     }
   }

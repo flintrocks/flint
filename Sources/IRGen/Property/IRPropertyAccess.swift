@@ -38,13 +38,13 @@ struct IRPropertyAccess {
       } else {
         fatalError()
       }
-    case .arrayType(_):
+    case .arrayType:
       if case .identifier(let identifier) = rhs, identifier.name == "size" {
         rhsOffset = "0"
       } else {
         fatalError()
       }
-    case .dictionaryType(_):
+    case .dictionaryType:
       if case .identifier(let identifier) = rhs, identifier.name == "size" {
         rhsOffset = "0"
       } else {

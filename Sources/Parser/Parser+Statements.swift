@@ -17,7 +17,7 @@ extension Parser {
       case .punctuation(.semicolon), .newline:
         currentIndex+=1
      // Valid starting tokens for statements
-      case .return, .become, .emit, .for, .if, .identifier(_), .punctuation(.ampersand), .punctuation(.openSquareBracket),
+      case .return, .become, .emit, .for, .if, .identifier, .punctuation(.ampersand), .punctuation(.openSquareBracket),
            .punctuation(.openBracket), .self, .var, .let, .public, .visible, .mutating, .try:
         statements.append(try parseStatement())
       default:
@@ -54,7 +54,7 @@ extension Parser {
       let ifStatement = try parseIfStatement()
       statement = .ifStatement(ifStatement)
     // Valid starting tokens for expressions
-    case .identifier(_), .punctuation(.ampersand), .punctuation(.openSquareBracket),
+    case .identifier, .punctuation(.ampersand), .punctuation(.openSquareBracket),
          .punctuation(.openBracket), .self, .var, .let, .public, .visible, .mutating, .try:
       let expression = try parseExpression(upTo: statementEndIndex)
       statement = .expression(expression)
@@ -72,10 +72,9 @@ extension Parser {
     return (statements, closeBraceToken)
   }
 
-
   func parseReturnStatement(statementEndIndex: Int) throws -> ReturnStatement {
     let returnToken = try consume(.return, or: .expectedStatement(at: latestSource))
-    var expression: Expression? = nil
+    var expression: Expression?
     if currentToken?.kind != .newline {
       expression = try parseExpression(upTo: statementEndIndex)
     }

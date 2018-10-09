@@ -24,7 +24,6 @@ struct IRContract {
     self.environment = environment
   }
 
-
   func rendered() -> String {
     // Generate code for each function in the contract.
     let functions = contractBehaviorDeclarations.flatMap { contractBehaviorDeclaration in
@@ -145,8 +144,6 @@ struct IRContract {
 
      // Generate runtime functions.
      let runtimeFunctionsDeclarations = renderRuntimeFunctions()
-
-
 
      return """
      \(structHeader.indented(by: indentedBy))

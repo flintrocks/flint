@@ -31,7 +31,7 @@ public struct ASTPassContext {
   ///
   /// - Parameter updates: The modifications which should be applied to the new `ASTPassContext`.
   /// - Returns: The `ASTPassContext` applied with the `updates`.
-  public func withUpdates(updates: (inout ASTPassContext) -> ()) -> ASTPassContext {
+  public func withUpdates(updates: (inout ASTPassContext) -> Void) -> ASTPassContext {
     var copy = self
     updates(&copy)
     return copy
@@ -54,7 +54,7 @@ extension ASTPassContext {
     get { return self[AsLValueContextEntry.self] }
     set { self[AsLValueContextEntry.self] = newValue }
   }
-    
+
   /// Whether the node currently being visited is inside a subscript i.e. 'a' in 'foo[a]'
   public var isInSubscript: Bool {
     get { return self[isInSubscriptEntry.self] ?? false }

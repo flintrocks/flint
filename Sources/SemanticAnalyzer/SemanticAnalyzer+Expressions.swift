@@ -51,8 +51,7 @@ extension SemanticAnalyzer {
     if environment.isInitializerCall(functionCall),
       !passContext.inAssignment,
       !passContext.isPropertyDefaultAssignment,
-      functionCall.arguments.isEmpty
-    {
+      functionCall.arguments.isEmpty {
       diagnostics.append(.noReceiverForStructInitializer(functionCall))
     }
 
@@ -94,7 +93,6 @@ extension SemanticAnalyzer {
 
     let isMutating = passContext.functionDeclarationContext?.isMutating ?? false
 
-
     if !passContext.isInEmit {
       // Find the function declaration associated with this function call.
       switch environment.matchFunctionCall(functionCall, enclosingType: functionCall.identifier.enclosingType ?? enclosingType, typeStates: typeStates, callerProtections: callerProtections, scopeContext: passContext.scopeContext!) {
@@ -115,10 +113,10 @@ extension SemanticAnalyzer {
       case .matchedInitializer(let matchingInitializer):
         checkFunctionArguments(functionCall, matchingInitializer.declaration.asFunctionDeclaration, &passContext, isMutating, &diagnostics)
 
-      case .matchedFallback(_):
+      case .matchedFallback:
         break
 
-      case .matchedGlobalFunction(_):
+      case .matchedGlobalFunction:
         break
 
     case .matchedFunctionWithoutCaller(let matchingFunctions):
@@ -136,8 +134,7 @@ extension SemanticAnalyzer {
       // Event call has failed to match but has candidates
       if !candidates.isEmpty {
         diagnostics.append(.partialMatchingEvents(functionCall, candidates: candidates))
-      }
-      else {
+      } else {
         diagnostics.append(.noMatchingEvents(functionCall))
       }
 
@@ -145,11 +142,10 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
   }
 
-
   /// Whether an expression refers to a state property.
   private func isStorageReference(expression: Expression, scopeContext: ScopeContext) -> Bool {
     switch expression {
-    case .self(_): return true
+    case .self: return true
     case .identifier(let identifier): return !scopeContext.containsDeclaration(for: identifier.name)
     case .inoutExpression(let inoutExpression): return isStorageReference(expression: inoutExpression.expression, scopeContext: scopeContext)
     case .binaryExpression(let binaryExpression):

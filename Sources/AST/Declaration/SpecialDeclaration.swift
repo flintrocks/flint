@@ -50,7 +50,6 @@ public struct SpecialDeclaration: ASTNode {
     return asFunctionDeclaration.isPublic
   }
 
-
   public init(signature: SpecialSignatureDeclaration, body: [Statement], closeBraceToken: Token, scopeContext: ScopeContext = ScopeContext()) {
     self.signature = signature
     self.body = body

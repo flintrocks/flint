@@ -81,7 +81,7 @@ struct Compiler {
     SolcCompiler(inputSource: irCode, outputDirectory: outputDirectory, emitBytecode: emitBytecode).compile()
 
     diagnostics.display()
-    
+
     print("Produced binary in \(outputDirectory.path.bold).")
     return CompilationOutcome(irCode: irCode, astDump: ASTDumper(topLevelModule: ast).dump())
   }

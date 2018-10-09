@@ -20,7 +20,7 @@ public struct TopLevelModule: ASTNode {
       }
       return nil
     }
-    let synthesizedBehaviours: [TopLevelDeclaration] = contracts.map{ .contractBehaviorDeclaration(accessorsAndMutators(contract: $0)) }
+    let synthesizedBehaviours: [TopLevelDeclaration] = contracts.map { .contractBehaviorDeclaration(accessorsAndMutators(contract: $0)) }
     self.declarations.append(contentsOf: synthesizedBehaviours)
   }
 
@@ -93,7 +93,7 @@ public struct TopLevelModule: ASTNode {
 
   func getProperty(identifier: Identifier, variableType: Type, sourceLocation: SourceLocation) -> ([Parameter], Expression, Type)? {
     switch variableType.rawType {
-      case .basicType(_):
+      case .basicType:
         return ([], .identifier(identifier), variableType)
       case .arrayType(let type), .fixedSizeArrayType(let type, _):
         var identifiers = [Identifier]()
@@ -110,7 +110,7 @@ public struct TopLevelModule: ASTNode {
             currentType = type
             continue
           }
-          if case .fixedSizeArrayType(let type,_) = currentType {
+          if case .fixedSizeArrayType(let type, _) = currentType {
             currentType = type
             continue
           }
@@ -128,7 +128,7 @@ public struct TopLevelModule: ASTNode {
         let keyParameter = Parameter(identifier: keyIdentifier, type: Type(inferredType: key, identifier: identifier), implicitToken: nil)
         let subExpression = SubscriptExpression(baseExpression: .identifier(identifier), indexExpression: .identifier(keyIdentifier), closeSquareBracketToken: Token(kind: .punctuation(.closeSquareBracket), sourceLocation: sourceLocation))
         return ([keyParameter], .subscriptExpression(subExpression), Type(inferredType: value, identifier: identifier))
-      case .stdlibType(_), .rangeType(_), .userDefinedType(_), .inoutType(_), .functionType(_), .any, .errorType:
+      case .stdlibType, .rangeType, .userDefinedType, .inoutType, .functionType, .any, .errorType:
         return nil
     }
   }

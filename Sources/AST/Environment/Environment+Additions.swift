@@ -11,7 +11,7 @@ extension Environment {
   public mutating func addContract(_ contract: ContractDeclaration) {
     declaredContracts.append(contract.identifier)
     types[contract.identifier.name] = TypeInformation()
-    setProperties(contract.variableDeclarations.map{ .variableDeclaration($0) }, enclosingType: contract.identifier.name)
+    setProperties(contract.variableDeclarations.map { .variableDeclaration($0) }, enclosingType: contract.identifier.name)
 
     for conformance in contract.conformances {
       addConformance(contract.identifier.name, conformsTo: conformance.name)
@@ -36,7 +36,7 @@ extension Environment {
         addFunction(functionDeclaration, enclosingType: contractIdentifier.name, states: behaviour.states, callerProtections: behaviour.callerProtections)
       case .specialDeclaration(let specialDeclaration):
         addSpecial(specialDeclaration, enclosingType: behaviour.contractIdentifier, callerProtections: behaviour.callerProtections)
-      case .functionSignatureDeclaration(_), .specialSignatureDeclaration(_):
+      case .functionSignatureDeclaration, .specialSignatureDeclaration:
         break
       }
     }
@@ -48,7 +48,7 @@ extension Environment {
     if types[structDeclaration.identifier.name] == nil {
       types[structDeclaration.identifier.name] = TypeInformation()
     }
-    setProperties(structDeclaration.variableDeclarations.map{ .variableDeclaration($0) }, enclosingType: structDeclaration.identifier.name)
+    setProperties(structDeclaration.variableDeclarations.map { .variableDeclaration($0) }, enclosingType: structDeclaration.identifier.name)
 
     for conformance in structDeclaration.conformances {
       addConformance(structDeclaration.identifier.name, conformsTo: conformance.name)
@@ -71,7 +71,7 @@ extension Environment {
     if types[enumDeclaration.identifier.name] == nil {
       types[enumDeclaration.identifier.name] = TypeInformation()
     }
-    setProperties(enumDeclaration.cases.map{ .enumCase($0) }, enclosingType: enumDeclaration.identifier.name)
+    setProperties(enumDeclaration.cases.map { .enumCase($0) }, enclosingType: enumDeclaration.identifier.name)
   }
 
   /// Add an event declaration to the environment.
@@ -136,7 +136,6 @@ extension Environment {
       .initializers
       .append(SpecialInformation(declaration: specialDeclaration, callerProtections: callerProtections, isSignature: true))
   }
-
 
   /// Add an initializer declaration to a type (contract or struct). In the case of a contract, a list of caller
   /// protections is expected.

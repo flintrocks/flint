@@ -18,7 +18,7 @@ public indirect enum Statement: ASTNode {
 
   public var isEnding: Bool {
     switch self {
-    case .returnStatement(_), .becomeStatement(_): return true
+    case .returnStatement, .becomeStatement: return true
     default: return false
     }
   }

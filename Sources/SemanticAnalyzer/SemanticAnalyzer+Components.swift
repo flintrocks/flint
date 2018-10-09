@@ -66,7 +66,7 @@ extension SemanticAnalyzer {
             // The variable is a constant but is attempted to be reassigned.
             diagnostics.append(.reassignmentToConstant(identifier, variableDeclaration.sourceLocation))
           }
-        } else if !passContext.environment!.isEnumDeclared(identifier.name){
+        } else if !passContext.environment!.isEnumDeclared(identifier.name) {
           // If the variable is not declared locally and doesn't refer to an enum, assign its enclosing type to the struct or contract behavior
           // declaration in which the function appears.
           identifier.enclosingType = passContext.enclosingTypeIdentifier!.name

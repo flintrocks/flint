@@ -53,7 +53,7 @@ extension Diagnostic {
 
   static func noMatchingFunctionForFunctionCall(_ functionCall: FunctionCall, candidates: [CallableInformation]) -> Diagnostic {
     let candidateNotes = candidates.map { callablecandidate -> Diagnostic in
-      switch callablecandidate{
+      switch callablecandidate {
       case .functionInformation(let candidate):
         let callerProtections = renderGroup(candidate.callerProtections)
         let messageTail: String
@@ -251,7 +251,7 @@ extension Diagnostic {
   }
 
   static func traitsAreIncompatible(in type: String, with functions: [FunctionInformation], at source: SourceLocation) -> Diagnostic {
-    let notes = functions.map{ function in
+    let notes = functions.map { function in
       return Diagnostic(severity: .note, sourceLocation: function.declaration.sourceLocation, message: "Function with the name '\(function.declaration.name)' has been declared here")
     }
     return Diagnostic(severity: .error, sourceLocation: source, message: "\(type) conforms to traits using the same function name", notes: notes)

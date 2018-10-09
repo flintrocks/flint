@@ -38,12 +38,10 @@ public class DiagnosticPool {
     if hasError {
       if shouldVerify, DiagnosticsVerifier(sourceContext).verify(producedDiagnostics: diagnostics) {
         return false
-      }
-      else if !shouldVerify {
+      } else if !shouldVerify {
         display()
         return true
-      }
-      else {
+      } else {
         return true
       }
     }

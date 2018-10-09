@@ -131,17 +131,15 @@ public struct Environment {
         identifier.name != targetVariables[targetIndex].identifier.name {
         if targetVariables[targetIndex].assignedExpression == nil {
           return false
-        }
-        else {
+        } else {
           targetIndex+=1
           continue
         }
       }
-      if targetTypes[targetIndex] == type(of: source[sourceIndex].expression, enclosingType: enclosingType, scopeContext: scopeContext){
+      if targetTypes[targetIndex] == type(of: source[sourceIndex].expression, enclosingType: enclosingType, scopeContext: scopeContext) {
         sourceIndex+=1
         targetIndex+=1
-      }
-      else {
+      } else {
         return false
       }
     }

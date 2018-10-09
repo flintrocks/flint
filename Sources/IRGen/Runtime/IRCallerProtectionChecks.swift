@@ -50,19 +50,16 @@ struct IRCallerProtectionChecks {
           let check = IRRuntimeFunction.isValidCallerProtection(address: "sload(add(\(offset!), \(index)))")
           return "\(variableName) := add(\(variableName), \(check)"
           }.joined(separator: "\n")
-      case .arrayType(_):
+      case .arrayType:
         let check = IRRuntimeFunction.isCallerProtectionInArray(arrayOffset: offset!)
         return "\(variableName) := add(\(variableName), \(check))"
       case .basicType(.address):
         let check = IRRuntimeFunction.isValidCallerProtection(address: "sload(\(offset!)))")
         return "\(variableName) := add(\(variableName), \(check)"
-      case .basicType(_), .stdlibType(_), .rangeType(_), .dictionaryType(_), .userDefinedType(_),
-           .inoutType(_), .functionType(_), .any, .errorType:
+      case .basicType, .stdlibType, .rangeType, .dictionaryType, .userDefinedType,
+           .inoutType, .functionType, .any, .errorType:
         return ""
       }
-
-
-
 
       }
     let revertString = revert ? "if eq(\(variableName), 0) { revert(0, 0) }" : ""

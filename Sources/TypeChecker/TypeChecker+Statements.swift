@@ -52,7 +52,7 @@ extension TypeChecker {
     let varType = environment.type(of: .variableDeclaration(forStatement.variable), enclosingType: typeIdentifier.name, scopeContext: passContext.scopeContext!)
     let iterableType = environment.type(of: forStatement.iterable, enclosingType: typeIdentifier.name, scopeContext: passContext.scopeContext!)
 
-    let valueType: RawType;
+    let valueType: RawType
     switch iterableType {
     case .arrayType(let v): valueType = v
     case .rangeType(let v): valueType = v
@@ -67,7 +67,7 @@ extension TypeChecker {
       diagnostics.append(.incompatibleForIterableType(iterableType: iterableType, statement: .forStatement(forStatement)))
     }
 
-    if !varType.isCompatible(with: valueType), ![varType, valueType].contains(.errorType){
+    if !varType.isCompatible(with: valueType), ![varType, valueType].contains(.errorType) {
       diagnostics.append(.incompatibleForVariableType(varType: varType, valueType: valueType, statement: .forStatement(forStatement)))
     }
 

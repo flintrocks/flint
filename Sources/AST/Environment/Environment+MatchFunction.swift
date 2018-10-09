@@ -80,7 +80,7 @@ extension Environment {
 
         return .matchedFunction(candidate)
       }
-      let matchedCandidates = candidates.filter{ $0.parameterTypes == argumentTypes }
+      let matchedCandidates = candidates.filter { $0.parameterTypes == argumentTypes }
       if matchedCandidates.count > 0 {
        return .matchedFunctionWithoutCaller(matchedCandidates)
       }

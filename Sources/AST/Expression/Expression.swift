@@ -92,7 +92,7 @@ public indirect enum Expression: ASTNode {
     case .attemptExpression(let attemptExpression): return attemptExpression.sourceLocation
     case .range(let rangeExpression): return rangeExpression.sourceLocation
     case .sequence(let expressions): return expressions.first!.sourceLocation
-    case .rawAssembly(_): fatalError()
+    case .rawAssembly: fatalError()
     }
   }
   public var description: String {
@@ -111,7 +111,7 @@ public indirect enum Expression: ASTNode {
       case .attemptExpression(let attemptExpression): return attemptExpression.description
       case .range(let rangeExpression): return rangeExpression.description
       case .sequence(let expressions): return expressions.map({ $0.description }).joined(separator: "\n")
-      case .rawAssembly(_): fatalError()
+      case .rawAssembly: fatalError()
     }
   }
 }

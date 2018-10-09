@@ -105,11 +105,9 @@ struct IRForStatement {
       let intOffset = functionContext.environment.propertyOffset(for: iterable.name, enclosingType: functionContext.enclosingTypeName) {
       // Is contract array
         offset = String(intOffset)
-    }
-    else if isLocal {
+    } else if isLocal {
       offset = "_\(iterable.name)"
-    }
-    else {
+    } else {
       fatalError("Couldn't find offset for iterable")
     }
 
@@ -118,23 +116,23 @@ struct IRForStatement {
 
     let type = functionContext.environment.type(of: iterable.name, enclosingType: functionContext.enclosingTypeName, scopeContext: functionContext.scopeContext)
     switch type {
-    case .arrayType(_):
+    case .arrayType:
       let arrayElementOffset = IRRuntimeFunction.storageArrayOffset(arrayOffset: offset, index: "\(prefix)i")
       loadArrLen = IRRuntimeFunction.load(address: offset, inMemory: false)
       switch forStatement.variable.type.rawType {
-        case .arrayType(_), .fixedSizeArrayType(_):
+        case .arrayType, .fixedSizeArrayType:
           toAssign = String(arrayElementOffset)
         default:
           toAssign = IRRuntimeFunction.load(address: arrayElementOffset, inMemory: false)
       }
 
-    case .fixedSizeArrayType(_):
+    case .fixedSizeArrayType:
       let typeSize = functionContext.environment.size(of: type)
       loadArrLen = String(typeSize)
       let arrayElementOffset = IRRuntimeFunction.storageFixedSizeArrayOffset(arrayOffset: offset, index: "\(prefix)i", arraySize: typeSize)
       toAssign = IRRuntimeFunction.load(address: arrayElementOffset, inMemory: false)
 
-    case .dictionaryType(_):
+    case .dictionaryType:
       loadArrLen = IRRuntimeFunction.load(address: offset, inMemory: false)
       let keysArrayOffset = IRRuntimeFunction.storageDictionaryKeysArrayOffset(dictionaryOffset: offset)
       let keyOffset = IRRuntimeFunction.storageOffsetForKey(baseOffset: keysArrayOffset, key: "add(\(prefix)i, 1)")
