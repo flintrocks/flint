@@ -19,11 +19,12 @@ public struct DiagnosticsFormatter {
     self.sourceContext = sourceContext
   }
 
-  public func rendered() -> String {
-    return diagnostics.map({ renderDiagnostic($0) }).joined(separator: "\n")
+  public func rendered() throws -> String {
+    return try diagnostics.map({ try renderDiagnostic($0) }).joined(separator: "\n")
   }
 
-  func renderDiagnostic(_ diagnostic: Diagnostic, highlightColor: Color = .lightRed, style: Style = .bold) -> String {
+  func renderDiagnostic(_ diagnostic: Diagnostic,
+                        highlightColor: Color = .lightRed, style: Style = .bold) throws -> String {
     let diagnosticFile = diagnostic.sourceLocation?.file
     var sourceFileText = ""
     if let file = diagnosticFile {
@@ -42,7 +43,7 @@ public struct DiagnosticsFormatter {
     let body: String
 
     if let sourceContext = sourceContext, let file = diagnosticFile {
-      let sourceCode = sourceContext.sourceCode(in: file)
+      let sourceCode = try sourceContext.sourceCode(in: file)
       let sourcePreview = renderSourcePreview(at: diagnostic.sourceLocation,
                                               sourceCode: sourceCode, highlightColor: highlightColor, style: style)
       body = """
@@ -53,8 +54,8 @@ public struct DiagnosticsFormatter {
       body = "  \(diagnostic.message.indented(by: 2).bold)"
     }
 
-    let notes = diagnostic.notes.map {
-        renderDiagnostic($0, highlightColor: .white, style: .default)
+    let notes = try diagnostic.notes.map {
+        try renderDiagnostic($0, highlightColor: .white, style: .default)
     }.joined(separator: "\n")
 
     return """

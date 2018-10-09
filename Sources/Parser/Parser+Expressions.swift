@@ -120,7 +120,7 @@ extension Parser {
       throw raise(.expectedCloseParen(at: latestSource))
     }
     let expression = try parseExpression(upTo: closeBracketIndex)
-    let closeBracketToken = try! consume(.punctuation(.closeBracket), or: .dummy())
+    let closeBracketToken = try consume(.punctuation(.closeBracket), or: .dummy())
 
     return BracketedExpression(expression: expression,
                                openBracketToken: openBracketToken,

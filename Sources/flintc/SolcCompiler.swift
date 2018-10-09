@@ -13,10 +13,10 @@ struct SolcCompiler {
   var outputDirectory: URL
   var emitBytecode: Bool
 
-  func compile() {
+  func compile() throws {
     let temporaryFile = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
       .appendingPathComponent(UUID().uuidString)
-    try! inputSource.write(to: temporaryFile, atomically: true, encoding: .utf8)
+    try inputSource.write(to: temporaryFile, atomically: true, encoding: .utf8)
 
     let process = Process()
 

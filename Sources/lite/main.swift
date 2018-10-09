@@ -14,6 +14,8 @@ import Symbolic
   import Glibc
 #endif
 
+// swiftlint:disable force_try
+
 /// Finds the named executable relative to the location of the `lite`
 /// executable.
 // Thank you Harlan and Robert! (https://github.com/silt-lang/silt/blob/master/Sources/lite/SiltInvocation.swift)
@@ -75,3 +77,5 @@ func run() -> Int32 {
 }
 
 exit(run())
+
+// swiftlint:enable force_try
