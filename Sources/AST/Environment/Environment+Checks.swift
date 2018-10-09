@@ -58,7 +58,8 @@ extension Environment {
   }
 
   /// Whether a struct is self referencing.
-  public func selfReferentialProperty(in type: RawTypeIdentifier, enclosingType: RawTypeIdentifier) -> PropertyInformation? {
+  public func selfReferentialProperty(in type: RawTypeIdentifier,
+                                      enclosingType: RawTypeIdentifier) -> PropertyInformation? {
     guard let enclosingMemberTypes = types[enclosingType] else { return nil }
 
     for member in enclosingMemberTypes.orderedProperties {
@@ -119,15 +120,19 @@ extension Environment {
   }
 
   /// Attempts to find a conflicting declaration of the given function declaration
-  public func conflictingFunctionDeclaration(for function: FunctionDeclaration, in type: RawTypeIdentifier) -> Identifier? {
+  public func conflictingFunctionDeclaration(for function: FunctionDeclaration,
+                                             in type: RawTypeIdentifier) -> Identifier? {
     var contractFunctions = [Identifier]()
 
     if isContractDeclared(type) {
       // Contract functions do not support overloading.
-      contractFunctions = types[type]!.allFunctions[function.name]?.filter({ !$0.isSignature }).map { $0.declaration.identifier } ?? []
+      contractFunctions = types[type]!.allFunctions[function.name]?
+        .filter({ !$0.isSignature })
+        .map { $0.declaration.identifier } ?? []
     }
 
-    if let conflict = conflictingDeclaration(of: function.identifier, in: contractFunctions + declaredStructs + declaredContracts) {
+    if let conflict = conflictingDeclaration(of: function.identifier,
+                                             in: contractFunctions + declaredStructs + declaredContracts) {
       return conflict
     }
 
@@ -157,7 +162,9 @@ extension Environment {
       return [:]
     }
     return typeInfo.traitFunctions.filter { (_, functions) in
-      functions.count > 1 && functions.contains(where: { $0.declaration.signature != functions.first!.declaration.signature})
+      functions.count > 1 && functions.contains(where: {
+        $0.declaration.signature != functions.first!.declaration.signature
+      })
     }
   }
 

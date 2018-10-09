@@ -18,7 +18,10 @@ public struct FunctionDeclaration: ASTNode {
   // Contextual information for the scope defined by the function.
   public var scopeContext: ScopeContext?
 
-  public init(signature: FunctionSignatureDeclaration, body: [Statement], closeBraceToken: Token, scopeContext: ScopeContext? = nil) {
+  public init(signature: FunctionSignatureDeclaration,
+              body: [Statement],
+              closeBraceToken: Token,
+              scopeContext: ScopeContext? = nil) {
     self.signature = signature
     self.body = body
     self.closeBraceToken = closeBraceToken

@@ -66,7 +66,8 @@ struct Compiler {
     ]
 
     // Run all of the passes.
-    let passRunnerOutcome = ASTPassRunner(ast: ast).run(passes: astPasses, in: environment, sourceContext: sourceContext)
+    let passRunnerOutcome = ASTPassRunner(ast: ast)
+      .run(passes: astPasses, in: environment, sourceContext: sourceContext)
     if let failed = diagnostics.checkpoint(passRunnerOutcome.diagnostics) {
       if failed {
         exitWithFailure()
@@ -75,7 +76,8 @@ struct Compiler {
     }
 
     // Generate YUL IR code.
-    let irCode = IRCodeGenerator(topLevelModule: passRunnerOutcome.element, environment: passRunnerOutcome.environment).generateCode()
+    let irCode = IRCodeGenerator(topLevelModule: passRunnerOutcome.element, environment: passRunnerOutcome.environment)
+      .generateCode()
 
     // Compile the YUL IR code using solc.
     SolcCompiler(inputSource: irCode, outputDirectory: outputDirectory, emitBytecode: emitBytecode).compile()

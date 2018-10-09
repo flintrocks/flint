@@ -22,9 +22,12 @@ struct IRSubscriptExpression {
   }
 
   func nestedStorageOffset(subExpr: SubscriptExpression, baseOffset: Int, functionContext: FunctionContext) -> String {
-    let indexExpressionCode = IRExpression(expression: subExpr.indexExpression).rendered(functionContext: functionContext)
+    let indexExpressionCode = IRExpression(expression: subExpr.indexExpression)
+      .rendered(functionContext: functionContext)
 
-    let type = functionContext.environment.type(of: subExpr.baseExpression, enclosingType: functionContext.enclosingTypeName, scopeContext: functionContext.scopeContext)
+    let type = functionContext.environment.type(of: subExpr.baseExpression,
+                                                enclosingType: functionContext.enclosingTypeName,
+                                                scopeContext: functionContext.scopeContext)
     let runtimeFunc: (String, String) -> String
 
     switch type {
@@ -42,7 +45,10 @@ struct IRSubscriptExpression {
     case .identifier:
       return runtimeFunc(String(baseOffset), indexExpressionCode)
     case .subscriptExpression(let newBase):
-      return runtimeFunc(nestedStorageOffset(subExpr: newBase, baseOffset: baseOffset, functionContext: functionContext), indexExpressionCode)
+      return runtimeFunc(nestedStorageOffset(subExpr: newBase,
+                                             baseOffset: baseOffset,
+                                             functionContext: functionContext),
+                         indexExpressionCode)
     default:
       fatalError("Subscript expression has an invalid type")
     }
@@ -51,11 +57,14 @@ struct IRSubscriptExpression {
   func rendered(functionContext: FunctionContext) -> String {
     guard let identifier = baseIdentifier(.subscriptExpression(subscriptExpression)),
       let enclosingType = identifier.enclosingType,
-      let baseOffset = functionContext.environment.propertyOffset(for: identifier.name, enclosingType: enclosingType) else {
+      let baseOffset = functionContext.environment.propertyOffset(for: identifier.name,
+                                                                  enclosingType: enclosingType) else {
         fatalError("Arrays and dictionaries cannot be defined as local variables yet.")
     }
 
-    let memLocation: String = nestedStorageOffset(subExpr: subscriptExpression, baseOffset: baseOffset, functionContext: functionContext)
+    let memLocation: String = nestedStorageOffset(subExpr: subscriptExpression,
+                                                  baseOffset: baseOffset,
+                                                  functionContext: functionContext)
 
     if asLValue {
       return memLocation

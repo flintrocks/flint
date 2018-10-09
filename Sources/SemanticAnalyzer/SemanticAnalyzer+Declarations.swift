@@ -11,7 +11,8 @@ import Diagnostic
 extension SemanticAnalyzer {
 
   // MARK: Contract
-  public func process(contractDeclaration: ContractDeclaration, passContext: ASTPassContext) -> ASTPassResult<ContractDeclaration> {
+  public func process(contractDeclaration: ContractDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<ContractDeclaration> {
     var diagnostics = [Diagnostic]()
     let environment = passContext.environment!
     if let conflict = environment.conflictingTypeDeclaration(for: contractDeclaration.identifier) {
@@ -35,7 +36,8 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Struct
-  public func process(structDeclaration: StructDeclaration, passContext: ASTPassContext) -> ASTPassResult<StructDeclaration> {
+  public func process(structDeclaration: StructDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<StructDeclaration> {
     var diagnostics = [Diagnostic]()
     let environment = passContext.environment!
     let structName = structDeclaration.identifier.name
@@ -62,7 +64,8 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: structDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
-  public func postProcess(structDeclaration: StructDeclaration, passContext: ASTPassContext) -> ASTPassResult<StructDeclaration> {
+  public func postProcess(structDeclaration: StructDeclaration,
+                          passContext: ASTPassContext) -> ASTPassResult<StructDeclaration> {
     var diagnostics = [Diagnostic]()
     // Check that all trait functions are defined
     let functions = passContext.environment!.undefinedFunctions(in: structDeclaration.identifier)
@@ -85,15 +88,18 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Contract Behaviour
-  public func process(contractBehaviorDeclaration: ContractBehaviorDeclaration, passContext: ASTPassContext) -> ASTPassResult<ContractBehaviorDeclaration> {
+  public func process(contractBehaviorDeclaration: ContractBehaviorDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<ContractBehaviorDeclaration> {
     var diagnostics = [Diagnostic]()
 
     let environment = passContext.environment!
 
-    if !environment.isContractDeclared(contractBehaviorDeclaration.contractIdentifier.name), contractBehaviorDeclaration.contractIdentifier.name != "self" {
+    if !environment.isContractDeclared(contractBehaviorDeclaration.contractIdentifier.name),
+      contractBehaviorDeclaration.contractIdentifier.name != "self" {
       // The contract behavior declaration could not be associated with any contract declaration.
       diagnostics.append(.contractBehaviorDeclarationNoMatchingContract(contractBehaviorDeclaration))
-    } else if environment.isStateful(contractBehaviorDeclaration.contractIdentifier.name) != (contractBehaviorDeclaration.states != []) {
+    } else if environment.isStateful(contractBehaviorDeclaration.contractIdentifier.name) !=
+      (contractBehaviorDeclaration.states != []) {
       // The statefullness of the contract declaration and contract behavior declaration do not match.
       diagnostics.append(.contractBehaviorDeclarationMismatchedStatefulness(contractBehaviorDeclaration))
     }
@@ -114,7 +120,10 @@ extension SemanticAnalyzer {
 
     // Create a context containing the contract the methods are defined for, and the caller protections the functions
     // within it are scoped by.
-    let declarationContext = ContractBehaviorDeclarationContext(contractIdentifier: contractBehaviorDeclaration.contractIdentifier, typeStates: contractBehaviorDeclaration.states, callerProtections: contractBehaviorDeclaration.callerProtections)
+    let declarationContext =
+      ContractBehaviorDeclarationContext(contractIdentifier: contractBehaviorDeclaration.contractIdentifier,
+                                         typeStates: contractBehaviorDeclaration.states,
+                                         callerProtections: contractBehaviorDeclaration.callerProtections)
 
     let passContext = passContext.withUpdates { $0.contractBehaviorDeclarationContext = declarationContext }
 
@@ -122,18 +131,21 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Events
-  public func process(eventDeclaration: EventDeclaration, passContext: ASTPassContext) -> ASTPassResult<EventDeclaration> {
+  public func process(eventDeclaration: EventDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<EventDeclaration> {
     var diagnostics = [Diagnostic]()
     let enclosingType = passContext.enclosingTypeIdentifier!.name
 
-    if let conflict = passContext.environment!.conflictingEventDeclaration(for: eventDeclaration.identifier, in: enclosingType) {
+    if let conflict = passContext.environment!.conflictingEventDeclaration(for: eventDeclaration.identifier,
+                                                                           in: enclosingType) {
       diagnostics.append(.invalidRedeclaration(eventDeclaration.identifier, originalSource: conflict))
     }
     return ASTPassResult(element: eventDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
   // MARK: Traits
-  public func process(traitDeclaration: TraitDeclaration, passContext: ASTPassContext) -> ASTPassResult<TraitDeclaration> {
+  public func process(traitDeclaration: TraitDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<TraitDeclaration> {
     var diagnostics = [Diagnostic]()
     let environment = passContext.environment!
 
@@ -173,7 +185,8 @@ extension SemanticAnalyzer {
     var diagnostics = [Diagnostic]()
     let environment = passContext.environment!
 
-    if let conflict = environment.conflictingPropertyDeclaration(for: enumCase.identifier, in: enumCase.type.rawType.name) {
+    if let conflict = environment.conflictingPropertyDeclaration(for: enumCase.identifier,
+                                                                 in: enumCase.type.rawType.name) {
       diagnostics.append(.invalidRedeclaration(enumCase.identifier, originalSource: conflict))
     }
 
@@ -201,7 +214,8 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Variable
-  public func process(variableDeclaration: VariableDeclaration, passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
+  public func process(variableDeclaration: VariableDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
     var passContext = passContext
     var diagnostics = [Diagnostic]()
     let environment = passContext.environment!
@@ -225,7 +239,8 @@ extension SemanticAnalyzer {
      }
 
     // Ensure that the type is declared.
-    if case .userDefinedType(let typeIdentifier) = variableDeclaration.type.rawType, !environment.isTypeDeclared(typeIdentifier) {
+    if case .userDefinedType(let typeIdentifier) = variableDeclaration.type.rawType,
+      !environment.isTypeDeclared(typeIdentifier) {
       diagnostics.append(.useOfUndeclaredType(variableDeclaration.type))
     }
 
@@ -239,7 +254,8 @@ extension SemanticAnalyzer {
       passContext.scopeContext?.localVariables += [variableDeclaration]
     } else if let enclosingType = passContext.enclosingTypeIdentifier?.name {
       // It's a property declaration.
-      if let conflict = environment.conflictingPropertyDeclaration(for: variableDeclaration.identifier, in: enclosingType) {
+      if let conflict = environment.conflictingPropertyDeclaration(for: variableDeclaration.identifier,
+                                                                   in: enclosingType) {
         diagnostics.append(.invalidRedeclaration(variableDeclaration.identifier, originalSource: conflict))
       }
 
@@ -247,7 +263,8 @@ extension SemanticAnalyzer {
       let isInitializerDeclared: Bool
 
       if let contractStateDeclarationContext = passContext.contractStateDeclarationContext {
-        isInitializerDeclared = environment.publicInitializer(forContract: contractStateDeclarationContext.contractIdentifier.name) != nil
+        isInitializerDeclared =
+          environment.publicInitializer(forContract: contractStateDeclarationContext.contractIdentifier.name) != nil
       } else if let structName = passContext.structDeclarationContext?.structIdentifier.name {
         isInitializerDeclared = environment.initializers(in: structName).count > 0
       } else {
@@ -258,7 +275,8 @@ extension SemanticAnalyzer {
 
       // If a default value is assigned, it should not refer to another property.
 
-      if variableDeclaration.assignedExpression == nil, !isInitializerDeclared, passContext.eventDeclarationContext == nil {
+      if variableDeclaration.assignedExpression == nil, !isInitializerDeclared,
+        passContext.eventDeclarationContext == nil {
         // The contract has no public initializer, so a default value must be provided.
 
         diagnostics.append(.statePropertyIsNotAssignedAValue(variableDeclaration))
@@ -275,11 +293,13 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Function
-  public func process(functionDeclaration: FunctionDeclaration, passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
+  public func process(functionDeclaration: FunctionDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     var diagnostics = [Diagnostic]()
 
     let enclosingType = passContext.enclosingTypeIdentifier!.name
-    if let conflict = passContext.environment!.conflictingFunctionDeclaration(for: functionDeclaration, in: enclosingType) {
+    if let conflict = passContext.environment!.conflictingFunctionDeclaration(for: functionDeclaration,
+                                                                              in: enclosingType) {
       diagnostics.append(.invalidRedeclaration(functionDeclaration.identifier, originalSource: conflict))
     }
 
@@ -287,7 +307,8 @@ extension SemanticAnalyzer {
     let implicitParameters = signature.parameters.filter { $0.isImplicit }
     let payableValueParameters = signature.parameters.filter { $0.isPayableValueParameter }
     if functionDeclaration.isPayable {
-      // If a function is marked with the @payable annotation, ensure it contains one compatible payable parameter, and no other implicit parameters.
+      // If a function is marked with the @payable annotation, ensure it contains one compatible payable parameter,
+      // and no other implicit parameters.
       if payableValueParameters.count > 1 {
         // If too many arguments are compatible, emit an error.
         diagnostics.append(.ambiguousPayableValueParameter(functionDeclaration))
@@ -308,7 +329,8 @@ extension SemanticAnalyzer {
     if functionDeclaration.isPublic {
       let dynamicParameters = signature.parameters.filter { $0.type.rawType.isDynamicType && !$0.isImplicit }
       if !dynamicParameters.isEmpty {
-        diagnostics.append(.useOfDynamicParamaterInFunctionDeclaration(functionDeclaration, dynamicParameters: dynamicParameters))
+        diagnostics.append(.useOfDynamicParamaterInFunctionDeclaration(functionDeclaration,
+                                                                       dynamicParameters: dynamicParameters))
       }
     }
 
@@ -339,7 +361,8 @@ extension SemanticAnalyzer {
     if returns.isEmpty,
       let resultType = functionDeclaration.signature.resultType {
       // Emit an error if a non-void function doesn't have a return statement.
-      diagnostics.append(.missingReturnInNonVoidFunction(closeBraceToken: functionDeclaration.closeBraceToken, resultType: resultType))
+      diagnostics.append(.missingReturnInNonVoidFunction(closeBraceToken: functionDeclaration.closeBraceToken,
+                                                         resultType: resultType))
     }
 
     // Check becomes are after returns
@@ -367,7 +390,8 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: functionDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
-  public func postProcess(functionDeclaration: FunctionDeclaration, passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
+  public func postProcess(functionDeclaration: FunctionDeclaration,
+                          passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     // Called after all the statements in a function have been visited.
 
     let mutatingExpressions = passContext.mutatingExpressions ?? []
@@ -375,7 +399,8 @@ extension SemanticAnalyzer {
     let environment = passContext.environment!
     var diagnostics = [Diagnostic]()
 
-    if functionDeclaration.isMutating, mutatingExpressions.isEmpty, !environment.isConforming(functionDeclaration, in: enclosingType) {
+    if functionDeclaration.isMutating, mutatingExpressions.isEmpty,
+      !environment.isConforming(functionDeclaration, in: enclosingType) {
       // The function is declared mutating but its body does not contain any mutating expression.
       diagnostics.append(.functionCanBeDeclaredNonMutating(functionDeclaration.mutatingToken))
     }
@@ -389,7 +414,8 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Special
-  public func process(specialDeclaration: SpecialDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration> {
+  public func process(specialDeclaration: SpecialDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration> {
     let enclosingType = passContext.enclosingTypeIdentifier!.name
     let environment = passContext.environment!
     var diagnostics = [Diagnostic]()
@@ -398,7 +424,9 @@ extension SemanticAnalyzer {
       if !specialDeclaration.signature.parameters.isEmpty {
         diagnostics.append(.fallbackDeclaredWithArguments(specialDeclaration))
       }
-      let complexStatements = specialDeclaration.body.filter({isComplexStatement($0, env: environment, enclosingType: enclosingType)})
+      let complexStatements = specialDeclaration.body.filter({
+        isComplexStatement($0, env: environment, enclosingType: enclosingType)
+      })
       if !complexStatements.isEmpty || specialDeclaration.body.count > 2 {
         diagnostics.append(.fallbackShouldBeSimple(specialDeclaration, complexStatements: complexStatements))
       }
@@ -416,7 +444,9 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: specialDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
-  private func isComplexStatement(_ statement: Statement, env environment: Environment, enclosingType: RawTypeIdentifier) -> Bool {
+  private func isComplexStatement(_ statement: Statement,
+                                  env environment: Environment,
+                                  enclosingType: RawTypeIdentifier) -> Bool {
     switch statement {
     case .expression(let expression):
       switch expression {
@@ -425,12 +455,18 @@ extension SemanticAnalyzer {
           return true
         }
       case .functionCall(let function):
-        let match = environment.matchFunctionCall(function, enclosingType: enclosingType, typeStates: [], callerProtections: [], scopeContext: ScopeContext())
+        let match = environment.matchFunctionCall(function,
+                                                  enclosingType: enclosingType,
+                                                  typeStates: [],
+                                                  callerProtections: [],
+                                                  scopeContext: ScopeContext())
         if case .matchedFunction(let functionInformation) = match,
           !functionInformation.isMutating {
           return false
         }
-        if case .matchedEvent(_) = environment.matchEventCall(function, enclosingType: enclosingType, scopeContext: ScopeContext()) {
+        if case .matchedEvent(_) = environment.matchEventCall(function,
+                                                              enclosingType: enclosingType,
+                                                              scopeContext: ScopeContext()) {
           return false
         }
         return true
@@ -453,12 +489,15 @@ extension SemanticAnalyzer {
     return true
   }
 
-  public func postProcess(specialDeclaration: SpecialDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration> {
+  public func postProcess(specialDeclaration: SpecialDeclaration,
+                          passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration> {
     var diagnostics = [Diagnostic]()
     var passContext = passContext
 
     // If we are in a contract behavior declaration, of a contract, check there is only one public initializer.
-    if let context = passContext.contractBehaviorDeclarationContext, passContext.traitDeclarationContext == nil, specialDeclaration.isPublic {
+    if let context = passContext.contractBehaviorDeclarationContext,
+      passContext.traitDeclarationContext == nil,
+      specialDeclaration.isPublic {
       let contractName = context.contractIdentifier.name
 
       // The caller protection block in which this initializer appears should be scoped by "any".
@@ -472,12 +511,15 @@ extension SemanticAnalyzer {
         if let publicFallback = passContext.environment!.publicFallback(forContract: contractName),
           publicFallback.sourceLocation != specialDeclaration.sourceLocation,
           specialDeclaration.isFallback {
-          diagnostics.append(.multiplePublicFallbacksDefined(specialDeclaration, originalFallbackLocation: publicFallback.sourceLocation))
+          diagnostics.append(.multiplePublicFallbacksDefined(specialDeclaration,
+                                                             originalFallbackLocation: publicFallback.sourceLocation))
         } else if let publicInitializer = passContext.environment!.publicInitializer(forContract: contractName),
           publicInitializer.sourceLocation != specialDeclaration.sourceLocation,
           specialDeclaration.isInit {
           // There can be at most one public initializer.
-          diagnostics.append(.multiplePublicInitializersDefined(specialDeclaration, originalInitializerLocation: publicInitializer.sourceLocation))
+          diagnostics.append(
+            .multiplePublicInitializersDefined(specialDeclaration,
+                                               originalInitializerLocation: publicInitializer.sourceLocation))
         } else {
           // This is the first public initializer we encounter in this contract.
           if specialDeclaration.isInit {
@@ -504,7 +546,9 @@ extension SemanticAnalyzer {
     if specialDeclaration.isInit, let unassignedProperties = passContext.unassignedProperties {
 
       if unassignedProperties.count > 0 {
-        diagnostics.append(.returnFromInitializerWithoutInitializingAllProperties(specialDeclaration, unassignedProperties: unassignedProperties))
+        diagnostics.append(
+          .returnFromInitializerWithoutInitializingAllProperties(specialDeclaration,
+                                                                 unassignedProperties: unassignedProperties))
       }
     }
 

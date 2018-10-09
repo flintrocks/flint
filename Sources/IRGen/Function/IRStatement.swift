@@ -85,7 +85,8 @@ struct IRForStatement {
 
     switch forStatement.iterable {
     case .identifier(let arrayIdentifier):
-      setup = generateArraySetupCode(prefix: "flint$\(forStatement.variable.identifier.name)$", iterable: arrayIdentifier, functionContext: functionContext)
+      setup = generateArraySetupCode(prefix: "flint$\(forStatement.variable.identifier.name)$",
+        iterable: arrayIdentifier, functionContext: functionContext)
     case .range(let rangeExpression):
       setup = generateRangeSetupCode(iterable: rangeExpression, functionContext: functionContext)
     default:
@@ -108,7 +109,8 @@ struct IRForStatement {
     let isLocal = functionContext.scopeContext.containsVariableDeclaration(for: iterable.name)
     let offset: String
     if !isLocal,
-      let intOffset = functionContext.environment.propertyOffset(for: iterable.name, enclosingType: functionContext.enclosingTypeName) {
+      let intOffset = functionContext.environment.propertyOffset(for: iterable.name,
+                                                                 enclosingType: functionContext.enclosingTypeName) {
       // Is contract array
         offset = String(intOffset)
     } else if isLocal {
@@ -120,7 +122,9 @@ struct IRForStatement {
     let loadArrLen: String
     let toAssign: String
 
-    let type = functionContext.environment.type(of: iterable.name, enclosingType: functionContext.enclosingTypeName, scopeContext: functionContext.scopeContext)
+    let type = functionContext.environment.type(of: iterable.name,
+                                                enclosingType: functionContext.enclosingTypeName,
+                                                scopeContext: functionContext.scopeContext)
     switch type {
     case .arrayType:
       let arrayElementOffset = IRRuntimeFunction.storageArrayOffset(arrayOffset: offset, index: "\(prefix)i")
@@ -135,7 +139,8 @@ struct IRForStatement {
     case .fixedSizeArrayType:
       let typeSize = functionContext.environment.size(of: type)
       loadArrLen = String(typeSize)
-      let arrayElementOffset = IRRuntimeFunction.storageFixedSizeArrayOffset(arrayOffset: offset, index: "\(prefix)i", arraySize: typeSize)
+      let arrayElementOffset =
+        IRRuntimeFunction.storageFixedSizeArrayOffset(arrayOffset: offset, index: "\(prefix)i", arraySize: typeSize)
       toAssign = IRRuntimeFunction.load(address: arrayElementOffset, inMemory: false)
 
     case .dictionaryType:
@@ -150,7 +155,9 @@ struct IRForStatement {
       fatalError()
     }
 
-    let variableUse = IRAssignment(lhs: .identifier(forStatement.variable.identifier), rhs: .rawAssembly(toAssign, resultType: nil)).rendered(functionContext: functionContext, asTypeProperty: false)
+    let variableUse = IRAssignment(lhs: .identifier(forStatement.variable.identifier),
+                                   rhs: .rawAssembly(toAssign, resultType: nil))
+      .rendered(functionContext: functionContext, asTypeProperty: false)
 
     return """
     {
@@ -184,18 +191,25 @@ struct IRForStatement {
     let changeToken: Token.Kind = ascending ? .punctuation(.plus) : .punctuation(.minus)
 
     // Create IR statements for loop sub-statements
-    let initialisation = IRAssignment(lhs: .identifier(forStatement.variable.identifier), rhs: iterable.initial).rendered(functionContext: functionContext, asTypeProperty: false)
+    let initialisation = IRAssignment(lhs: .identifier(forStatement.variable.identifier), rhs: iterable.initial)
+      .rendered(functionContext: functionContext, asTypeProperty: false)
     var condition = BinaryExpression(lhs: .identifier(forStatement.variable.identifier),
                                      op: Token(kind: comparisonToken, sourceLocation: forStatement.sourceLocation),
-                                     rhs: .identifier(Identifier(identifierToken: Token(kind: .identifier("bound"), sourceLocation: forStatement.sourceLocation))))
-    let change: Expression = .binaryExpression(BinaryExpression(lhs: .identifier(forStatement.variable.identifier),
-                                                                op: Token(kind: changeToken, sourceLocation: forStatement.sourceLocation),
-                                                                rhs: .literal(Token(kind: .literal(.decimal(.integer(1))), sourceLocation: forStatement.sourceLocation))))
-    let update = IRAssignment(lhs: .identifier(forStatement.variable.identifier), rhs: change).rendered(functionContext: functionContext, asTypeProperty: false)
+                                     rhs: .identifier(
+                                      Identifier(identifierToken: Token(kind: .identifier("bound"),
+                                                                        sourceLocation: forStatement.sourceLocation))))
+    let change: Expression = .binaryExpression(
+      BinaryExpression(lhs: .identifier(forStatement.variable.identifier),
+                       op: Token(kind: changeToken, sourceLocation: forStatement.sourceLocation),
+                       rhs: .literal(Token(kind: .literal(.decimal(.integer(1))),
+                                           sourceLocation: forStatement.sourceLocation))))
+    let update = IRAssignment(lhs: .identifier(forStatement.variable.identifier), rhs: change)
+      .rendered(functionContext: functionContext, asTypeProperty: false)
 
     // Change <= into (< || ==)
     if [.lessThanOrEqual, .greaterThanOrEqual].contains(condition.opToken) {
-      let strictOperator: Token.Kind.Punctuation = condition.opToken == .lessThanOrEqual ? .openAngledBracket : .closeAngledBracket
+      let strictOperator: Token.Kind.Punctuation =
+        condition.opToken == .lessThanOrEqual ? .openAngledBracket : .closeAngledBracket
 
       var lhsExpression = condition
       lhsExpression.op = Token(kind: .punctuation(strictOperator), sourceLocation: lhsExpression.op.sourceLocation)
@@ -210,11 +224,15 @@ struct IRForStatement {
       condition.op = Token(kind: .punctuation(.or), sourceLocation: sourceLocation)
     }
 
+    let rangeExpression = IRExpression(expression: iterable.bound).rendered(functionContext: functionContext)
+    let binaryExpression = IRExpression(expression: .binaryExpression(condition))
+      .rendered(functionContext: functionContext)
+
     return """
     {
     let \(initialisation)
-    let _bound := \(IRExpression(expression: iterable.bound).rendered(functionContext: functionContext))
-    } \(IRExpression(expression: .binaryExpression(condition)).rendered(functionContext: functionContext)) { \(update) } {
+    let _bound := \(rangeExpression)
+    } \(binaryExpression) { \(update) } {
     """
   }
 }
@@ -239,10 +257,18 @@ struct IRBecomeStatement {
 
   func rendered(functionContext: FunctionContext) -> String {
     let sl = becomeStatement.sourceLocation
-    let stateVariable: Expression = .identifier(Identifier(name: IRContract.stateVariablePrefix + functionContext.enclosingTypeName, sourceLocation: .DUMMY))
-    let selfState: Expression = .binaryExpression(BinaryExpression(lhs: .self(Token(kind: .self, sourceLocation: sl)), op: Token(kind: .punctuation(.dot), sourceLocation: sl), rhs: stateVariable))
+    let stateVariable: Expression = .identifier(
+      Identifier(name: IRContract.stateVariablePrefix + functionContext.enclosingTypeName,
+                 sourceLocation: .DUMMY))
+    let selfState: Expression = .binaryExpression(
+      BinaryExpression(lhs: .self(Token(kind: .self, sourceLocation: sl)),
+                       op: Token(kind: .punctuation(.dot), sourceLocation: sl),
+                       rhs: stateVariable))
 
-    let assignState: Expression = .binaryExpression(BinaryExpression(lhs: selfState, op: Token(kind: .punctuation(.equal), sourceLocation: sl), rhs: becomeStatement.expression))
+    let assignState: Expression = .binaryExpression(
+      BinaryExpression(lhs: selfState,
+                       op: Token(kind: .punctuation(.equal), sourceLocation: sl),
+                       rhs: becomeStatement.expression))
 
     return IRExpression(expression: assignState).rendered(functionContext: functionContext)
   }

@@ -32,7 +32,13 @@ extension Parser {
       throw raise(.unexpectedEOF())
     }
 
-    guard let statementEndIndex = indexOfFirstAtCurrentDepth([.punctuation(.semicolon), .newline, .punctuation(.closeBrace)], maxIndex: tokens.count) else {
+    guard let statementEndIndex = indexOfFirstAtCurrentDepth(
+      [
+        .punctuation(.semicolon),
+        .newline,
+        .punctuation(.closeBrace)
+      ],
+      maxIndex: tokens.count) else {
       throw raise(.statementSameLine(at: latestSource))
     }
     let statement: Statement
@@ -68,7 +74,8 @@ extension Parser {
   func parseCodeBlock() throws -> ([Statement], closeBraceToken: Token) {
     try consume(.punctuation(.openBrace), or: .leftBraceExpected(in: "code block", at: latestSource))
     let statements = try parseStatements()
-    let closeBraceToken = try consume(.punctuation(.closeBrace), or: .rightBraceExpected(in: "code block", at: latestSource))
+    let closeBraceToken = try consume(.punctuation(.closeBrace),
+                                      or: .rightBraceExpected(in: "code block", at: latestSource))
     return (statements, closeBraceToken)
   }
 
@@ -105,7 +112,10 @@ extension Parser {
       elseClauseStatements = try parseElseClause()
     }
 
-    return IfStatement(ifToken: ifToken, condition: condition, statements: statements, elseClauseStatements: elseClauseStatements)
+    return IfStatement(ifToken: ifToken,
+                       condition: condition,
+                       statements: statements,
+                       elseClauseStatements: elseClauseStatements)
   }
 
   func parseElseClause() throws -> [Statement] {

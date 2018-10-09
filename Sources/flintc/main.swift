@@ -23,7 +23,9 @@ func main() {
     }
 
     let outputDirectory = URL(fileURLWithPath: FileManager.default.currentDirectoryPath).appendingPathComponent("bin")
-    try! FileManager.default.createDirectory(atPath: outputDirectory.path, withIntermediateDirectories: true, attributes: nil)
+    try! FileManager.default.createDirectory(atPath: outputDirectory.path,
+                                             withIntermediateDirectories: true,
+                                             attributes: nil)
 
     let compilationOutcome = Compiler(
       inputFiles: inputFiles,
@@ -31,7 +33,9 @@ func main() {
       outputDirectory: outputDirectory,
       dumpAST: dumpAST,
       emitBytecode: emitBytecode,
-      diagnostics: DiagnosticPool(shouldVerify: shouldVerify, quiet: quiet, sourceContext: SourceContext(sourceFiles: inputFiles))
+      diagnostics: DiagnosticPool(shouldVerify: shouldVerify,
+                                  quiet: quiet,
+                                  sourceContext: SourceContext(sourceFiles: inputFiles))
     ).compile()
 
     if emitIR {
@@ -58,7 +62,13 @@ func exitWithSolcNotInstalledDiagnostic() -> Never {
     severity: .error,
     sourceLocation: nil,
     message: "Missing dependency: solc",
-    notes: [Diagnostic(severity: .note, sourceLocation: nil, message: "Refer to http://solidity.readthedocs.io/en/develop/installing-solidity.html for installation instructions.")]
+    notes: [
+      Diagnostic(
+        severity: .note,
+        sourceLocation: nil,
+        message: "Refer to http://solidity.readthedocs.io/en/develop/installing-solidity.html " +
+                 "for installation instructions.")
+    ]
   )
   print(DiagnosticsFormatter(diagnostics: [diagnostic], sourceContext: nil).rendered())
   exit(1)

@@ -36,7 +36,8 @@ public struct Environment {
   }
 
   /// The source location of a property declaration.
-  public func propertyDeclarationSourceLocation(_ identifier: String, enclosingType: RawTypeIdentifier) -> SourceLocation? {
+  public func propertyDeclarationSourceLocation(_ identifier: String,
+                                                enclosingType: RawTypeIdentifier) -> SourceLocation? {
     return property(identifier, enclosingType)!.sourceLocation
   }
 
@@ -113,7 +114,10 @@ public struct Environment {
   }
 
   // MARK: - Compatibility
-  func areArgumentsCompatible(source: [FunctionArgument], target: EventInformation, enclosingType: String, scopeContext: ScopeContext) -> Bool {
+  func areArgumentsCompatible(source: [FunctionArgument],
+                              target: EventInformation,
+                              enclosingType: String,
+                              scopeContext: ScopeContext) -> Bool {
     let targetVariables = target.declaration.variableDeclarations
     let targetTypes = target.eventTypes
 
@@ -136,7 +140,9 @@ public struct Environment {
           continue
         }
       }
-      if targetTypes[targetIndex] == type(of: source[sourceIndex].expression, enclosingType: enclosingType, scopeContext: scopeContext) {
+      if targetTypes[targetIndex] == type(of: source[sourceIndex].expression,
+                                          enclosingType: enclosingType,
+                                          scopeContext: scopeContext) {
         sourceIndex+=1
         targetIndex+=1
       } else {

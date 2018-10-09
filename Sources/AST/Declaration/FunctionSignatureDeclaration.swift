@@ -28,7 +28,13 @@ public struct FunctionSignatureDeclaration: ASTNode, Equatable {
     return resultType?.rawType ?? .basicType(.void)
   }
 
-  public init(funcToken: Token, attributes: [Attribute], modifiers: [Token], identifier: Identifier, parameters: [Parameter], closeBracketToken: Token, resultType: Type?) {
+  public init(funcToken: Token,
+              attributes: [Attribute],
+              modifiers: [Token],
+              identifier: Identifier,
+              parameters: [Parameter],
+              closeBracketToken: Token,
+              resultType: Type?) {
     self.funcToken = funcToken
     self.attributes = attributes
     self.modifiers = modifiers

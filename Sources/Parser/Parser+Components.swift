@@ -103,7 +103,8 @@ extension Parser {
     }
 
     while currentIndex < closingIndex {
-      guard let elementEnd = indexOfFirstAtCurrentDepth([.punctuation(.comma), .punctuation(.closeSquareBracket)]) else {
+      guard let elementEnd = indexOfFirstAtCurrentDepth([.punctuation(.comma),
+                                                         .punctuation(.closeSquareBracket)]) else {
         throw raise(.expectedSeparator(at: latestSource))
       }
       let element = try parseExpression(upTo: elementEnd)
@@ -112,9 +113,12 @@ extension Parser {
         try consume(.punctuation(.comma), or: .expectedSeparator(at: latestSource))
       }
     }
-    let closeSquareBracket = try consume(.punctuation(.closeSquareBracket), or: .expectedCloseSquareArrayLiteral(at: latestSource))
+    let closeSquareBracket = try consume(.punctuation(.closeSquareBracket),
+                                         or: .expectedCloseSquareArrayLiteral(at: latestSource))
 
-    return ArrayLiteral(openSquareBracketToken: openSquareBracket, elements: elements, closeSquareBracketToken: closeSquareBracket)
+    return ArrayLiteral(openSquareBracketToken: openSquareBracket,
+                        elements: elements,
+                        closeSquareBracketToken: closeSquareBracket)
   }
 
   // MARK: Parameters
@@ -141,7 +145,8 @@ extension Parser {
         try consume(.punctuation(.comma), or: .expectedSeparator(at: latestSource))
       }
     }
-    let closeBracketToken = try consume(.punctuation(.closeBracket), or: .expectedParameterCloseParenthesis(at: latestSource))
+    let closeBracketToken = try consume(.punctuation(.closeBracket),
+                                        or: .expectedParameterCloseParenthesis(at: latestSource))
 
     return (parameters, closeBracketToken)
   }
@@ -165,7 +170,8 @@ extension Parser {
   // MARK: Conformances
   func parseConformances() throws -> [Conformance] {
     try consume(.punctuation(.colon), or: .expectedConformance(at: latestSource))
-    guard let endOfConformances = indexOfFirstAtCurrentDepth([.punctuation(.openBracket), .newline, .punctuation(.openBrace)]) else {
+    guard let endOfConformances = indexOfFirstAtCurrentDepth([.punctuation(.openBracket),
+                                                              .newline, .punctuation(.openBrace)]) else {
       throw raise(.expectedConformance(at: latestSource))
     }
     let identifiers = try parseIdentifierList(upTo: endOfConformances)
@@ -184,18 +190,26 @@ extension Parser {
 
   // MARK: Type
   func parseType() throws -> Type {
-    if let openSquareBracketToken = attempt(try consume(.punctuation(.openSquareBracket), or: .expectedType(at: latestSource))) {
+    if let openSquareBracketToken = attempt(try consume(.punctuation(.openSquareBracket),
+                                                        or: .expectedType(at: latestSource))) {
       // The type is an array type or a dictionary type.
       let keyType = try parseType()
       if attempt(try consume(.punctuation(.colon), or: .expectedColonDictionaryLiteral(at: latestSource))) != nil {
         // The type is a dictionary type.
         let valueType = try parseType()
-        let closeSquareBracketToken = try consume(.punctuation(.closeSquareBracket), or: .expectedCloseSquareDictionaryLiteral(at: latestSource))
-        return Type(openSquareBracketToken: openSquareBracketToken, dictionaryWithKeyType: keyType, valueType: valueType, closeSquareBracketToken: closeSquareBracketToken)
+        let closeSquareBracketToken = try consume(.punctuation(.closeSquareBracket),
+                                                  or: .expectedCloseSquareDictionaryLiteral(at: latestSource))
+        return Type(openSquareBracketToken: openSquareBracketToken,
+                    dictionaryWithKeyType: keyType,
+                    valueType: valueType,
+                    closeSquareBracketToken: closeSquareBracketToken)
       }
 
-      let closeSquareBracketToken = try consume(.punctuation(.closeSquareBracket), or: .expectedCloseSquareArrayType(at: latestSource))
-      return Type(openSquareBracketToken: openSquareBracketToken, arrayWithElementType: keyType, closeSquareBracketToken: closeSquareBracketToken)
+      let closeSquareBracketToken = try consume(.punctuation(.closeSquareBracket),
+                                                or: .expectedCloseSquareArrayType(at: latestSource))
+      return Type(openSquareBracketToken: openSquareBracketToken,
+                  arrayWithElementType: keyType,
+                  closeSquareBracketToken: closeSquareBracketToken)
     }
 
     if let inoutToken = attempt(try consume(.inout, or: .dummy())) {
@@ -218,7 +232,8 @@ extension Parser {
         throw raise(.expectedIntegerInFixedArrayType(at: latestSource))
       }
 
-      let closeSquareBracketToken = try consume(.punctuation(.closeSquareBracket), or: .expectedCloseSquareArrayType(at: latestSource))
+      let closeSquareBracketToken = try consume(.punctuation(.closeSquareBracket),
+                                                or: .expectedCloseSquareArrayType(at: latestSource))
       return Type(fixedSizeArrayWithElementType: type, size: size, closeSquareBracketToken: closeSquareBracketToken)
     }
 

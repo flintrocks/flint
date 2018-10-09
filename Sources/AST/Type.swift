@@ -48,7 +48,8 @@ public indirect enum RawType: Equatable {
     case .inoutType(let rawType): return "$inout\(rawType.name)"
     case .any: return "Any"
     case .errorType: return "Flint$ErrorType"
-    case .functionType(let parameters, let result): return "(\(parameters.map { $0.name }.joined(separator: ", ")) -> \(result)"
+    case .functionType(let parameters, let result):
+      return "(\(parameters.map { $0.name }.joined(separator: ", ")) -> \(result)"
     }
   }
 
@@ -156,7 +157,10 @@ public struct Type: ASTNode {
     sourceLocation = .spanning(type, to: closeSquareBracketToken)
   }
 
-  public init(openSquareBracketToken: Token, dictionaryWithKeyType keyType: Type, valueType: Type, closeSquareBracketToken: Token) {
+  public init(openSquareBracketToken: Token,
+              dictionaryWithKeyType keyType: Type,
+              valueType: Type,
+              closeSquareBracketToken: Token) {
     rawType = .dictionaryType(key: keyType.rawType, value: valueType.rawType)
     sourceLocation = .spanning(openSquareBracketToken, to: closeSquareBracketToken)
   }

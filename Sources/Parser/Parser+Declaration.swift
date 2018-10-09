@@ -78,7 +78,11 @@ extension Parser {
     let members = try parseContractMembers(enclosingType: identifier.name)
     try consume(.punctuation(.closeBrace), or: .rightBraceExpected(in: "contract declaration", at: latestSource))
 
-    return ContractDeclaration(contractToken: contractToken, identifier: identifier, conformances: conformances, states: states, members: members)
+    return ContractDeclaration(contractToken: contractToken,
+                               identifier: identifier,
+                               conformances: conformances,
+                               states: states,
+                               members: members)
   }
 
   func parseStructDeclaration() throws -> StructDeclaration {
@@ -92,7 +96,10 @@ extension Parser {
     let members = try parseStructMembers(structIdentifier: identifier)
     try consume(.punctuation(.closeBrace), or: .rightBraceExpected(in: "struct declaration", at: latestSource))
 
-    return StructDeclaration(structToken: structToken, identifier: identifier, conformances: conformances, members: members)
+    return StructDeclaration(structToken: structToken,
+                             identifier: identifier,
+                             conformances: conformances,
+                             members: members)
   }
 
   func parseEnumDeclaration() throws -> EnumDeclaration {
@@ -155,7 +162,12 @@ extension Parser {
 
     try consume(.punctuation(.closeBrace), or: .rightBraceExpected(in: "contract behavior", at: latestSource))
 
-    return ContractBehaviorDeclaration(contractIdentifier: contractIdentifier, states: states, callerBinding: callerBinding, callerProtections: callerProtections, closeBracketToken: closeBracketToken, members: members)
+    return ContractBehaviorDeclaration(contractIdentifier: contractIdentifier,
+                                       states: states,
+                                       callerBinding: callerBinding,
+                                       callerProtections: callerProtections,
+                                       closeBracketToken: closeBracketToken,
+                                       members: members)
   }
 
   // MARK: Top Level Members
@@ -178,7 +190,9 @@ extension Parser {
         guard let newLine = indexOfFirstAtCurrentDepth([.newline]) else {
           throw raise(.statementSameLine(at: latestSource))
         }
-        let decl = try parseVariableDeclaration(modifiers: modifiers, enclosingType: structIdentifier.name, upTo: newLine)
+        let decl = try parseVariableDeclaration(modifiers: modifiers,
+                                                enclosingType: structIdentifier.name,
+                                                upTo: newLine)
         members.append(.variableDeclaration(decl))
       } else if first == .punctuation(.closeBrace) {
         return members
@@ -211,7 +225,11 @@ extension Parser {
       _ = try consume(.punctuation(.equal), or: .dummy())
       hiddenValue = try parseExpression(upTo: indexOfFirstAtCurrentDepth([.newline])!)
     }
-    return EnumMember(caseToken: caseToken, identifier: identifier, type: Type(identifier: enumIdentifier), hiddenValue: hiddenValue, hiddenType: hiddenType)
+    return EnumMember(caseToken: caseToken,
+                      identifier: identifier,
+                      type: Type(identifier: enumIdentifier),
+                      hiddenValue: hiddenValue,
+                      hiddenType: hiddenType)
   }
 
   func parseTraitMembers() throws -> [TraitMember] {
@@ -256,13 +274,15 @@ extension Parser {
     let declType = currentToken?.kind
     if .func == declType {
       if signatureDeclaration {
-        return .functionSignatureDeclaration(try parseFunctionSignatureDeclaration(attributes: attrs, modifiers: modifiers))
+        return .functionSignatureDeclaration(
+          try parseFunctionSignatureDeclaration(attributes: attrs, modifiers: modifiers))
       } else {
         return .functionDeclaration(try parseFunctionDeclaration(attributes: attrs, modifiers: modifiers))
       }
     } else if .init == declType {
       if signatureDeclaration {
-        return .specialSignatureDeclaration(try parseSpecialSignatureDeclaration(attributes: attrs, modifiers: modifiers))
+        return .specialSignatureDeclaration(
+          try parseSpecialSignatureDeclaration(attributes: attrs, modifiers: modifiers))
       } else {
         return .specialDeclaration(try parseSpecialDeclaration(attributes: attrs, modifiers: modifiers))
       }
@@ -305,14 +325,16 @@ extension Parser {
 
     if .func == first {
       if signatureDeclaration {
-        return .functionSignatureDeclaration(try parseFunctionSignatureDeclaration(attributes: attrs, modifiers: modifiers))
+        return .functionSignatureDeclaration(
+          try parseFunctionSignatureDeclaration(attributes: attrs, modifiers: modifiers))
       }
       return .functionDeclaration(try parseFunctionDeclaration(attributes: attrs, modifiers: modifiers))
     }
 
     if .init == first  || .fallback == first {
       if signatureDeclaration {
-        return .specialSignatureDeclaration(try parseSpecialSignatureDeclaration(attributes: attrs, modifiers: modifiers))
+        return .specialSignatureDeclaration(
+          try parseSpecialSignatureDeclaration(attributes: attrs, modifiers: modifiers))
       }
       return .specialDeclaration(try parseSpecialDeclaration(attributes: attrs, modifiers: modifiers))
     }
@@ -347,7 +369,9 @@ extension Parser {
     guard let newLine = indexOfFirstAtCurrentDepth([.newline]) else {
       throw raise(.statementSameLine(at: latestSource))
     }
-    let variableDeclaration = try parseVariableDeclaration(modifiers: modifiers, enclosingType: enclosingType, upTo: newLine)
+    let variableDeclaration = try parseVariableDeclaration(modifiers: modifiers,
+                                                           enclosingType: enclosingType,
+                                                           upTo: newLine)
     return .variableDeclaration(variableDeclaration)
 
   }
@@ -379,7 +403,9 @@ extension Parser {
   /// - Parameter enclosingType: The name of the type in which the variable is declared, if it is a state property.
   /// - Returns: The parsed `VariableDeclaration`.
   /// - Throws: If the token streams cannot be parsed as a `VariableDeclaration`.
-  func parseVariableDeclaration(modifiers: [Token], enclosingType: RawTypeIdentifier? = nil, upTo: Int) throws -> VariableDeclaration {
+  func parseVariableDeclaration(modifiers: [Token],
+                                enclosingType: RawTypeIdentifier? = nil,
+                                upTo: Int) throws -> VariableDeclaration {
 
     let declarationToken = try consume(anyOf: [.var, .let], or: .badDeclaration(at: latestSource))
 
@@ -397,7 +423,8 @@ extension Parser {
     if currentIndex >= upTo {
       assignedExpression = nil
     } else if currentToken?.kind == .punctuation(.equal) {
-      // If we are parsing a state property defined in a type, and it has been assigned a default value, parse it otherwise leave it to binary expression
+      // If we are parsing a state property defined in a type, and it has been assigned a default value,
+      // parse it otherwise leave it to binary expression
       if asTypeProperty {
         _ = try consume(.punctuation(.equal), or: .expectedValidOperator(at: latestSource))
         assignedExpression = try parseExpression(upTo: upTo)
@@ -408,7 +435,11 @@ extension Parser {
       throw raise(.expectedValidOperator(at: latestSource))
     }
 
-    return VariableDeclaration(modifiers: modifiers, declarationToken: declarationToken, identifier: name, type: typeAnnotation.type, assignedExpression: assignedExpression)
+    return VariableDeclaration(modifiers: modifiers,
+                               declarationToken: declarationToken,
+                               identifier: name,
+                               type: typeAnnotation.type,
+                               assignedExpression: assignedExpression)
   }
 
   func parseResult() throws -> Type {
@@ -424,7 +455,8 @@ extension Parser {
     return FunctionDeclaration(signature: signature, body: body, closeBraceToken: closeBraceToken)
   }
 
-  func parseFunctionSignatureDeclaration(attributes: [Attribute], modifiers: [Token]) throws -> FunctionSignatureDeclaration {
+  func parseFunctionSignatureDeclaration(attributes: [Attribute],
+                                         modifiers: [Token]) throws -> FunctionSignatureDeclaration {
     let funcToken = try consume(.func, or: .badDeclaration(at: latestSource))
     let identifier = try parseIdentifier()
     let (parameters, closeBracketToken) = try parseParameters()
@@ -452,7 +484,8 @@ extension Parser {
     return SpecialDeclaration(signature: signature, body: body, closeBraceToken: closeBraceToken)
   }
 
-  func parseSpecialSignatureDeclaration(attributes: [Attribute], modifiers: [Token]) throws -> SpecialSignatureDeclaration {
+  func parseSpecialSignatureDeclaration(attributes: [Attribute],
+                                        modifiers: [Token]) throws -> SpecialSignatureDeclaration {
     let specialToken: Token = try consume(anyOf: [.init, .fallback], or: .badDeclaration(at: latestSource))
     let (parameters, closeBracketToken) = try parseParameters()
 
