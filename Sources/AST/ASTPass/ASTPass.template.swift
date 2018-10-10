@@ -12,129 +12,81 @@ import Lexer
 /// The class `ASTVisitor` is used to visit an AST using a given `ASTPass`. The appropriate `process` function will be
 /// called when visiting a node, and `postProcess` will be called after visiting the children of that node.
 public protocol ASTPass {
-
-  {% set nodes %}
-    ["TopLevelModule"]
-  {% endset %}
-
-  // MARK: Modules
-  {% for node in nodes %}
-  func process(topLevelModule: {{ node }}, passContext: ASTPassContext) -> ASTPassResult<{{ node }}>
+  {# Modules #}
+  {%- set nodes = [
+    "TopLevelModule"
+  ] -%}
+  
+  {# Declarations #}
+  {%- set nodes = nodes.concat([
+    "TopLevelDeclaration",
+    "ContractDeclaration",
+    "StructDeclaration",
+    "EnumDeclaration",
+    "TraitDeclaration",
+    "ContractBehaviorDeclaration"
+  ]) -%}
+  
+  {# Members #}
+  {%- set nodes = nodes.concat([
+    "ContractMember",
+    "StructMember",
+    "EnumMember",
+    "TraitMember",
+    "ContractBehaviorMember"
+  ]) -%}
+  
+  {# Statements #}
+  {%- set nodes = nodes.concat([
+    "Statement",
+    "ReturnStatement",
+    "BecomeStatement",
+    "EmitStatement",
+    "IfStatement",
+    "ForStatement"
+  ]) -%}
+  
+  {# Declarations #}
+  {%- set nodes = nodes.concat([
+    "VariableDeclaration",
+    "FunctionDeclaration",
+    "FunctionSignatureDeclaration",
+    "SpecialDeclaration",
+    "SpecialSignatureDeclaration",
+    "EventDeclaration"
+  ]) -%}
+  
+  {# Expression #}
+  {%- set nodes = nodes.concat([
+    "Expression",
+    "InoutExpression",
+    "BinaryExpression",
+    "FunctionCall",
+    "ArrayLiteral",
+    "RangeExpression",
+    "AST",
+    "SubscriptExpression",
+    "AttemptExpression"
+  ]) -%}
+  
+  {# Components #}
+  {%- set nodes = nodes.concat([
+    "Token",
+    "Attribute",
+    "Parameter",
+    "TypeAnnotation",
+    "Identifier",
+    "Type",
+    "CallerProtection",
+    "TypeState",
+    "Conformance",
+    "FunctionArgument"
+  ]) -%}
+  
+  {%- for node in nodes %}
+  func process({{ node | camelCase }}: {{ node }}, passContext: ASTPassContext) -> ASTPassResult<{{ node }}>
+  func postProcess({{ node | camelCase }}: {{ node }}, passContext: ASTPassContext) -> ASTPassResult<{{ node }}>
   {% endfor %}
-
-  // MARK: Top Level Declarations
-  func process(topLevelDeclaration: TopLevelDeclaration, passContext: ASTPassContext) -> ASTPassResult<TopLevelDeclaration>
-  func process(contractDeclaration: ContractDeclaration, passContext: ASTPassContext) -> ASTPassResult<ContractDeclaration>
-  func process(structDeclaration: StructDeclaration, passContext: ASTPassContext) -> ASTPassResult<StructDeclaration>
-  func process(enumDeclaration: EnumDeclaration, passContext: ASTPassContext) -> ASTPassResult<EnumDeclaration>
-  func process(traitDeclaration: TraitDeclaration, passContext: ASTPassContext) -> ASTPassResult<TraitDeclaration>
-  func process(contractBehaviorDeclaration: ContractBehaviorDeclaration, passContext: ASTPassContext) -> ASTPassResult<ContractBehaviorDeclaration>
-
-  // MARK: Top Level Members
-  func process(contractMember: ContractMember, passContext: ASTPassContext) -> ASTPassResult<ContractMember>
-  func process(structMember: StructMember, passContext: ASTPassContext) -> ASTPassResult<StructMember>
-  func process(enumCase: EnumMember, passContext: ASTPassContext) -> ASTPassResult<EnumMember>
-  func process(traitMember: TraitMember, passContext: ASTPassContext) -> ASTPassResult<TraitMember>
-  func process(contractBehaviorMember: ContractBehaviorMember, passContext: ASTPassContext) -> ASTPassResult<ContractBehaviorMember>
-
-  // MARK: Statements
-  func process(statement: Statement, passContext: ASTPassContext) -> ASTPassResult<Statement>
-  func process(returnStatement: ReturnStatement, passContext: ASTPassContext) -> ASTPassResult<ReturnStatement>
-  func process(becomeStatement: BecomeStatement, passContext: ASTPassContext) -> ASTPassResult<BecomeStatement>
-  func process(emitStatement: EmitStatement, passContext: ASTPassContext) -> ASTPassResult<EmitStatement>
-  func process(ifStatement: IfStatement, passContext: ASTPassContext) -> ASTPassResult<IfStatement>
-  func process(forStatement: ForStatement, passContext: ASTPassContext) -> ASTPassResult<ForStatement>
-
-  // MARK: Declarations
-  func process(variableDeclaration: VariableDeclaration, passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration>
-  func process(functionDeclaration: FunctionDeclaration, passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration>
-  func process(functionSignatureDeclaration: FunctionSignatureDeclaration, passContext: ASTPassContext) -> ASTPassResult<FunctionSignatureDeclaration>
-  func process(specialDeclaration: SpecialDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration>
-  func process(specialSignatureDeclaration: SpecialSignatureDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialSignatureDeclaration>
-  func process(eventDeclaration: EventDeclaration, passContext: ASTPassContext) -> ASTPassResult<EventDeclaration>
-
-  // MARK: Expression
-  func process(expression: Expression, passContext: ASTPassContext) -> ASTPassResult<Expression>
-  func process(inoutExpression: InoutExpression, passContext: ASTPassContext) -> ASTPassResult<InoutExpression>
-  func process(binaryExpression: BinaryExpression, passContext: ASTPassContext) -> ASTPassResult<BinaryExpression>
-  func process(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall>
-  func process(arrayLiteral: ArrayLiteral, passContext: ASTPassContext) -> ASTPassResult<ArrayLiteral>
-  func process(rangeExpression: RangeExpression, passContext: ASTPassContext) -> ASTPassResult<RangeExpression>
-  func process(dictionaryLiteral: AST.DictionaryLiteral, passContext: ASTPassContext) -> ASTPassResult<AST.DictionaryLiteral>
-  func process(subscriptExpression: SubscriptExpression, passContext: ASTPassContext) -> ASTPassResult<SubscriptExpression>
-  func process(attemptExpression: AttemptExpression, passContext: ASTPassContext) -> ASTPassResult<AttemptExpression>
-
-  // MARK: Components
-  func process(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token>
-  func process(attribute: Attribute, passContext: ASTPassContext) -> ASTPassResult<Attribute>
-  func process(parameter: Parameter, passContext: ASTPassContext) -> ASTPassResult<Parameter>
-  func process(typeAnnotation: TypeAnnotation, passContext: ASTPassContext) -> ASTPassResult<TypeAnnotation>
-  func process(identifier: Identifier, passContext: ASTPassContext) -> ASTPassResult<Identifier>
-  func process(type: Type, passContext: ASTPassContext) -> ASTPassResult<Type>
-  func process(callerProtection: CallerProtection, passContext: ASTPassContext) -> ASTPassResult<CallerProtection>
-  func process(typeState: TypeState, passContext: ASTPassContext) -> ASTPassResult<TypeState>
-  func process(conformance: Conformance, passContext: ASTPassContext) -> ASTPassResult<Conformance>
-  func process(functionArgument: FunctionArgument, passContext: ASTPassContext) -> ASTPassResult<FunctionArgument>
-
-  // MARK: -
-
-  // MARK: Modules
-  func postProcess(topLevelModule: TopLevelModule, passContext: ASTPassContext) -> ASTPassResult<TopLevelModule>
-
-  // MARK: Top Level Declaration
-  func postProcess(topLevelDeclaration: TopLevelDeclaration, passContext: ASTPassContext) -> ASTPassResult<TopLevelDeclaration>
-  func postProcess(contractDeclaration: ContractDeclaration, passContext: ASTPassContext) -> ASTPassResult<ContractDeclaration>
-  func postProcess(structDeclaration: StructDeclaration, passContext: ASTPassContext) -> ASTPassResult<StructDeclaration>
-  func postProcess(enumDeclaration: EnumDeclaration, passContext: ASTPassContext) -> ASTPassResult<EnumDeclaration>
-  func postProcess(traitDeclaration: TraitDeclaration, passContext: ASTPassContext) -> ASTPassResult<TraitDeclaration>
-  func postProcess(contractBehaviorDeclaration: ContractBehaviorDeclaration, passContext: ASTPassContext) -> ASTPassResult<ContractBehaviorDeclaration>
-
-  // MARK: Top Level Members
-  func postProcess(contractMember: ContractMember, passContext: ASTPassContext) -> ASTPassResult<ContractMember>
-  func postProcess(structMember: StructMember, passContext: ASTPassContext) -> ASTPassResult<StructMember>
-  func postProcess(enumCase: EnumMember, passContext: ASTPassContext) -> ASTPassResult<EnumMember>
-  func postProcess(traitMember: TraitMember, passContext: ASTPassContext) -> ASTPassResult<TraitMember>
-  func postProcess(contractBehaviorMember: ContractBehaviorMember, passContext: ASTPassContext) -> ASTPassResult<ContractBehaviorMember>
-
-  // MARK: Statements
-  func postProcess(statement: Statement, passContext: ASTPassContext) -> ASTPassResult<Statement>
-  func postProcess(returnStatement: ReturnStatement, passContext: ASTPassContext) -> ASTPassResult<ReturnStatement>
-  func postProcess(becomeStatement: BecomeStatement, passContext: ASTPassContext) -> ASTPassResult<BecomeStatement>
-  func postProcess(emitStatement: EmitStatement, passContext: ASTPassContext) -> ASTPassResult<EmitStatement>
-  func postProcess(ifStatement: IfStatement, passContext: ASTPassContext) -> ASTPassResult<IfStatement>
-  func postProcess(forStatement: ForStatement, passContext: ASTPassContext) -> ASTPassResult<ForStatement>
-
-  // MARK: Declarations
-  func postProcess(variableDeclaration: VariableDeclaration, passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration>
-  func postProcess(functionDeclaration: FunctionDeclaration, passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration>
-  func postProcess(functionSignatureDeclaration: FunctionSignatureDeclaration, passContext: ASTPassContext) -> ASTPassResult<FunctionSignatureDeclaration>
-  func postProcess(specialDeclaration: SpecialDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialDeclaration>
-  func postProcess(specialSignatureDeclaration: SpecialSignatureDeclaration, passContext: ASTPassContext) -> ASTPassResult<SpecialSignatureDeclaration>
-  func postProcess(eventDeclaration: EventDeclaration, passContext: ASTPassContext) -> ASTPassResult<EventDeclaration>
-
-  // MARK: Expression
-  func postProcess(expression: Expression, passContext: ASTPassContext) -> ASTPassResult<Expression>
-  func postProcess(inoutExpression: InoutExpression, passContext: ASTPassContext) -> ASTPassResult<InoutExpression>
-  func postProcess(binaryExpression: BinaryExpression, passContext: ASTPassContext) -> ASTPassResult<BinaryExpression>
-  func postProcess(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall>
-  func postProcess(arrayLiteral: ArrayLiteral, passContext: ASTPassContext) -> ASTPassResult<ArrayLiteral>
-  func postProcess(rangeExpression: RangeExpression, passContext: ASTPassContext) -> ASTPassResult<RangeExpression>
-  func postProcess(dictionaryLiteral: DictionaryLiteral, passContext: ASTPassContext) -> ASTPassResult<DictionaryLiteral>
-  func postProcess(subscriptExpression: SubscriptExpression, passContext: ASTPassContext) -> ASTPassResult<SubscriptExpression>
-  func postProcess(attemptExpression: AttemptExpression, passContext: ASTPassContext) -> ASTPassResult<AttemptExpression>
-
-  // MARK: Components
-  func postProcess(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token>
-  func postProcess(attribute: Attribute, passContext: ASTPassContext) -> ASTPassResult<Attribute>
-  func postProcess(parameter: Parameter, passContext: ASTPassContext) -> ASTPassResult<Parameter>
-  func postProcess(typeAnnotation: TypeAnnotation, passContext: ASTPassContext) -> ASTPassResult<TypeAnnotation>
-  func postProcess(identifier: Identifier, passContext: ASTPassContext) -> ASTPassResult<Identifier>
-  func postProcess(type: Type, passContext: ASTPassContext) -> ASTPassResult<Type>
-  func postProcess(callerProtection: CallerProtection, passContext: ASTPassContext) -> ASTPassResult<CallerProtection>
-  func postProcess(typeState: TypeState, passContext: ASTPassContext) -> ASTPassResult<TypeState>
-  func postProcess(conformance: Conformance, passContext: ASTPassContext) -> ASTPassResult<Conformance>
-  func postProcess(functionArgument: FunctionArgument, passContext: ASTPassContext) -> ASTPassResult<FunctionArgument>
-
 }
 
 extension ASTPass {
