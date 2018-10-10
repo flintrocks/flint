@@ -13,8 +13,14 @@ import Lexer
 /// called when visiting a node, and `postProcess` will be called after visiting the children of that node.
 public protocol ASTPass {
 
+  {% set nodes %}
+    ["TopLevelModule"]
+  {% endset %}
+
   // MARK: Modules
-  func process(topLevelModule: TopLevelModule, passContext: ASTPassContext) -> ASTPassResult<TopLevelModule>
+  {% for node in nodes %}
+  func process(topLevelModule: {{ node }}, passContext: ASTPassContext) -> ASTPassResult<{{ node }}>
+  {% endfor %}
 
   // MARK: Top Level Declarations
   func process(topLevelDeclaration: TopLevelDeclaration, passContext: ASTPassContext) -> ASTPassResult<TopLevelDeclaration>
