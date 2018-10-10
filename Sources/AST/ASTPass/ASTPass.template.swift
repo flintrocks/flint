@@ -28,11 +28,11 @@ public protocol ASTPass {
     "ContractBehaviorDeclaration"
   ]) -%}
 
-  //"EnumMember",
   {# Members #}
   {%- set nodes = nodes.concat([
     "ContractMember",
     "StructMember",
+    "EnumMember",
     "TraitMember",
     "ContractBehaviorMember"
   ]) -%}
@@ -84,9 +84,6 @@ public protocol ASTPass {
     "FunctionArgument"
   ]) -%}
 
-  func process(enumCase: EnumMember, passContext: ASTPassContext) -> ASTPassResult<EnumMember>
-  func postProcess(enumCase: EnumMember, passContext: ASTPassContext) -> ASTPassResult<EnumMember>
-
   func process(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token>
   func postProcess(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token>
   
@@ -106,13 +103,6 @@ extension ASTPass {
     return ASTPassResult(element: {{ node | camelCase }}, diagnostics: [], passContext: passContext)
   }
   {% endfor %}
-
-  public func process(enumCase: EnumMember, passContext: ASTPassContext) -> ASTPassResult<EnumMember> {
-    return ASTPassResult(element: enumCase, diagnostics: [], passContext: passContext)
-  }
-  public func postProcess(enumCase: EnumMember, passContext: ASTPassContext) -> ASTPassResult<EnumMember> {
-    return ASTPassResult(element: enumCase, diagnostics: [], passContext: passContext)
-  }
 
   public func process(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token> {
     return ASTPassResult(element: literalToken, diagnostics: [], passContext: passContext)
