@@ -1,3 +1,4 @@
+// swiftlint:disable all
 //
 //  ASTPass.swift
 //  AST
@@ -426,3 +427,4 @@ extension ASTPass {
     return ASTPassResult(element: functionArgument, diagnostics: [], passContext: passContext)
   }
 }
+// swiftlint:enable all
