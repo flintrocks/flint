@@ -70,7 +70,6 @@ public protocol ASTPass {
     "AttemptExpression"
   ]) -%}
 
-  //"Token",
   {# Components #}
   {%- set nodes = nodes.concat([
     "Attribute",
@@ -78,15 +77,13 @@ public protocol ASTPass {
     "TypeAnnotation",
     "Identifier",
     "Type",
+    "Token",
     "CallerProtection",
     "TypeState",
     "Conformance",
     "FunctionArgument"
   ]) -%}
 
-  func process(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token>
-  func postProcess(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token>
-  
   {%- for node in nodes %}
   func process({{ node | camelCase }}: {{ node }}, passContext: ASTPassContext) -> ASTPassResult<{{ node }}>
   func postProcess({{ node | camelCase }}: {{ node }}, passContext: ASTPassContext) -> ASTPassResult<{{ node }}>
@@ -103,12 +100,5 @@ extension ASTPass {
     return ASTPassResult(element: {{ node | camelCase }}, diagnostics: [], passContext: passContext)
   }
   {% endfor %}
-
-  public func process(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token> {
-    return ASTPassResult(element: literalToken, diagnostics: [], passContext: passContext)
-  }
-  public func postProcess(literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token> {
-    return ASTPassResult(element: literalToken, diagnostics: [], passContext: passContext)
-  }
 }
 // swiftlint:enable all

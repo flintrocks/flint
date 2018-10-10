@@ -974,8 +974,8 @@ public struct ASTVisitor {
   }
 
   func visit(_ literalToken: Token, passContext: ASTPassContext) -> ASTPassResult<Token> {
-    let processResult = pass.process(literalToken: literalToken, passContext: passContext)
-    let postProcessResult = pass.process(literalToken: processResult.element, passContext: processResult.passContext)
+    let processResult = pass.process(token: literalToken, passContext: passContext)
+    let postProcessResult = pass.process(token: processResult.element, passContext: processResult.passContext)
     return ASTPassResult(element: postProcessResult.element,
                          diagnostics: postProcessResult.diagnostics,
                          passContext: passContext)
