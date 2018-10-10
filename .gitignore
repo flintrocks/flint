@@ -3,6 +3,7 @@
 /.derived-sources
 /Packages
 /*.xcodeproj
+/node_modules
 Package.resolved
 
 *.sol
