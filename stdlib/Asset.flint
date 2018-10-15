@@ -2,7 +2,9 @@
 // TODO: semantic check preventing cross-asset transfers
 struct trait Asset {
   // Initialises the asset "unsafely", i.e. from `amount` given as an integer.
-  public init(unsafeRawValue: Int)
+  public init(unsafeRawValue: Int) {
+    setRawValue(unsafeRawValue)
+  }
   
   // Initialises the asset by transferring `amount` from an existing asset.
   // Should check if `source` has sufficient funds, and cause a fatal error
@@ -18,6 +20,9 @@ struct trait Asset {
   
   // Moves all funds from `source` into `this` asset.
   mutating public func transfer(source: inout Asset)
+  
+  // Returns the funds contained in this asset, as an integer.
+  mutating public func setRawValue(value: Int) -> Int
   
   // Returns the funds contained in this asset, as an integer.
   public func getRawValue() -> Int
