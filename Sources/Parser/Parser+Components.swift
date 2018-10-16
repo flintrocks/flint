@@ -219,7 +219,7 @@ extension Parser {
     }
 
     if let selfTypeToken = attempt(try consume(Token.Kind.selfType, or: .dummy())) {
-        return Type.selfType(token: selfTypeToken)
+        return Type(inferredType: .selfType, identifier: Identifier(identifierToken: selfTypeToken))
     }
 
     let identifier = try parseIdentifier()

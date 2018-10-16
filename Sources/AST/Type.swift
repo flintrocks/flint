@@ -111,8 +111,6 @@ public indirect enum RawType: Equatable {
 
 /// A Flint type.
 public struct Type: ASTNode {
-  private var representsSelfType = false
-
   public var rawType: RawType
   public var genericArguments = [Type]()
 
@@ -129,7 +127,7 @@ public struct Type: ASTNode {
 
   var isSelfType: Bool {
     get {
-        return representsSelfType
+        return rawType == .selfType
     }
   }
 
@@ -179,13 +177,6 @@ public struct Type: ASTNode {
   public init(inferredType: RawType, identifier: Identifier) {
     rawType = inferredType
     sourceLocation = identifier.sourceLocation
-  }
-
-  public static func selfType(token: Token) -> Type {
-    var selfType = Type(inferredType: .selfType, identifier: Identifier(identifierToken: token))
-    selfType.representsSelfType = true
-
-    return selfType
   }
 
   // MARK: - ASTNode
