@@ -107,6 +107,14 @@ public indirect enum RawType: Equatable {
     default: return false
     }
   }
+
+  public func isCompatible(with otherType: RawType, in passContext: ASTPassContext) -> Bool {
+    if let traitDeclarationContext = passContext.traitDeclarationContext, self == .selfType, traitDeclarationContext.traitIdentifier.name == otherType.name {
+      return true
+    }
+
+    return isCompatible(with: otherType)
+  }
 }
 
 /// A Flint type.
