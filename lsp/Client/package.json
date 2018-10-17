@@ -1,0 +1,108 @@
+{
+	"name": "vscode-swift",
+	"displayName": "Swift for Visual Studio Code",
+	"description": "Provides rich language support for Swift PM projects in Visual Studio Code.",
+	"author": "David Owens II",
+	"license": "MIT",
+	"version": "0.8.0",
+	"publisher": "kiadstudios",
+	"preview": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/owensd/vscode-swift"
+	},
+	"engines": {
+		"vscode": "^1.8.0"
+	},
+	"categories": [
+		"Languages",
+		"Snippets"
+	],
+	"activationEvents": [
+		"onLanguage:swift"
+	],
+	"keywords": [
+		"swift",
+		"ios",
+		"macos",
+		"apple",
+		"ide"
+	],
+	"main": "./out/src/extension",
+	"files": [
+		"CHANGELOG.md",
+		"images/**",
+		"node_modules/**",
+		"out/**",
+		"package.json",
+		"README.md",
+		"snippets/**",
+		"syntaxes/**"
+	],
+	"contributes": {
+		"languages": [
+			{
+				"id": "swift",
+				"extension": [
+					".swift"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "swift",
+				"scopeName": "source.swift",
+				"path": "./syntaxes/swift.tmLanguage"
+			}
+		],
+		"snippets": [
+			{
+				"language": "swift",
+				"path": "./snippets/snippets.json"
+			}
+		],
+		"configuration": {
+			"type": "object",
+			"title": "Swift Language Server Configuration",
+			"properties": {
+				"swift.languageServerPath": {
+					"type": "string",
+					"default": "lib/usr/bin/langsrv",
+					"description": "The path to the Swift Language Server utility."
+				},
+				"swift.enableLanguageServer": {
+					"type": "bool",
+					"default": true,
+					"description": "Option to turn off the language server."
+				},
+				"swift.enableSwiftBugLinks": {
+					"type": "bool",
+					"default": true,
+					"description": "Option to turn off Swift JIRA but linking."
+				},
+				"swift.toolchainPath": {
+					"type": "string",
+					"default": null,
+					"description": "The toolchain path for the version of Swift to be used."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "tsc -p ./",
+		"compile": "tsc -watch -p ./",
+		"update-vscode": "node ./node_modules/vscode/bin/install",
+		"postinstall": "node ./node_modules/vscode/bin/install"
+	},
+	"devDependencies": {
+		"@types/mocha": "^2.2.33",
+		"@types/node": "^6.0.52",
+		"typescript": "^2.1.5",
+		"vscode": "^1.0.3"
+	},
+	"dependencies": {
+		"vscode-languageclient": "^3.1.0",
+		"unzip-stream": "^0.3.0",
+		"request": "^2.81.0"
+	}
+}
