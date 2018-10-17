@@ -119,7 +119,7 @@ extension Diagnostic {
                       message: "Event '\(functionCall.identifier.name)' is not in scope")
   }
 
-  static func useOfSelfOutsideOfTrait(_ expression: Expression) -> Diagnostic {
+  static func useOfSelfOutsideTrait(_ expression: Expression) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: expression.sourceLocation,
                       message: "Use of Self outside of a trait")
   }

@@ -1,0 +1,25 @@
+struct trait S {
+  mutating func bye()
+
+  mutating func hello(param: inout Self) -> Int {
+    var this: Self = self
+    this = self
+    this.bye()
+    param.bye()
+    return 0
+  }
+}
+
+struct SS: S {
+  mutating func bye() {
+    hello(&self)
+  }
+}
+
+contract A {
+  let x: SS = SS()
+}
+
+A :: a <- (any) {
+  public init() {}
+}

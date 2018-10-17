@@ -89,6 +89,14 @@ public indirect enum RawType: Equatable {
     return false
   }
 
+  public var isSelfType: Bool {
+    if case .inoutType(.selfType) = self {
+      return true
+    }
+    
+    return self == .selfType
+  }
+
   /// Whether the type is compatible with the given type, i.e., if two expressions of those types can be used
   /// interchangeably.
   public func isCompatible(with otherType: RawType) -> Bool {
@@ -135,7 +143,7 @@ public struct Type: ASTNode {
 
   var isSelfType: Bool {
     get {
-        return rawType == .selfType
+      return rawType == .selfType
     }
   }
 
