@@ -159,10 +159,6 @@ public struct Environment {
   ///   - target: arguments of the function available in this scope.
   /// - Returns: Boolean indicating whether function arguments are compatible.
   func areFunctionArgumentsCompatible(source: [RawType], target: [RawType], enclosingType: RawTypeIdentifier) -> Bool {
-    guard let conformances = types[enclosingType]?.conformances else {
-      return source == target
-    }
-
     // If source contains an argument of self type then attempt to replace with enclosing type
     let sourceSelf = source.map { type -> RawType in
       if type.isSelfType {
