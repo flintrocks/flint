@@ -18,6 +18,7 @@ struct trait Asset {
   
   // TODO: These implementations cause the compiler to crash due to calling
   // a mutating function from the constructor.
+  // See: https://github.com/flintrocks/flint/issues/30
   //init(unsafeRawValue: Int) {
   //  setRawValue(unsafeRawValue)
   //}
