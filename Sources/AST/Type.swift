@@ -63,7 +63,7 @@ public indirect enum RawType: Equatable {
     case .fixedSizeArrayType(let element, _): return element.isBuiltInType
     case .dictionaryType(let key, let value): return key.isBuiltInType && value.isBuiltInType
     case .inoutType(let element): return element.isBuiltInType
-    case .selfType: return true
+    case .selfType: return false
     case .userDefinedType: return false
     case .functionType: return false
     }
@@ -143,7 +143,7 @@ public struct Type: ASTNode {
 
   var isSelfType: Bool {
     get {
-      return rawType == .selfType
+      return rawType.isSelfType
     }
   }
 

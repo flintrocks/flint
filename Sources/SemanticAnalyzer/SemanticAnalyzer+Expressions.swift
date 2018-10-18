@@ -31,7 +31,7 @@ extension SemanticAnalyzer {
           binaryExpression.rhs =
             binaryExpression.rhs.assigningEnclosingType(type: traitDeclarationContext.traitIdentifier.name)
         } else {
-          diagnostics.append(.useOfSelfOutsideTrait(binaryExpression.lhs))
+          diagnostics.append(.useOfSelfOutsideTrait(at: binaryExpression.lhs.sourceLocation))
         }
       } else {
         binaryExpression.rhs = binaryExpression.rhs.assigningEnclosingType(type: lhsType.name)

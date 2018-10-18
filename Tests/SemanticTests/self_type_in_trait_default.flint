@@ -5,8 +5,8 @@ struct trait Trait {
 
   // NOT YET IMPLEMENTED (#21) mutating func notDefaulted(thisParam: inout Self)
 
-  // Accept Self parameter and return Self type
-  mutating func defaulted(thisParam: inout Self) -> Self {
+  // Accept Self parameter
+  mutating func defaulted(thisParam: inout Self) {
     // Variable declaration
     var this: Self = self
     // Variable assignment
@@ -15,8 +15,6 @@ struct trait Trait {
     this.function()
     // Function self
     thisParam.function()
-    // Self return
-    return self
   }
 }
 
@@ -26,9 +24,6 @@ struct Implementation: Trait {
   mutating func function() {
     defaulted(&self)
   }
-
-  // Self should only be allowed in traits
-  func selfNotAllowedHere(no: Self) {}
 }
 
 contract A { }

@@ -119,9 +119,9 @@ extension Diagnostic {
                       message: "Event '\(functionCall.identifier.name)' is not in scope")
   }
 
-  static func useOfSelfOutsideTrait(_ expression: Expression) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: expression.sourceLocation,
-                      message: "Use of Self outside of a trait")
+  static func useOfSelfOutsideTrait(at sourceLocation: SourceLocation) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: sourceLocation,
+                      message: "Use of Self is only allowed in traits")
   }
 
   static func noReceiverForStructInitializer(_ functionCall: FunctionCall) -> Diagnostic {
