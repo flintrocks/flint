@@ -1,7 +1,0 @@
-**/*.ts
-**/tsconfig.json
-test/**
-out/test/**
-lib/**
-tmp/**
-*.vsix
