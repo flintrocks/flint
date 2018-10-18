@@ -93,7 +93,7 @@ public indirect enum RawType: Equatable {
     if case .inoutType(.selfType) = self {
       return true
     }
-    
+
     return self == .selfType
   }
 
@@ -117,7 +117,9 @@ public indirect enum RawType: Equatable {
   }
 
   public func isCompatible(with otherType: RawType, in passContext: ASTPassContext) -> Bool {
-    if let traitDeclarationContext = passContext.traitDeclarationContext, self == .selfType, traitDeclarationContext.traitIdentifier.name == otherType.name {
+    if let traitDeclarationContext = passContext.traitDeclarationContext,
+      self == .selfType,
+      traitDeclarationContext.traitIdentifier.name == otherType.name {
       return true
     }
 
@@ -142,9 +144,7 @@ public struct Type: ASTNode {
   }
 
   var isSelfType: Bool {
-    get {
-      return rawType.isSelfType
-    }
+    return rawType.isSelfType
   }
 
   // Initializers for each kind of raw type.
