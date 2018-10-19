@@ -69,7 +69,13 @@ public struct IRPreprocessor: ASTPass {
 
   public func process(variableDeclaration: VariableDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
+    var variableDeclaration = variableDeclaration
     var passContext = passContext
+
+    if let structDeclarationContext = passContext.structDeclarationContext,
+      variableDeclaration.type.rawType.isSelfType {
+      variableDeclaration.type.rawType = .userDefinedType(structDeclarationContext.structIdentifier.name)
+    }
 
     if passContext.functionDeclarationContext != nil {
       // We're in a function. Record the local variable declaration.
@@ -82,6 +88,29 @@ public struct IRPreprocessor: ASTPass {
   public func process(functionDeclaration: FunctionDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     var functionDeclaration = functionDeclaration
+
+    // Convert Self to struct type, if defined in struct
+    if let structDeclarationContext = passContext.structDeclarationContext {
+      functionDeclaration.signature.parameters =
+        functionDeclaration.signature.parameters.map { (parameter) -> Parameter in
+        let type = parameter.type.rawType
+
+        if type.isSelfType {
+          var parameter = parameter
+          let structType: RawType = .userDefinedType(structDeclarationContext.structIdentifier.name)
+
+          if type.isInout {
+            parameter.type.rawType = .inoutType(structType)
+          } else {
+            parameter.type.rawType = structType
+          }
+
+          return parameter
+        }
+
+        return parameter
+      }
+    }
 
     // Mangle the function name in the declaration.
     let parameters = functionDeclaration.signature.parameters.map { $0.type.rawType }
