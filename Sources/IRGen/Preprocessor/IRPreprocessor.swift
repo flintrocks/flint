@@ -49,24 +49,6 @@ public struct IRPreprocessor: ASTPass {
   }
 
   // MARK: Declaration
-  public func process(structDeclaration: StructDeclaration,
-                      passContext: ASTPassContext) -> ASTPassResult<StructDeclaration> {
-    let environment = passContext.environment!
-    var structDeclaration = structDeclaration
-
-    let conformingFunctions = environment.conformingFunctions(in: structDeclaration.identifier.name)
-      .compactMap { functionInformation -> StructMember in
-        var functionDeclaration = functionInformation.declaration
-        functionDeclaration.scopeContext = ScopeContext()
-
-        return .functionDeclaration(functionDeclaration)
-      }
-
-    structDeclaration.members += conformingFunctions
-
-    return ASTPassResult(element: structDeclaration, diagnostics: [], passContext: passContext)
-  }
-
   public func process(variableDeclaration: VariableDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
     var variableDeclaration = variableDeclaration
@@ -88,29 +70,6 @@ public struct IRPreprocessor: ASTPass {
   public func process(functionDeclaration: FunctionDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     var functionDeclaration = functionDeclaration
-
-    // Convert Self to struct type, if defined in struct
-    if let structDeclarationContext = passContext.structDeclarationContext {
-      functionDeclaration.signature.parameters =
-        functionDeclaration.signature.parameters.map { (parameter) -> Parameter in
-        let type = parameter.type.rawType
-
-        if type.isSelfType {
-          var parameter = parameter
-          let structType: RawType = .userDefinedType(structDeclarationContext.structIdentifier.name)
-
-          if type.isInout {
-            parameter.type.rawType = .inoutType(structType)
-          } else {
-            parameter.type.rawType = structType
-          }
-
-          return parameter
-        }
-
-        return parameter
-      }
-    }
 
     // Mangle the function name in the declaration.
     let parameters = functionDeclaration.signature.parameters.map { $0.type.rawType }

@@ -62,6 +62,7 @@ struct Compiler {
       SemanticAnalyzer(),
       TypeChecker(),
       Optimizer(),
+      IRConformanceProcessor(),
       IRPreprocessor()
     ]
 
