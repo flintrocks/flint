@@ -136,10 +136,22 @@ extension IRPreprocessor {
       if isGlobalFunctionCall {
         declarationEnclosingType = Environment.globalFunctionStructName
       } else {
-        declarationEnclosingType = passContext.environment!.type(of: receiverTrail.last!,
-                                                                 enclosingType: enclosingType,
-                                                                 callerProtections: callerProtections,
-                                                                 scopeContext: scopeContext).name
+        let type = passContext.environment!.type(of: receiverTrail.last!,
+                                                 enclosingType: enclosingType,
+                                                 callerProtections: callerProtections,
+                                                 scopeContext: scopeContext)
+        if type.isSelfType {
+          if let traitDeclarationContext = passContext.traitDeclarationContext {
+            declarationEnclosingType = traitDeclarationContext.traitIdentifier.name
+          } else if let structDeclarationContext = passContext.structDeclarationContext {
+            declarationEnclosingType = structDeclarationContext.structIdentifier.name
+          } else {
+            declarationEnclosingType = RawType.errorType.name
+          }
+        } else {
+          declarationEnclosingType = type.name
+        }
+
       }
 
       // Set the mangled identifier for the function.
