@@ -2,7 +2,7 @@
 //  IRConformanceProcessor.swift
 //  IRGen
 //
-//  Created by Nik on 20/10/2018.
+//  Created by Niklas Vangerow on 20/10/2018.
 //
 
 import AST
@@ -35,7 +35,6 @@ public struct IRConformanceProcessor: ASTPass {
   public func process(functionDeclaration: FunctionDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     var functionDeclaration = functionDeclaration
-    var environment = passContext.environment!
 
     // Convert Self to struct type, if defined in struct
     if let structDeclarationContext = passContext.structDeclarationContext {
@@ -58,10 +57,16 @@ public struct IRConformanceProcessor: ASTPass {
           }
 
           return parameter
-      }
+        }
 
-      environment.addFunction(functionDeclaration, enclosingType: structDeclarationContext.structIdentifier.name,
-                              states: [], callerProtections: [])
+      // We update the passContext with a new function as the signature has changed.
+      let newPassContext = passContext.withUpdates { (context) in
+          context.environment!.addFunction(functionDeclaration,
+                                           enclosingType: structDeclarationContext.structIdentifier.name,
+                                           states: [], callerProtections: [])
+        }
+
+      return ASTPassResult(element: functionDeclaration, diagnostics: [], passContext: newPassContext)
     }
 
 
