@@ -33,6 +33,15 @@ public struct TraitResolver: ASTPass {
     return ASTPassResult(element: structDeclaration, diagnostics: [], passContext: passContext)
   }
 
+  public func process(traitDeclaration: TraitDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<TraitDeclaration> {
+    var traitDeclaration = traitDeclaration
+    // Replace trait members with empty list as we NEEDN'T process the trait (IR does not get generated).
+    // This was necessary as this subtree does unnecessary type checking and breaks with the addition of Self.
+    traitDeclaration.members = []
+    return ASTPassResult(element: traitDeclaration, diagnostics: [], passContext: passContext)
+  }
+
   public func process(functionDeclaration: FunctionDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     // Convert Self to struct type, if defined in struct

@@ -11,7 +11,7 @@ import Foundation
 import Source
 import Lexer
 
-/// A prepocessing step to update the program's AST before code generation.
+/// A preprocessing step to update the program's AST before code generation.
 public struct IRPreprocessor: ASTPass {
 
   public init() {}
@@ -27,15 +27,6 @@ public struct IRPreprocessor: ASTPass {
     }
 
     return ASTPassResult(element: structMember, diagnostics: [], passContext: passContext)
-  }
-
-  public func process(traitDeclaration: TraitDeclaration,
-                      passContext: ASTPassContext) -> ASTPassResult<TraitDeclaration> {
-    var traitDeclaration = traitDeclaration
-    // Replace trait members with empty list as we NEEDN'T process the trait (IR does not get generated).
-    // This was necessary as this subtree does unnecessary type checking and breaks with the addition of Self.
-    traitDeclaration.members = []
-    return ASTPassResult(element: traitDeclaration, diagnostics: [], passContext: passContext)
   }
 
   /// Returns assignment statements for all the properties which have been assigned default values.
