@@ -1,5 +1,5 @@
 //
-//  IRConformanceProcessor.swift
+//  TraitResolver.swift
 //  IRGen
 //
 //  Created by Niklas Vangerow on 20/10/2018.
@@ -9,8 +9,9 @@ import AST
 import Lexer
 
 /// A prepocessing step to update the program's AST before code generation, specifically in order to resolve Self
+/// Copies defaulted struct trait declarations into their conforming struct types.
 
-public struct IRConformanceProcessor: ASTPass {
+public struct TraitResolver: ASTPass {
   public init() {}
 
   // MARK: Declaration
@@ -34,13 +35,12 @@ public struct IRConformanceProcessor: ASTPass {
 
   public func process(functionDeclaration: FunctionDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
-    var functionDeclaration = functionDeclaration
-
     // Convert Self to struct type, if defined in struct
     if let structDeclarationContext = passContext.structDeclarationContext {
+      var functionDeclaration = functionDeclaration
+
       functionDeclaration.signature.parameters =
         functionDeclaration.signature.parameters.map { (parameter) -> Parameter in
-          // Change types in environment as well
           let type = parameter.type.rawType
 
           if type.isSelfType {
