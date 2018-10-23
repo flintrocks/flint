@@ -1,0 +1,22 @@
+// RUN: %flintc %s --verify
+
+contract Marking {
+  var a: Int = 0
+  var b: Int = 1
+}
+
+Marking :: (any) {
+  public init() {}
+}
+
+Marking :: caller <- (any) {
+  public mutating func test1(a: Int = 0, b: Int = 1) {
+    self.a = a;
+    self.b = b;
+  }
+
+  public mutating func test2() {
+    test1(a:3, b:2);
+    test1();
+  }
+}
