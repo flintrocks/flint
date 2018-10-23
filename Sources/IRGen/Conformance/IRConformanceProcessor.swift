@@ -69,7 +69,6 @@ public struct IRConformanceProcessor: ASTPass {
       return ASTPassResult(element: functionDeclaration, diagnostics: [], passContext: newPassContext)
     }
 
-
     return ASTPassResult(element: functionDeclaration, diagnostics: [], passContext: passContext)
   }
 }
