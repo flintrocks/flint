@@ -11,7 +11,15 @@ env.addFilter('camelCase', str => str.charAt(0).toLowerCase() + str.substr(1));
 for (const source of [
   'AST/ASTPass/ASTPass'
 ]) {
-  console.log(`Processing ${source}.swift`)
+  let sourceTime = fs.statSync(`Sources/${source}.template.swift`);
+  let resultTime = fs.existsSync(`.derived-sources/${source}.swift`)
+    ? fs.statSync(`.derived-sources/${source}.swift`)
+    : 0;
+  if (sourceTime <= resultTime) {
+    console.log(`Skipping ${source}.swift`);
+    continue;
+  }
+  console.log(`Processing ${source}.swift ...`);
   mkdirp.sync(`.derived-sources/${path.dirname(source)}`);
   fs.writeFileSync(
     `.derived-sources/${source}.swift`,
