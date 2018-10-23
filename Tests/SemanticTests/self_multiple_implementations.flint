@@ -44,19 +44,19 @@ struct TheAssetTwo: TheAsset {
   }
 }
 
-struct Bla {
+struct Comparisoin {
   init() {}
 
-  mutating func abc() {
-    var assOne: TheAssetOne = TheAssetOne()
-    var assOneOne: TheAssetOne = TheAssetOne()
+  mutating func transfer() {
+    var assetOneDestination: TheAssetOne = TheAssetOne()
+    var assetOneSource: TheAssetOne = TheAssetOne()
 
-    assOne.transfer(&assOneOne, 100)
+    assetOneDestination.transfer(&assetOneSource, 100)
 
-    var assTwo: TheAssetTwo = TheAssetTwo()
-    var assTwoTwo: TheAssetTwo = TheAssetTwo()
+    var assetTwoDestination: TheAssetTwo = TheAssetTwo()
+    var assetTwoSource: TheAssetTwo = TheAssetTwo()
 
-    assTwo.transfer(&assTwoTwo, 100)
+    assetTwoDestination.transfer(&assetTwoSource, 100)
   }
 }
 
@@ -66,15 +66,15 @@ A :: (any) {
   public init() {}
 
   public mutating func transfer() -> Bool {
-    var assOne: TheAssetOne = TheAssetOne()
-    var assOneOne: TheAssetOne = TheAssetOne()
+    var assetOneDestination: TheAssetOne = TheAssetOne()
+    var assetOneSource: TheAssetOne = TheAssetOne()
 
-    assOne.transfer(&assOneOne, 100)
+    assetOneDestination.transfer(&assetOneSource, 100)
 
-    var assTwo: TheAssetTwo = TheAssetTwo()
-    var assTwoTwo: TheAssetTwo = TheAssetTwo()
+    var assetTwoDestination: TheAssetTwo = TheAssetTwo()
+    var assetTwoSource: TheAssetTwo = TheAssetTwo()
 
-    assTwo.transfer(&assTwoTwo, 100)
+    assetTwoDestination.transfer(&assetTwoSource, 100)
     return true
   }
 }
