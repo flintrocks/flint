@@ -80,4 +80,16 @@ public struct TraitResolver: ASTPass {
 
     return ASTPassResult(element: functionDeclaration, diagnostics: [], passContext: passContext)
   }
+
+  public func process(variableDeclaration: VariableDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
+    var variableDeclaration = variableDeclaration
+
+    if let structDeclarationContext = passContext.structDeclarationContext,
+      variableDeclaration.type.rawType.isSelfType {
+      variableDeclaration.type.rawType = .userDefinedType(structDeclarationContext.structIdentifier.name)
+    }
+
+    return ASTPassResult(element: variableDeclaration, diagnostics: [], passContext: passContext)
+  }
 }

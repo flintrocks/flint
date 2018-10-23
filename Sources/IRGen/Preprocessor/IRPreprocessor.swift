@@ -51,13 +51,7 @@ public struct IRPreprocessor: ASTPass {
   // MARK: Declaration
   public func process(variableDeclaration: VariableDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
-    var variableDeclaration = variableDeclaration
     var passContext = passContext
-
-    if let structDeclarationContext = passContext.structDeclarationContext,
-      variableDeclaration.type.rawType.isSelfType {
-      variableDeclaration.type.rawType = .userDefinedType(structDeclarationContext.structIdentifier.name)
-    }
 
     if passContext.functionDeclarationContext != nil {
       // We're in a function. Record the local variable declaration.
