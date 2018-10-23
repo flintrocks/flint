@@ -11,8 +11,8 @@ contract(config.contractName, function(accounts) {
       const instance = await Contract.deployed()
       let t;
 
-      await instance.setFirstBFoo(100);
-      await instance.setSecondBFoo(100);
+      await instance.setFirstBValue(100);
+      await instance.setSecondBValue(100);
 
       t = await instance.addBoth.call();
       assert.equal(t.valueOf(), 200);

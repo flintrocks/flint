@@ -1,21 +1,21 @@
 struct trait A {
-    func getStoredFoo() -> Int
-    mutating func setStoredFoo(value: Int)
+    func getStoredValue() -> Int
+    mutating func setStoredValue(value: Int)
 
     mutating func add(other: inout Self) {
-        setStoredFoo(getStoredFoo() + other.getStoredFoo())
+        setStoredValue(getStoredValue() + other.getStoredValue())
     }
 }
 
 struct B: A {
-    var storedFoo: Int = 0
+    var storedValue: Int = 0
 
-    func getStoredFoo() -> Int {
-        return storedFoo
+    func getStoredValue() -> Int {
+        return storedValue
     }
 
-    mutating func setStoredFoo(value: Int) {
-        storedFoo = value
+    mutating func setStoredValue(value: Int) {
+        storedValue = value
     }
 }
 
@@ -27,16 +27,16 @@ contract C {
 C :: (any) {
     public init() {}
 
-    public mutating func setFirstBFoo(val: Int) {
-      b.storedFoo = val
+    public mutating func setFirstBValue(val: Int) {
+      b.storedValue = val
     }
 
-    public mutating func setSecondBFoo(val: Int) {
-      otherB.storedFoo = val
+    public mutating func setSecondBValue(val: Int) {
+      otherB.storedValue = val
     }
 
     public mutating func addBoth() -> Int {
       b.add(&otherB)
-      return b.getStoredFoo()
+      return b.getStoredValue()
     }
 }
