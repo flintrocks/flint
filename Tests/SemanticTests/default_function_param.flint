@@ -10,7 +10,7 @@ Marking :: (any) {
 }
 
 Marking :: caller <- (any) {
-  public mutating func test1(a: Int = 0, b: Int = 1) {
+  mutating func test1(a: Int = 0, b: Int = 1) {
     self.a = a;
     self.b = b;
   }
@@ -18,5 +18,8 @@ Marking :: caller <- (any) {
   public mutating func test2() {
     test1(a:3, b:2);
     test1();
+    test1(a:2);
+    test1(b:5);
+    test1(b:2, a:3);
   }
 }

@@ -158,9 +158,12 @@ public struct Environment {
   ///   - source: arguments of the function that the user is trying to call.
   ///   - target: arguments of the function available in this scope.
   /// - Returns: Boolean indicating whether function arguments are compatible.
-  func areFunctionArgumentsCompatible(source: [RawType], target: [RawType], enclosingType: RawTypeIdentifier) -> Bool {
+  func areFunctionArgumentsCompatible(source: FunctionInformation,
+                                      target: FunctionCall,
+                                      enclosingType: RawTypeIdentifier,
+                                      scopeContext: ScopeContext) -> Bool {
     // If source contains an argument of self type then attempt to replace with enclosing type
-    let sourceSelf = source.map { type -> RawType in
+    let sourceSelf = source.parameterTypes.map { type -> RawType in
       if type.isSelfType {
         if type.isInout {
           return .inoutType(.userDefinedType(enclosingType))
@@ -172,7 +175,38 @@ public struct Environment {
       return type
     }
 
-    return sourceSelf == target
+    let sourceVariables = source.declaration.signature.parameters.map({ $0.asVariableDeclaration })
+    let targetArguments = target.arguments
+
+    guard targetArguments.count <= source.parameterIdentifiers.count else {
+      return false
+    }
+    guard targetArguments.count >= source.requiredParameterIdentifiers.count else {
+      return false
+    }
+
+    var sourceIndex = 0
+    var targetIndex = 0
+    while targetIndex < targetArguments.count && sourceIndex < sourceVariables.count {
+      if let identifier = targetArguments[targetIndex].identifier,
+         identifier.name != sourceVariables[sourceIndex].identifier.name {
+        if sourceVariables[sourceIndex].assignedExpression == nil {
+          return false
+        } else {
+          sourceIndex+=1
+          continue
+        }
+      }
+      if sourceSelf[sourceIndex] == type(of: targetArguments[targetIndex].expression,
+              enclosingType: enclosingType,
+              scopeContext: scopeContext) {
+        sourceIndex+=1
+        targetIndex+=1
+      } else {
+        return false
+      }
+    }
+    return true
   }
 
   /// Whether two caller protection groups are compatible, i.e. whether a function with caller protection `source` is
