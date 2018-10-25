@@ -189,10 +189,16 @@ extension Parser {
   }
 
   func parseFunctionCallArgument(upTo: Int) throws -> FunctionArgument {
-    let identifier = try parseIdentifier()
-    try consume(.punctuation(.colon), or: .expectedColonAfterArgumentLabel(at: latestSource))
+    // Find next colon
+    if let firstPartEnd = indexOfFirstAtCurrentDepth([.punctuation(.colon)]),
+      firstPartEnd < upTo {
+      let identifier = try parseIdentifier()
+      try consume(.punctuation(.colon), or: .expectedColonAfterArgumentLabel(at: latestSource))
+      let expression = try parseExpression(upTo: upTo)
+      return FunctionArgument(identifier: identifier, expression: expression)
+    }
     let expression = try parseExpression(upTo: upTo)
-    return FunctionArgument(identifier: identifier, expression: expression)
+    return FunctionArgument(identifier: nil, expression: expression)
   }
 
   // MARK: Range

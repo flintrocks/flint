@@ -25,7 +25,7 @@ public struct FunctionInformation {
     return declaration.signature.rawType
   }
 
-  var requiredParameterIdentifiers: [Identifier] {
+  public var requiredParameterIdentifiers: [Identifier] {
     return declaration.signature.parameters.filter({ $0.assignedExpression == nil }).map({ $0.identifier })
   }
 }
