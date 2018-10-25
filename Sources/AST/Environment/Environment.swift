@@ -232,4 +232,52 @@ public struct Environment {
     }
     return true
   }
+
+  // Adds the defaulted parameters to a function call given a function declaration
+  // This assumes parameters are passed in order, and they are valid
+  public func addDefaultParameters(functionCall: FunctionCall, toAdd: [VariableDeclaration]) -> [FunctionArgument] {
+    var declarationIndex = 0
+    var existingArguments = functionCall.arguments;
+
+    while declarationIndex < toAdd.count {
+      if declarationIndex == existingArguments.count {
+        // Add everything that's remaining
+        existingArguments.insert(FunctionArgument(identifier: toAdd[declarationIndex].identifier,
+                expression: toAdd[declarationIndex].assignedExpression!),
+                at: declarationIndex)
+
+        declarationIndex+=1
+        continue
+      }
+
+      if existingArguments[declarationIndex].identifier == nil {
+        // Identifier-less call parameters should always match the declaration parameter
+        declarationIndex+=1
+
+        continue;
+      }
+
+      if toAdd[declarationIndex].assignedExpression == nil {
+        // Parameter must have been provided
+        declarationIndex+=1
+
+        continue
+      }
+
+      if toAdd[declarationIndex].identifier.name == existingArguments[declarationIndex].identifier!.name {
+        // Default parameter value is overridden
+        declarationIndex+=1
+
+        continue
+      }
+
+      existingArguments.insert(FunctionArgument(identifier: toAdd[declarationIndex].identifier,
+              expression: toAdd[declarationIndex].assignedExpression!),
+              at: declarationIndex)
+
+      declarationIndex+=1
+    }
+
+    return existingArguments
+  }
 }

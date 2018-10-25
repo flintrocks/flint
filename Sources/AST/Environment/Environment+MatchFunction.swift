@@ -79,7 +79,7 @@ extension Environment {
                 .merge(with: regularMatch)
   }
 
-  private func matchRegularFunction(functionCall: FunctionCall,
+  public func matchRegularFunction(functionCall: FunctionCall,
                                     enclosingType: RawTypeIdentifier,
                                     argumentTypes: [RawType],
                                     typeStates: [TypeState],
