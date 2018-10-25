@@ -155,8 +155,8 @@ public struct Environment {
   /// Whether to function arguments are compatible.
   ///
   /// - Parameters:
-  ///   - source: arguments of the function that the user is trying to call.
-  ///   - target: arguments of the function available in this scope.
+  ///   - source: function information of the function that the user is trying to call.
+  ///   - target: function call available in this scope.
   /// - Returns: Boolean indicating whether function arguments are compatible.
   func areFunctionArgumentsCompatible(source: FunctionInformation,
                                       target: FunctionCall,
