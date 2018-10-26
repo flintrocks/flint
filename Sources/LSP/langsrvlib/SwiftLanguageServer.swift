@@ -95,9 +95,9 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
 //        case .workspaceDidChangeWatchedFiles(let params):
 //            try doWorkspaceDidChangeWatchedFiles(params)
 //
-//        case .textDocumentDidOpen(let params):
-//            try doDocumentDidOpen(params)
-//
+        case .textDocumentDidOpen(let params):
+            return try doDocumentDidOpen(params)
+
 //        case .textDocumentDidChange(let params):
 //            try doDocumentDidChange(params)
 //
@@ -112,13 +112,23 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
 //
 //        case .textDocumentSignatureHelp(let requestId, let params):
 //            return try doSignatureHelp(requestId, params)
-
         default: throw "command is not supported: \(command)"
         }
 
         return nil
     }
 
+  
+    private func doDocumentDidOpen(_ params: DidOpenTextDocumentParams) throws -> LanguageServerResponse {
+        log("command: documentDidOpen - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
+        // openDocuments[params.textDocument.uri] = params.textDocument.text
+      
+        // TODO(ethan) implement this to process the input file and generate diagnostics
+        // Also check if the capabilities below will need to be set to true.
+        let params = PublishDiagnosticsParams(uri: params.textDocument.uri, diagnostics: [])
+        return .textDocumentPublishDiagnostics(params: params)
+    }
+  
     private func doInitialize(_ requestId: RequestId, _ params: InitializeParams) throws -> LanguageServerResponse {
         projectPath = params.rootPath!
         buildPath = "\(projectPath!)/.build"
