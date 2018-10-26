@@ -29,7 +29,7 @@ struct Compiler {
   }
 
   func tokenizeFiles() throws -> [Token] {
-    let stdlibTokens = try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
+    let stdlibTokens = [Token]()//try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
     let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
 
     return stdlibTokens + userTokens
