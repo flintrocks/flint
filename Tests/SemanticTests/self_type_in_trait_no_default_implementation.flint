@@ -1,13 +1,15 @@
 // RUN: %flintc %s --verify
 
 struct trait Trait {
-  mutating func noDefaultImplementation(thisParam: inout Self)
-  // TODO: write test case for parameter conformance in implementation, specifically for paramters of type Self
+  // A function signature that conforming structures need to implement,
+  // substituting `Self` for their own type.
+  func noDefaultImplementation(param: inout Self)
 }
 
-// An implementation of struct trait Trait not implementing `noDefaultImplementation`
+// A correct implementation of struct trait Trait
 struct Implementation: Trait {
-  // expects-error {{}}
+  func noDefaultImplementation(param: inout Implementation) {
+  }
 }
 
 contract A { }

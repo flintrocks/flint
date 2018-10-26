@@ -176,6 +176,28 @@ public struct Environment {
     return sourceSelf == target
   }
 
+  /// Whether two function signatures are compatible.
+  ///
+  /// - Parameters:
+  ///   - source: signature declaration of the function that the user is trying to use.
+  ///   - target: signature declaration of the function available in this scope.
+  ///   - enclosingType: Type identifier of type containing *source* function.
+  /// - Returns: Boolean indicating whether two function arguments are compatible.
+  func areFunctionSignaturesCompatible(source: FunctionSignatureDeclaration,
+                                       target: FunctionSignatureDeclaration,
+                                       enclosingType: RawTypeIdentifier) -> Bool {
+    // Lifted directly from FunctionSignatureDeclaration.
+    return source.identifier.name == target.identifier.name &&
+      source.modifiers.map({ $0.kind }) == target.modifiers.map({ $0.kind }) &&
+      source.attributes.map({ $0.kind }) == target.attributes.map({ $0.kind }) &&
+      source.resultType?.rawType == target.resultType?.rawType &&
+      source.parameters.identifierNames == target.parameters.identifierNames &&
+      areFunctionArgumentsCompatible(source: source.parameters.rawTypes,
+                                     target: target.parameters.rawTypes,
+                                     enclosingType: enclosingType) &&
+      source.parameters.map({ $0.isInout }) == target.parameters.map({ $0.isInout })
+  }
+
   /// Whether two caller protection groups are compatible, i.e. whether a function with caller protection `source` is
   /// able to call a function which require caller protections `target`.
   func areCallerProtectionsCompatible(source: [CallerProtection], target: [CallerProtection]) -> Bool {
