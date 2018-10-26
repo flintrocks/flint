@@ -154,6 +154,10 @@ public struct Environment {
 
   /// Whether two function arguments are compatible.
   ///
+  /// # What is compatibility?
+  /// Compatibility means that `source` and `target` are equal following a replacement
+  /// of all ocurrences of `Self` in `source`.
+  ///
   /// - Parameters:
   ///   - source: arguments of the function that the user is trying to use.
   ///   - target: arguments of the function available in this scope.
@@ -178,11 +182,15 @@ public struct Environment {
 
   /// Whether two function signatures are compatible.
   ///
+  /// # What is compatibility?
+  /// Compatibility means that `source` and `target` are equal following a replacement
+  /// of all ocurrences of `Self` in `source`.
+  ///
   /// - Parameters:
   ///   - source: signature declaration of the function that the user is trying to use.
   ///   - target: signature declaration of the function available in this scope.
   ///   - enclosingType: Type identifier of type containing *source* function.
-  /// - Returns: Boolean indicating whether two function arguments are compatible.
+  /// - Returns: Boolean indicating whether two function signatures are compatible.
   func areFunctionSignaturesCompatible(source: FunctionSignatureDeclaration,
                                        target: FunctionSignatureDeclaration,
                                        enclosingType: RawTypeIdentifier) -> Bool {
