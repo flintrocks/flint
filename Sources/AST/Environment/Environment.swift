@@ -152,11 +152,12 @@ public struct Environment {
     return true
   }
 
-  /// Whether to function arguments are compatible.
+  /// Whether two function arguments are compatible.
   ///
   /// - Parameters:
-  ///   - source: arguments of the function that the user is trying to call.
+  ///   - source: arguments of the function that the user is trying to use.
   ///   - target: arguments of the function available in this scope.
+  ///   - enclosingType: Type identifier of type containing *source* function.
   /// - Returns: Boolean indicating whether function arguments are compatible.
   func areFunctionArgumentsCompatible(source: [RawType], target: [RawType], enclosingType: RawTypeIdentifier) -> Bool {
     // If source contains an argument of self type then attempt to replace with enclosing type
