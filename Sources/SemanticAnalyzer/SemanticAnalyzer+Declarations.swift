@@ -392,6 +392,23 @@ extension SemanticAnalyzer {
       diagnostics.append(.multipleBecomes(statement))
     }
 
+    // Check that all default arguments are at the end
+    let arguments = signature.parameters
+
+    var currentArgumentIndex = 0
+
+    while currentArgumentIndex < arguments.count && arguments[currentArgumentIndex].assignedExpression == nil {
+      currentArgumentIndex += 1
+    }
+
+    while currentArgumentIndex < arguments.count {
+      if arguments[currentArgumentIndex].assignedExpression == nil {
+        diagnostics.append(.defaultArgumentsNotAtEnd(functionDeclaration))
+      }
+
+      currentArgumentIndex += 1
+    }
+
     return ASTPassResult(element: functionDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 

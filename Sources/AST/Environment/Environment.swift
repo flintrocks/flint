@@ -176,32 +176,75 @@ public struct Environment {
     let sourceVariables = source.declaration.signature.parameters.map({ $0.asVariableDeclaration })
     let targetArguments = target.arguments
 
-    guard target.arguments.count <= source.parameterIdentifiers.count &&
-          target.arguments.count >= source.requiredParameterIdentifiers.count else {
+    guard targetArguments.count <= source.parameterIdentifiers.count &&
+          targetArguments.count >= source.requiredParameterIdentifiers.count else {
       return false
     }
 
+    // Check required parameters first
     var sourceIndex = 0
     var targetIndex = 0
-    while targetIndex < targetArguments.count && sourceIndex < sourceVariables.count {
-      if let identifier = targetArguments[targetIndex].identifier,
-         identifier.name != sourceVariables[sourceIndex].identifier.name {
-        if sourceVariables[sourceIndex].assignedExpression == nil {
+
+    while sourceIndex < sourceVariables.count && sourceVariables[sourceIndex].assignedExpression == nil {
+      // Check identifiers
+      if targetArguments[targetIndex].identifier != nil {
+        if targetArguments[targetIndex].identifier!.name != sourceVariables[sourceIndex].identifier.name {
           return false
-        } else {
-          sourceIndex += 1
-          continue
         }
       }
-      if sourceSelf[sourceIndex] == type(of: targetArguments[targetIndex].expression,
+
+      // Check types
+      if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
                                          enclosingType: enclosingType,
                                          scopeContext: scopeContext) {
+        // Wrong type
+        return false;
+      }
+
+      sourceIndex += 1
+      targetIndex += 1
+    }
+
+    // Check default parameters
+    while sourceIndex < sourceVariables.count && targetIndex < targetArguments.count {
+      guard let argumentIdentifier = targetArguments[targetIndex].identifier else {
+        if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
+                                           enclosingType: enclosingType,
+                                           scopeContext: scopeContext) {
+          return false;
+        }
+
         sourceIndex += 1
         targetIndex += 1
-      } else {
+        continue
+      }
+
+      while sourceIndex < sourceVariables.count &&
+            argumentIdentifier.name != sourceVariables[sourceIndex].identifier.name {
+        sourceIndex += 1
+      }
+
+      if sourceIndex == sourceVariables.count {
+        // Identifier was not found
         return false
       }
+
+      if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
+                                         enclosingType: enclosingType,
+                                         scopeContext: scopeContext) {
+        // Wrong type
+        return false;
+      }
+
+      sourceIndex += 1
+      targetIndex += 1
     }
+
+    if targetIndex < targetArguments.count {
+      // Not all arguments were matches
+      return false
+    }
+
     return true
   }
 

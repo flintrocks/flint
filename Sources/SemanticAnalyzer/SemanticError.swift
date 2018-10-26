@@ -550,4 +550,10 @@ extension Diagnostic {
     return Diagnostic(severity: .warning, sourceLocation: variableDeclaration.sourceLocation,
                       message: "Variables are already implicitly mutating")
   }
+
+  static func defaultArgumentsNotAtEnd(_ functionDeclaration: FunctionDeclaration) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: functionDeclaration.sourceLocation,
+        message: "Default parameters should be the last ones to be declared")
+  }
+
 }

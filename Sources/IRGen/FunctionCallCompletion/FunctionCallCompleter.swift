@@ -49,7 +49,8 @@ public struct FunctionCallCompleter: ASTPass {
   }
 
   // Adds the defaulted parameters to a function call given all the declared parameters of a function
-  // This assumes parameters are passed in order, and they are valid
+  // This assumes parameters are valid, ie. they were already determined to be a match and they follow
+  // the following rule: all default parameters must be declared at the end of the function signature
   private func add(declarationParameters: [VariableDeclaration], to functionCall: FunctionCall) -> [FunctionArgument] {
     var declarationIndex = 0
     var existingArguments = functionCall.arguments
