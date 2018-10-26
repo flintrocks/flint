@@ -2,7 +2,7 @@
 //  Array+Parameter.swift
 //  AST
 //
-//  Created by Nik on 26/10/2018.
+//  Created by Niklas Vangerow on 26/10/2018.
 //
 
 import Foundation
