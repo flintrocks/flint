@@ -1,4 +1,4 @@
-struct Wei {
+struct Wei: Asset {
   var rawValue: Int
 
   init(unsafeRawValue: Int) {
@@ -6,31 +6,12 @@ struct Wei {
   }
 
   init(source: inout Wei, amount: Int) {
-    if source.getRawValue() < amount {
-      fatalError()
-    }
-
-    source.rawValue -= amount
-    rawValue = amount
+    transfer(&source, amount)
   }
 
   init(source: inout Wei) {
     let value: Int = source.getRawValue()
-    source.rawValue -= value
-    rawValue = value
-  }
-
-  mutating func transfer(source: inout Wei, amount: Int) {
-    if source.getRawValue() < amount {
-      fatalError()
-    }
-
-    source.rawValue -= amount
-    rawValue += amount
-  }
-
-  mutating func transfer(source: inout Wei) {
-    transfer(&source, source.getRawValue())
+    transfer(&source, amount)
   }
 
   mutating func setRawValue(value: Int) -> Int {
