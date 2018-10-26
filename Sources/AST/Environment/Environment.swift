@@ -121,10 +121,8 @@ public struct Environment {
     let targetVariables = target.declaration.variableDeclarations
     let targetTypes = target.eventTypes
 
-    guard source.count <= target.parameterIdentifiers.count else {
-      return false
-    }
-    guard source.count >= target.requiredParameterIdentifiers.count else {
+    guard source.count <= target.parameterIdentifiers.count &&
+            source.count >= target.requiredParameterIdentifiers.count else {
       return false
     }
 
@@ -136,15 +134,15 @@ public struct Environment {
         if targetVariables[targetIndex].assignedExpression == nil {
           return false
         } else {
-          targetIndex+=1
+          targetIndex += 1
           continue
         }
       }
       if targetTypes[targetIndex] == type(of: source[sourceIndex].expression,
                                           enclosingType: enclosingType,
                                           scopeContext: scopeContext) {
-        sourceIndex+=1
-        targetIndex+=1
+        sourceIndex += 1
+        targetIndex += 1
       } else {
         return false
       }
@@ -178,10 +176,8 @@ public struct Environment {
     let sourceVariables = source.declaration.signature.parameters.map({ $0.asVariableDeclaration })
     let targetArguments = target.arguments
 
-    guard targetArguments.count <= source.parameterIdentifiers.count else {
-      return false
-    }
-    guard targetArguments.count >= source.requiredParameterIdentifiers.count else {
+    guard target.arguments.count <= source.parameterIdentifiers.count &&
+          target.arguments.count >= source.requiredParameterIdentifiers.count else {
       return false
     }
 
@@ -193,15 +189,15 @@ public struct Environment {
         if sourceVariables[sourceIndex].assignedExpression == nil {
           return false
         } else {
-          sourceIndex+=1
+          sourceIndex += 1
           continue
         }
       }
       if sourceSelf[sourceIndex] == type(of: targetArguments[targetIndex].expression,
-              enclosingType: enclosingType,
-              scopeContext: scopeContext) {
-        sourceIndex+=1
-        targetIndex+=1
+                                         enclosingType: enclosingType,
+                                         scopeContext: scopeContext) {
+        sourceIndex += 1
+        targetIndex += 1
       } else {
         return false
       }
@@ -231,53 +227,5 @@ public struct Environment {
       }
     }
     return true
-  }
-
-  // Adds the defaulted parameters to a function call given a function declaration
-  // This assumes parameters are passed in order, and they are valid
-  public func addDefaultParameters(functionCall: FunctionCall, toAdd: [VariableDeclaration]) -> [FunctionArgument] {
-    var declarationIndex = 0
-    var existingArguments = functionCall.arguments;
-
-    while declarationIndex < toAdd.count {
-      if declarationIndex == existingArguments.count {
-        // Add everything that's remaining
-        existingArguments.insert(FunctionArgument(identifier: toAdd[declarationIndex].identifier,
-                expression: toAdd[declarationIndex].assignedExpression!),
-                at: declarationIndex)
-
-        declarationIndex+=1
-        continue
-      }
-
-      if existingArguments[declarationIndex].identifier == nil {
-        // Identifier-less call parameters should always match the declaration parameter
-        declarationIndex+=1
-
-        continue;
-      }
-
-      if toAdd[declarationIndex].assignedExpression == nil {
-        // Parameter must have been provided
-        declarationIndex+=1
-
-        continue
-      }
-
-      if toAdd[declarationIndex].identifier.name == existingArguments[declarationIndex].identifier!.name {
-        // Default parameter value is overridden
-        declarationIndex+=1
-
-        continue
-      }
-
-      existingArguments.insert(FunctionArgument(identifier: toAdd[declarationIndex].identifier,
-              expression: toAdd[declarationIndex].assignedExpression!),
-              at: declarationIndex)
-
-      declarationIndex+=1
-    }
-
-    return existingArguments
   }
 }

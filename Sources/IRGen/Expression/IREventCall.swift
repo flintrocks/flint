@@ -17,10 +17,7 @@ struct IREventCall {
     var stores = [String]()
     var memoryOffset = 0
 
-    let argumentsWithDefault = functionContext.environment.addDefaultParameters(functionCall: eventCall,
-            toAdd: eventDeclaration.variableDeclarations)
-
-    for (i, argument) in argumentsWithDefault.enumerated() {
+    for (i, argument) in eventCall.arguments.enumerated() {
       let argument = IRExpression(expression: argument.expression).rendered(functionContext: functionContext)
       stores.append("mstore(\(memoryOffset), \(argument))")
       memoryOffset += functionContext.environment.size(of: types[i].rawType) * EVM.wordSize

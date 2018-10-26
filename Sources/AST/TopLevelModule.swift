@@ -98,8 +98,10 @@ public struct TopLevelModule: ASTNode {
     }
     let valueIdentifier = Identifier(identifierToken: Token(kind: .identifier("value"),
                                                             sourceLocation: variable.sourceLocation))
-    let valueParameter = Parameter(identifier: valueIdentifier, type: resultType, implicitToken: nil,
-            assignedExpression: nil)
+    let valueParameter = Parameter(identifier: valueIdentifier,
+                                   type: resultType,
+                                   implicitToken: nil,
+                                   assignedExpression: nil)
     let body = [
       Statement.expression(.binaryExpression(
         BinaryExpression(lhs: expression,
@@ -169,8 +171,11 @@ public struct TopLevelModule: ASTNode {
       return (parameters, subscriptExpression, Type(inferredType: currentType, identifier: identifier))
     case .dictionaryType(let key, let value):
       let keyIdentifier = Identifier(identifierToken: Token(kind: .identifier("key"), sourceLocation: sourceLocation))
-      let keyParameter = Parameter(identifier: keyIdentifier, type: Type(inferredType: key, identifier: identifier),
-                                   implicitToken: nil, assignedExpression: nil)
+      let keyParameter = Parameter(identifier: keyIdentifier,
+                                   type: Type(inferredType: key,
+                                              identifier: identifier),
+                                   implicitToken: nil,
+                                   assignedExpression: nil)
       let subExpression = SubscriptExpression(baseExpression: .identifier(identifier),
                                               indexExpression: .identifier(keyIdentifier),
                                               closeSquareBracketToken: Token(kind: .punctuation(.closeSquareBracket),

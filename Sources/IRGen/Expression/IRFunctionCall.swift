@@ -15,34 +15,12 @@ struct IRFunctionCall {
     let enclosingType: RawTypeIdentifier = functionContext.enclosingTypeName
     let scopeContext: ScopeContext = functionContext.scopeContext
 
-    let argumentTypes = functionCall.arguments.map {
-      environment.type(of: $0.expression, enclosingType: enclosingType, scopeContext: scopeContext)
-    }
-
     if case .matchedEvent(let eventInformation) =
       environment.matchEventCall(functionCall,
                                  enclosingType: enclosingType,
                                  scopeContext: scopeContext) {
       return IREventCall(eventCall: functionCall, eventDeclaration: eventInformation.declaration)
         .rendered(functionContext: functionContext)
-    }
-
-    if case .matchedFunction(let functionInformation) =
-      environment.matchRegularFunction(functionCall: functionCall,
-                                       enclosingType: enclosingType,
-                                       argumentTypes: argumentTypes,
-                                       typeStates: [],
-                                       callerProtections: [],
-                                       scopeContext: scopeContext) {
-
-      let argumentsWithDefault = environment.addDefaultParameters(functionCall: functionCall,
-              toAdd: functionInformation.declaration.signature.parameters.map({ $0.asVariableDeclaration }))
-
-      let args: String = argumentsWithDefault.map({ argument in
-        return IRExpression(expression: argument.expression, asLValue: false).rendered(functionContext: functionContext)
-      }).joined(separator: ", ")
-      let identifier = functionCall.mangledIdentifier ?? functionCall.identifier.name
-      return "\(identifier)(\(args))"
     }
 
     let args: String = functionCall.arguments.map({ argument in
