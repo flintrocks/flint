@@ -45,5 +45,7 @@ EventTest :: (any) {
     emit B()
     emit B(a: 1)
     emit B(b: 4)
+    emit B(1) // expected-error {{All arguments of an event call should be labeled}}
+    emit B(1, 2) // expected-error {{All arguments of an event call should be labeled}}
   }
 }

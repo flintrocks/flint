@@ -556,4 +556,9 @@ extension Diagnostic {
         message: "Default parameters should be the last ones to be declared")
   }
 
+  static func unlabeledEventCallArguments(_ eventCall: FunctionCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: eventCall.sourceLocation,
+      message: "All arguments of an event call should be labeled")
+  }
+
 }
