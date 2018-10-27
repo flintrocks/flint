@@ -28,6 +28,7 @@ Test :: caller <- (any) {
 
   func bad_declaration(a: Int = 0, b: Address) {} // expected-error {{Default parameters should be the last ones to be declared}}
   func good_declaration(b: Address, a: Int = 0) {}
+  func duplicate_declaration(a: Int, a: Int) {} // expected-error {{Duplicate parameter declarations in function declaration}}
 
   mutating func test3(a: Int, b: Int = 1) {
     self.a = a

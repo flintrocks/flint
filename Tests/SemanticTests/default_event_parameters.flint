@@ -8,6 +8,16 @@ contract EventTest {
     let a: Int = 3
     let b: Int = 3
   }
+
+  event bad { // expected-error {{Default parameters should be the last ones to be declared}}
+    let a: Int = 2
+    let b: Address
+  }
+
+  event duplicate { //expected-error {{Duplicate parameter declarations in event declaration}}
+    let a: Int
+    let a: Int
+  }
 }
 
 EventTest :: (any) {
