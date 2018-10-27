@@ -63,7 +63,6 @@ extension SemanticAnalyzer {
 
   public func process(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
     let environment = passContext.environment!
-    let enclosingType = passContext.enclosingTypeIdentifier!.name
     var diagnostics = [Diagnostic]()
 
     if environment.isInitializerCall(functionCall),
@@ -71,20 +70,6 @@ extension SemanticAnalyzer {
       !passContext.isPropertyDefaultAssignment,
       functionCall.arguments.isEmpty {
       diagnostics.append(.noReceiverForStructInitializer(functionCall))
-    }
-
-    // Semantic check for event calls
-    if case .matchedEvent(_) =
-      environment.matchEventCall(functionCall,
-                                 enclosingType: enclosingType,
-                                 scopeContext: passContext.scopeContext ?? ScopeContext()) {
-      // Make sure all arguments are labeled
-      for argument in functionCall.arguments {
-        guard let _ = argument.identifier else {
-          diagnostics.append(.unlabeledEventCallArguments(functionCall))
-          return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
-        }
-      }
     }
 
     return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
@@ -179,17 +164,28 @@ extension SemanticAnalyzer {
         diagnostics.append(.noMatchingFunctionForFunctionCall(functionCall, candidates: candidates))
       }
     } else if case .failure(let candidates) =
-      environment.matchEventCall(functionCall,
-                                 enclosingType: enclosingType,
-                                 scopeContext: passContext.scopeContext ?? ScopeContext()) {
-      // Event call has failed to match but has candidates
-      if !candidates.isEmpty {
-        diagnostics.append(.partialMatchingEvents(functionCall, candidates: candidates))
-      } else {
-        diagnostics.append(.noMatchingEvents(functionCall))
-      }
-
+        environment.matchEventCall(functionCall,
+                                   enclosingType: enclosingType,
+                                   scopeContext: passContext.scopeContext ?? ScopeContext()) {
+        // Event call has failed to match but has candidates
+        if !candidates.isEmpty {
+          diagnostics.append(.partialMatchingEvents(functionCall, candidates: candidates))
+        } else {
+          diagnostics.append(.noMatchingEvents(functionCall))
+        }
+    } else if case .matchedEvent(_) =
+        environment.matchEventCall(functionCall,
+                                   enclosingType: enclosingType,
+                                   scopeContext: passContext.scopeContext ?? ScopeContext()) {
+        // Make sure all arguments are labeled
+        for argument in functionCall.arguments {
+          guard argument.identifier != nil else {
+            diagnostics.append(.unlabeledEventCallArguments(functionCall))
+            return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
+          }
+        }
     }
+
     return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
   }
 

@@ -111,7 +111,7 @@ extension TypeChecker {
       // Ensure an event call's arguments match the expected types.
 
       for argument in functionCall.arguments {
-        guard let _ = argument.identifier else {
+        guard argument.identifier != nil else {
           // This will have been caught as a semantic error
           continue
         }

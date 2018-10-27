@@ -149,8 +149,10 @@ extension Parser {
         }
       }
 
-      let parameter = Parameter(identifier: identifier, type: typeAnnotation.type,
-              implicitToken: implicitToken, assignedExpression: assignedExpression)
+      let parameter = Parameter(identifier: identifier,
+                                type: typeAnnotation.type,
+                                implicitToken: implicitToken,
+                                assignedExpression: assignedExpression)
       parameters.append(parameter)
       if currentIndex < closingIndex {
         try consume(.punctuation(.comma), or: .expectedSeparator(at: latestSource))

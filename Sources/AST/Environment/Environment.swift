@@ -118,14 +118,21 @@ public struct Environment {
                               target: [FunctionArgument],
                               enclosingType: String,
                               scopeContext: ScopeContext) -> Bool {
-    let sourceVariables = source.declaration.variableDeclarations
-    let sourceTypes = source.eventTypes
+    let declaredParameters = source.declaration.variableDeclarations
+    let declarationTypes = source.eventTypes
 
     guard target.count <= source.parameterIdentifiers.count &&
           target.count >= source.requiredParameterIdentifiers.count else {
       return false
     }
 
+    return checkParameterCompatibility(of: target,
+                                       against: declaredParameters,
+                                       withTypes: declarationTypes,
+                                       enclosingType: enclosingType,
+                                       scopeContext: scopeContext)
+
+    /*
     // Check required parameters first
     var sourceIndex = 0
     var targetIndex = 0
@@ -190,7 +197,22 @@ public struct Environment {
       return false
     }
 
-    return true
+    return true */
+  }
+
+  // Attempts to replace Self in rawTypeList with the given enclosingType
+  func replaceSelf(in rawTypeList: [RawType], enclosingType: RawTypeIdentifier) -> [RawType] {
+    return rawTypeList.map { type -> RawType in
+      if type.isSelfType {
+        if type.isInout {
+          return .inoutType(.userDefinedType(enclosingType))
+        }
+
+        return .userDefinedType(enclosingType)
+      }
+
+      return type
+    }
   }
 
   /// Whether two function arguments are compatible.
@@ -208,18 +230,7 @@ public struct Environment {
                                       target: [RawType],
                                       enclosingType: RawTypeIdentifier) -> Bool {
     // If source contains an argument of self type then attempt to replace with enclosing type
-    let sourceSelf = source.map { type -> RawType in
-      if type.isSelfType {
-        if type.isInout {
-          return .inoutType(.userDefinedType(enclosingType))
-        }
-
-        return .userDefinedType(enclosingType)
-      }
-
-      return type
-    }
-
+    let sourceSelf = replaceSelf(in: source, enclosingType: enclosingType)
     return sourceSelf == target
   }
 
@@ -232,86 +243,86 @@ public struct Environment {
                                           enclosingType: RawTypeIdentifier,
                                           scopeContext: ScopeContext) -> Bool {
     // If source contains an argument of self type then attempt to replace with enclosing type
-    let sourceSelf = source.parameterTypes.map { type -> RawType in
-      if type.isSelfType {
-        if type.isInout {
-          return .inoutType(.userDefinedType(enclosingType))
-        }
+    let declarationTypesNoSelf = replaceSelf(in: source.parameterTypes, enclosingType: enclosingType)
+    let declaredParameters = source.declaration.signature.parameters.map({ $0.asVariableDeclaration })
 
-        return .userDefinedType(enclosingType)
-      }
-
-      return type
-    }
-
-    let sourceVariables = source.declaration.signature.parameters.map({ $0.asVariableDeclaration })
-    let targetArguments = target.arguments
-
-    guard targetArguments.count <= source.parameterIdentifiers.count &&
-          targetArguments.count >= source.requiredParameterIdentifiers.count else {
+    guard target.arguments.count <= source.parameterIdentifiers.count &&
+          target.arguments.count >= source.requiredParameterIdentifiers.count else {
       return false
     }
 
-    // Check required parameters first
-    var sourceIndex = 0
-    var targetIndex = 0
+    return checkParameterCompatibility(of: target.arguments,
+                                       against: declaredParameters,
+                                       withTypes: declarationTypesNoSelf,
+                                       enclosingType: enclosingType,
+                                       scopeContext: scopeContext)
+  }
 
-    while sourceIndex < sourceVariables.count && sourceVariables[sourceIndex].assignedExpression == nil {
+  func checkParameterCompatibility(of callArguments: [FunctionArgument],
+                                   against declaredParameters: [VariableDeclaration],
+                                   withTypes declarationTypes: [RawType],
+                                   enclosingType: RawTypeIdentifier,
+                                   scopeContext: ScopeContext) -> Bool {
+    var declaredIndex = 0
+    var callArgumentIndex = 0
+
+    // Check required parameters first
+    while declaredIndex < declaredParameters.count && declaredParameters[declaredIndex].assignedExpression == nil {
       // Check identifiers
-      if targetArguments[targetIndex].identifier != nil {
-        if targetArguments[targetIndex].identifier!.name != sourceVariables[sourceIndex].identifier.name {
+      if callArguments[callArgumentIndex].identifier != nil {
+        if callArguments[callArgumentIndex].identifier!.name != declaredParameters[declaredIndex].identifier.name {
           return false
         }
       }
 
       // Check types
-      if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
-                                         enclosingType: enclosingType,
-                                         scopeContext: scopeContext) {
+      if declarationTypes[declaredIndex] != type(of: callArguments[callArgumentIndex].expression,
+                                                 enclosingType: enclosingType,
+                                                 scopeContext: scopeContext) {
         // Wrong type
         return false
       }
 
-      sourceIndex += 1
-      targetIndex += 1
+      declaredIndex += 1
+      callArgumentIndex += 1
     }
 
     // Check default parameters
-    while sourceIndex < sourceVariables.count && targetIndex < targetArguments.count {
-      guard let argumentIdentifier = targetArguments[targetIndex].identifier else {
-        if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
-                                           enclosingType: enclosingType,
-                                           scopeContext: scopeContext) {
+    while declaredIndex < declaredParameters.count && callArgumentIndex < callArguments.count {
+      guard let argumentIdentifier = callArguments[callArgumentIndex].identifier else {
+        if declarationTypes[declaredIndex] != type(of: callArguments[callArgumentIndex].expression,
+                                                   enclosingType: enclosingType,
+                                                   scopeContext: scopeContext) {
           return false
         }
 
-        sourceIndex += 1
-        targetIndex += 1
+        declaredIndex += 1
+        callArgumentIndex += 1
         continue
       }
 
-      while sourceIndex < sourceVariables.count &&
-            argumentIdentifier.name != sourceVariables[sourceIndex].identifier.name {
-        sourceIndex += 1
+      while declaredIndex < declaredParameters.count &&
+          argumentIdentifier.name != declaredParameters[declaredIndex].identifier.name {
+        declaredIndex += 1
       }
 
-      if sourceIndex == sourceVariables.count {
+      if declaredIndex == declaredParameters.count {
         // Identifier was not found
         return false
       }
 
-      if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
-                                         enclosingType: enclosingType,
-                                         scopeContext: scopeContext) {
+      if declarationTypes[declaredIndex] != type(of: callArguments[callArgumentIndex].expression,
+                                                 enclosingType: enclosingType,
+                                                 scopeContext: scopeContext) {
         // Wrong type
         return false
       }
 
-      sourceIndex += 1
-      targetIndex += 1
+      declaredIndex += 1
+      callArgumentIndex += 1
     }
 
-    if targetIndex < targetArguments.count {
+    if callArgumentIndex < callArguments.count {
       // Not all arguments were matches
       return false
     }
