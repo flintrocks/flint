@@ -25,7 +25,7 @@ let package = Package(
     .target(
       name: "Diagnostic",
       dependencies: [
-        "Source",
+        "Source", "Rainbow"
         ]
     ),
     .target(
