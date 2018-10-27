@@ -193,16 +193,44 @@ public struct Environment {
     return true
   }
 
-  /// Whether to function arguments are compatible.
+  /// Whether two function arguments are compatible.
+  ///
+  /// # What is compatibility?
+  /// Compatibility means that `source` and `target` are equal following a replacement
+  /// of all ocurrences of `Self` in `source`.
   ///
   /// - Parameters:
-  ///   - source: function information of the function that the user is trying to call.
-  ///   - target: function call available in this scope.
+  ///   - source: arguments of the function that the user is trying to use.
+  ///   - target: arguments of the function available in this scope.
+  ///   - enclosingType: Type identifier of type containing *source* function.
   /// - Returns: Boolean indicating whether function arguments are compatible.
-  func areFunctionArgumentsCompatible(source: FunctionInformation,
-                                      target: FunctionCall,
-                                      enclosingType: RawTypeIdentifier,
-                                      scopeContext: ScopeContext) -> Bool {
+  func areFunctionArgumentsCompatible(source: [RawType],
+                                      target: [RawType],
+                                      enclosingType: RawTypeIdentifier) -> Bool {
+    // If source contains an argument of self type then attempt to replace with enclosing type
+    let sourceSelf = source.map { type -> RawType in
+      if type.isSelfType {
+        if type.isInout {
+          return .inoutType(.userDefinedType(enclosingType))
+        }
+
+        return .userDefinedType(enclosingType)
+      }
+
+      return type
+    }
+
+    return sourceSelf == target
+  }
+
+  // Function that checks whether the arguments of a function call are compatible
+  // (ie. the call could be successfully made) with a function declaration.
+  // - source: function information of the function that the user is trying to call.
+  // - target: function call that the user is trying to make.
+  func areFunctionCallArgumentsCompatible(source: FunctionInformation,
+                                          target: FunctionCall,
+                                          enclosingType: RawTypeIdentifier,
+                                          scopeContext: ScopeContext) -> Bool {
     // If source contains an argument of self type then attempt to replace with enclosing type
     let sourceSelf = source.parameterTypes.map { type -> RawType in
       if type.isSelfType {
@@ -289,6 +317,32 @@ public struct Environment {
     }
 
     return true
+  }
+
+  /// Whether two function signatures are compatible.
+  ///
+  /// # What is compatibility?
+  /// Compatibility means that `source` and `target` are equal following a replacement
+  /// of all ocurrences of `Self` in `source`.
+  ///
+  /// - Parameters:
+  ///   - source: signature declaration of the function that the user is trying to use.
+  ///   - target: signature declaration of the function available in this scope.
+  ///   - enclosingType: Type identifier of type containing *source* function.
+  /// - Returns: Boolean indicating whether two function signatures are compatible.
+  func areFunctionSignaturesCompatible(source: FunctionSignatureDeclaration,
+                                       target: FunctionSignatureDeclaration,
+                                       enclosingType: RawTypeIdentifier) -> Bool {
+    // Lifted directly from FunctionSignatureDeclaration.
+    return source.identifier.name == target.identifier.name &&
+      source.modifiers.map({ $0.kind }) == target.modifiers.map({ $0.kind }) &&
+      source.attributes.map({ $0.kind }) == target.attributes.map({ $0.kind }) &&
+      source.resultType?.rawType == target.resultType?.rawType &&
+      source.parameters.identifierNames == target.parameters.identifierNames &&
+      areFunctionArgumentsCompatible(source: source.parameters.rawTypes,
+                                     target: target.parameters.rawTypes,
+                                     enclosingType: enclosingType) &&
+      source.parameters.map({ $0.isInout }) == target.parameters.map({ $0.isInout })
   }
 
   /// Whether two caller protection groups are compatible, i.e. whether a function with caller protection `source` is
