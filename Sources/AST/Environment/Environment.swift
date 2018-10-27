@@ -114,39 +114,82 @@ public struct Environment {
   }
 
   // MARK: - Compatibility
-  func areArgumentsCompatible(source: [FunctionArgument],
-                              target: EventInformation,
+  func areArgumentsCompatible(source: EventInformation,
+                              target: [FunctionArgument],
                               enclosingType: String,
                               scopeContext: ScopeContext) -> Bool {
-    let targetVariables = target.declaration.variableDeclarations
-    let targetTypes = target.eventTypes
+    let sourceVariables = source.declaration.variableDeclarations
+    let sourceTypes = source.eventTypes
 
-    guard source.count <= target.parameterIdentifiers.count &&
-            source.count >= target.requiredParameterIdentifiers.count else {
+    guard target.count <= source.parameterIdentifiers.count &&
+          target.count >= source.requiredParameterIdentifiers.count else {
       return false
     }
 
+    // Check required parameters first
     var sourceIndex = 0
     var targetIndex = 0
-    while sourceIndex < source.count && targetIndex < targetVariables.count {
-      if let identifier = source[sourceIndex].identifier,
-        identifier.name != targetVariables[targetIndex].identifier.name {
-        if targetVariables[targetIndex].assignedExpression == nil {
+
+    while sourceIndex < sourceVariables.count && sourceVariables[sourceIndex].assignedExpression == nil {
+      // Check identifiers
+      if target[targetIndex].identifier != nil {
+        if target[targetIndex].identifier!.name != sourceVariables[sourceIndex].identifier.name {
           return false
-        } else {
-          targetIndex += 1
-          continue
         }
       }
-      if targetTypes[targetIndex] == type(of: source[sourceIndex].expression,
+
+      // Check types
+      if sourceTypes[sourceIndex] != type(of: target[targetIndex].expression,
                                           enclosingType: enclosingType,
                                           scopeContext: scopeContext) {
-        sourceIndex += 1
-        targetIndex += 1
-      } else {
+        // Wrong type
         return false
       }
+
+      sourceIndex += 1
+      targetIndex += 1
     }
+
+    // Check default parameters
+    while sourceIndex < sourceVariables.count && targetIndex < target.count {
+      guard let argumentIdentifier = target[targetIndex].identifier else {
+        if sourceTypes[sourceIndex] != type(of: target[targetIndex].expression,
+                                            enclosingType: enclosingType,
+                                            scopeContext: scopeContext) {
+          return false
+        }
+
+        sourceIndex += 1
+        targetIndex += 1
+        continue
+      }
+
+      while sourceIndex < sourceVariables.count &&
+            argumentIdentifier.name != sourceVariables[sourceIndex].identifier.name {
+        sourceIndex += 1
+      }
+
+      if sourceIndex == sourceVariables.count {
+        // Identifier was not found
+        return false
+      }
+
+      if sourceTypes[sourceIndex] != type(of: target[targetIndex].expression,
+                                          enclosingType: enclosingType,
+                                          scopeContext: scopeContext) {
+        // Wrong type
+        return false
+      }
+
+      sourceIndex += 1
+      targetIndex += 1
+    }
+
+    if targetIndex < target.count {
+      // Not all arguments were matches
+      return false
+    }
+
     return true
   }
 
