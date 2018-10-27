@@ -167,10 +167,12 @@ public struct Environment {
     return sourceSelf == target
   }
 
-  // Function that checks whether the arguments of a function call are compatible
-  // (ie. the call could be successfully made) with a function declaration.
-  // - source: function information of the function that the user is trying to call.
-  // - target: function call that the user is trying to make.
+  /// Function that checks whether the arguments of a function call are compatible
+  /// (i.e. the call could be successfully made) with a function declaration.
+  /// - Parameters:
+  ///   - source: function information of the function that the user is trying to call.
+  ///   - target: function call that the user is trying to make.
+  /// - Returns: Boolean indicating whether function call arguments are compatible.
   func areFunctionCallArgumentsCompatible(source: FunctionInformation,
                                           target: FunctionCall,
                                           enclosingType: RawTypeIdentifier,
