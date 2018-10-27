@@ -447,7 +447,6 @@ extension SemanticAnalyzer {
       identifiers.append(argument.identifier.name)
     }
 
-
     return ASTPassResult(element: functionDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 

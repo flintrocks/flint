@@ -139,7 +139,7 @@ extension Parser {
       let identifier = try parseIdentifier()
       let typeAnnotation = try parseTypeAnnotation()
 
-      var assignedExpression: Expression? = nil
+      var assignedExpression: Expression?
 
       if currentToken?.kind == .punctuation(.equal) {
         _ = try consume(.punctuation(.equal), or: .expectedValidOperator(at: latestSource))
