@@ -191,7 +191,7 @@ This type of error is responsible for the bug in [King of the Ether](https://www
 The following solution was reworked following the discussion on October 25th, with the following goals in mind, roughly in order of decreasing importance:
 
  1. External contracts should be considered untrustworthy, and there will not (yet) be a way to change this.
- 2. External calls should always be surrounded with `do-try-catch` blocks.
+ 2. External calls should always be surrounded with `do-catch` blocks, where any call implies a `try`.
  3. Any data related to an external call should be specified at the call site.
  4. External calls should have a syntax distinct from regular function calls.
  5. The supporting syntax should feel similar to Swift (wherever possible).
@@ -243,19 +243,19 @@ contract Beta {
     let alpha: Alpha = Alpha(address: someAddress) // using the implicit constructor
     
     do {
-      try call alpha.simpleFunction() // with default gas allocation: 2300
-      try call(gas: 200) alpha.simpleFunction() // with user-specified gas allocation
+      call alpha.simpleFunction() // with default gas allocation: 2300
+      call(gas: 200) alpha.simpleFunction() // with user-specified gas allocation
     } catch ExternalCallError {
       // recover gracefully
     }
     
     // if the call fails, this will terminate
-    try! alpha.functionWithArguments(value: 1, tax: 2)
+    call! alpha.functionWithArguments(value: 1, tax: 2)
     
     // error: user must specify an amount of Wei to pay
-    // try! call alpha.expensiveFunction()
+    // call! alpha.expensiveFunction()
     
-    try! call(wei: 100) alpha.expensiveFunction()
+    call(wei: 100)! alpha.expensiveFunction()
     
     if let returnedValue: Int = call alpha.functionWithReturn() {
       // function returned value, here available as `returnedValue`
