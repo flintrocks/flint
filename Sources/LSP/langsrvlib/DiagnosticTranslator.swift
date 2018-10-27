@@ -4,10 +4,9 @@
 //
 //  Created by Ethan on 27/10/2018.
 //
-
+import struct Diagnostic.Diagnostic
 import LanguageServerProtocol
-import Diagnostic
 
 public protocol DiagnosticTranslator {
-  func translate(diagnostic: Diagnostic.Diagnostic) -> LanguageServerProtocol.Diagnostic
+  func translate(diagnostic: Diagnostic) -> LanguageServerProtocol.Diagnostic
 }
