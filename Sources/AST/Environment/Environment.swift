@@ -198,7 +198,7 @@ public struct Environment {
                                          enclosingType: enclosingType,
                                          scopeContext: scopeContext) {
         // Wrong type
-        return false;
+        return false
       }
 
       sourceIndex += 1
@@ -211,7 +211,7 @@ public struct Environment {
         if sourceSelf[sourceIndex] != type(of: targetArguments[targetIndex].expression,
                                            enclosingType: enclosingType,
                                            scopeContext: scopeContext) {
-          return false;
+          return false
         }
 
         sourceIndex += 1
@@ -233,7 +233,7 @@ public struct Environment {
                                          enclosingType: enclosingType,
                                          scopeContext: scopeContext) {
         // Wrong type
-        return false;
+        return false
       }
 
       sourceIndex += 1
