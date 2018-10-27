@@ -9,8 +9,8 @@ import JSONLib
 import Foundation
 import LanguageServerProtocol
 
-let languageServerLogCategory = "SwiftLanguageServer"
-let languageServerSettingsKey = "swift"
+let languageServerLogCategory = "FlintLanguageServer"
+let languageServerSettingsKey = "flint"
 
 public enum LanguageServerError: Error {
     case toolchainNotFound(path: String)
@@ -24,16 +24,7 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
 
     // cached goodness... maybe abstract this.
     private var openDocuments: [DocumentUri:String] = [:]
-    private var projectPath: String!
-    private var buildPath: String!
-
     // Settings that are not updated until a workspaceDidChangeConfiguration request comes in.
-    private var toolchainPath: String!
-    private var packageName: String!
-
-    private var packagePath: String!
-    private var includePath: String!
-    private var swiftPath: String!
 
 
     /// Initializes a new instance of a `SwiftLanguageServer`.
@@ -83,24 +74,24 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         case .initialized: 
             return try doInitialized()
 
-//        case .shutdown(let requestId):
-//            return try doShutdown(requestId)
-//
-//        case .exit:
-//            doExit()
-//
-//        case .workspaceDidChangeConfiguration(let params):
-//            try doWorkspaceDidChangeConfiguration(params)
-//
+        case .shutdown(let requestId):
+            return try doShutdown(requestId)
+
+        case .exit:
+            doExit()
+
+        case .workspaceDidChangeConfiguration(let params):
+            try doWorkspaceDidChangeConfiguration(params)
+// TODO(ethan), the cases commented are beyond our first demoable implementation, hence not supported.
 //        case .workspaceDidChangeWatchedFiles(let params):
 //            try doWorkspaceDidChangeWatchedFiles(params)
 //
         case .textDocumentDidOpen(let params):
             return try doDocumentDidOpen(params)
 
-//        case .textDocumentDidChange(let params):
-//            try doDocumentDidChange(params)
-//
+        case .textDocumentDidChange(let params):
+            try doDocumentDidChange(params)
+
 //        case .textDocumentCompletion(let requestId, let params):
 //            return try doCompletion(requestId, params)
 //
@@ -117,26 +108,40 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
 
         return nil
     }
-
-  
+    
+    private func doShutdown(_ requestId: RequestId) throws -> LanguageServerResponse {
+        canExit = true
+        return .shutdown(requestId: requestId)
+    }
+    
+    private func doExit() {
+        exit(canExit ? 0 : 1)
+    }
+    
     private func doDocumentDidOpen(_ params: DidOpenTextDocumentParams) throws -> LanguageServerResponse {
         log("command: documentDidOpen - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
         // openDocuments[params.textDocument.uri] = params.textDocument.text
       
         // TODO(ethan) implement this to process the input file and generate diagnostics
         // Also check if the capabilities below will need to be set to true.
-        let params = PublishDiagnosticsParams(uri: params.textDocument.uri, diagnostics: [])
+        let d = LanguageServerProtocol.Diagnostic(
+            range: Range(start: Position(line: 0, character: 0),
+                         end: Position(line: 0, character:3)),
+            message: "Some error", severity: LanguageServerProtocol.DiagnosticSeverity.error)
+        let params = PublishDiagnosticsParams(uri: params.textDocument.uri, diagnostics: [d])
         return .textDocumentPublishDiagnostics(params: params)
+        
     }
   
-    private func doInitialize(_ requestId: RequestId, _ params: InitializeParams) throws -> LanguageServerResponse {
-        projectPath = params.rootPath!
-        buildPath = "\(projectPath!)/.build"
+    private func doDocumentDidChange(_ params: DidChangeTextDocumentParams) throws {
+        log("command: documentDidChange - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
+    }
 
-        // sourcekit(initialize: true)
-        
+    
+    private func doInitialize(_ requestId: RequestId, _ params: InitializeParams) throws -> LanguageServerResponse {
         var capabilities = ServerCapabilities()
         capabilities.textDocumentSync = .kind(.full)
+        // TODO(ethan), uncomment the cases once they are implemented
         // capabilities.hoverProvider = true
         // capabilities.completionProvider = CompletionOptions(resolveProvider: nil, triggerCharacters: ["."])
         // capabilities.definitionProvider = true
@@ -152,8 +157,7 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         // capabilities.documentOnTypeFormattingProvider = DocumentOnTypeFormattingOptions(firstTriggerCharacter: "{", moreTriggerCharacter: nil)
         // capabilities.renameProvider = true
         // capabilities.documentLinkProvider = DocumentLinkOptions(resolveProvider: false)
-
-        try configureWorkspace(settings: nil)
+        // try configureWorkspace(settings: nil)
         
         return .initialize(requestId: requestId, result: InitializeResult(capabilities: capabilities))
     }
@@ -164,17 +168,11 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     }
 
     private func doWorkspaceDidChangeConfiguration(_ params: DidChangeConfigurationParams) throws {
-        let settings = (params.settings as! JSValue)[languageServerSettingsKey] ?? [:]
-        try configureWorkspace(settings: settings)
+        log("onWorkspaceDidChangeConfig", category: languageServerLogCategory)
     }
 
     private func configureWorkspace(settings: JSValue?) throws {
-        self.toolchainPath = getToolchainPath(settings)
-        log("configuration: toolchainPath set to %{public}@", category: languageServerLogCategory, toolchainPath)
-
-        if !FileManager.default.fileExists(atPath: self.toolchainPath) {
-            throw LanguageServerError.toolchainNotFound(path: self.toolchainPath)
-        }
+        log("configureWorkspace", category: languageServerLogCategory)
         // TODO(owensd): handle targets...
     }
 
@@ -225,17 +223,6 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         case "source.lang.swift.decl.extension.enum": return .`enum`
         default: return .text
         }
-    }
-
-    private func getToolchainPath(_ settings: JSValue?) -> String {
-        if let toolchainPath = settings?["toolchainPath"].string {
-            return toolchainPath
-        }
-
-        let path = shell(tool: "/usr/bin/xcrun", arguments: ["-f", "swift"])
-        return path
-            .replacingOccurrences(of: "/usr/bin/swift", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
