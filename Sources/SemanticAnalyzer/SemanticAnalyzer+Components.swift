@@ -144,7 +144,7 @@ extension SemanticAnalyzer {
   public func process(parameter: Parameter, passContext: ASTPassContext) -> ASTPassResult<Parameter> {
     var diagnostics = [Diagnostic]()
 
-    if parameter.type.rawType.isUserDefinedType, !parameter.isInout {
+    if parameter.type.rawType.isUserDefinedType, !parameter.isInout, !parameter.type.isCurrencyType {
       // Ensure all structs are passed by reference, for now.
       diagnostics.append(Diagnostic(severity: .error, sourceLocation: parameter.sourceLocation,
                                     message: "Structs cannot be passed by value yet, and have to be passed inout"))
