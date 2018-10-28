@@ -7,7 +7,15 @@
 
 import JSONLib
 import Foundation
+import struct Diagnostic.Diagnostic
+import class Diagnostic.DiagnosticPool
+import struct Diagnostic.SourceContext
+typealias DDiagnostic = Diagnostic
 import LanguageServerProtocol
+import Foundation
+import Commander
+import AST
+
 
 let languageServerLogCategory = "FlintLanguageServer"
 let languageServerSettingsKey = "flint"
@@ -124,11 +132,8 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
       
         // TODO(ethan) implement this to process the input file and generate diagnostics
         // Also check if the capabilities below will need to be set to true.
-        let d = LanguageServerProtocol.Diagnostic(
-            range: Range(start: Position(line: 0, character: 0),
-                         end: Position(line: 0, character:3)),
-            message: "Some error", severity: LanguageServerProtocol.DiagnosticSeverity.error)
-        let params = PublishDiagnosticsParams(uri: params.textDocument.uri, diagnostics: [d])
+        let diagnostics = doCompile(inputFiles: [URL(string: params.textDocument.uri)!]).map(translateDiagnostic)
+        let params = PublishDiagnosticsParams(uri: params.textDocument.uri, diagnostics: diagnostics)
         return .textDocumentPublishDiagnostics(params: params)
         
     }
@@ -176,6 +181,26 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         // TODO(owensd): handle targets...
     }
 
+    
+    private func doCompile(inputFiles: [URL]) -> [DDiagnostic] {
+        do {
+            return try Compiler(
+                inputFiles: inputFiles,
+                stdlibFiles: StandardLibrary.default.files,
+                outputDirectory: URL(string: "./")!,
+                diagnostics: DiagnosticPool(shouldVerify: false,
+                                            quiet: true,
+                                            sourceContext: SourceContext(sourceFiles: inputFiles))
+                ).compile()
+        } catch let err {
+            let diagnostic = Diagnostic(severity: .error,
+                                        sourceLocation: nil,
+                                        message: err.localizedDescription)
+            return [diagnostic]
+        }
+    }
+    
+    
     func kind(_ value: String?) -> CompletionItemKind {
         switch value ?? "" {
         case "source.lang.swift.decl.function.free": return .function
