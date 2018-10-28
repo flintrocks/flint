@@ -1,17 +1,17 @@
 struct Wei: Asset {
-  var rawValue: Int
+  var rawValue: Int = 0
 
   init(unsafeRawValue: Int) {
     self.rawValue = unsafeRawValue
   }
 
   init(source: inout Wei, amount: Int) {
-    transfer(&source, amount)
+    transfer(source, amount)
   }
 
   init(source: inout Wei) {
-    let value: Int = source.getRawValue()
-    transfer(&source, amount)
+    let amount: Int = source.getRawValue()
+    transfer(source, amount)
   }
 
   mutating func setRawValue(value: Int) -> Int {
