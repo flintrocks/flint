@@ -196,7 +196,9 @@ extension Environment {
     let typeInfo = types[enclosingType.name]!
     if let conforming = typeInfo.initializers.filter({ !$0.isSignature }).first { // Compatibility check
       if let signature = typeInfo.allInitialisers.filter({ $0.isSignature }).first,
-        conforming.declaration.signature != signature.declaration.signature {
+        !areFunctionSignaturesCompatible(source: signature.declaration.signature.asFunctionSignatureDeclaration,
+                                         target: conforming.declaration.signature.asFunctionSignatureDeclaration,
+                                         enclosingType: enclosingType.name) {
         return [signature]
       }
       return []

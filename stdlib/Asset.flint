@@ -4,12 +4,12 @@
 
 struct trait Asset {
   // Initialises the asset "unsafely", i.e. from `amount` given as an integer.
-  init(unsafeRawValue: Int)
+  // init(unsafeRawValue: Int)
 
   // Initialises the asset by transferring `amount` from an existing asset.
   // Should check if `source` has sufficient funds, and cause a fatal error
   // if not.
-  init(source: inout Self, amount: Int)
+  // init(source: inout Self, amount: Int)
 
   // Initialises the asset by transferring all funds from `source`.
   // `source` should be left empty.
@@ -57,13 +57,13 @@ struct trait Asset {
 struct Wei: Asset {
   var rawValue: Int = 0
 
-  init(unsafeRawValue: Int) {
-    self.rawValue = unsafeRawValue
-  }
+  // init(unsafeRawValue: Int) {
+  //   self.rawValue = unsafeRawValue
+  // }
 
-  init(source: inout Wei, amount: Int) {
-    // transfer(&source, amount)
-  }
+  // init(source: inout Wei, amount: Int) {
+  //   // transfer(&source, amount)
+  // }
 
   init(source: inout Wei) {
     let amount: Int = source.getRawValue()
