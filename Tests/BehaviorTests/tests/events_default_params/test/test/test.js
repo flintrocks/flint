@@ -147,7 +147,7 @@ contract(config.contractName, function() {
     }).then(function (result) {
       assert.equal(result.logs.length, 1);
 
-      // D(a: 1, b: 2, c: 3, d: 10)
+      // D(a: 4, b: 3, c: 2, d: 1)
       var log = result.logs[0];
       assert.equal(log.event, "D");
       assert.equal(_.size(log.args), 4);
