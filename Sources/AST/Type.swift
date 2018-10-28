@@ -102,6 +102,15 @@ public indirect enum RawType: Equatable {
     return false
   }
 
+  // Strip inoutType for use in type comparisons
+  public var stripInout: RawType {
+    if case .inoutType(let type) = self {
+      return type
+    }
+
+    return self
+  }
+
   /// Whether the type is compatible with the given type, i.e., if two expressions of those types can be used
   /// interchangeably.
   public func isCompatible(with otherType: RawType) -> Bool {
