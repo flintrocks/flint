@@ -5,6 +5,9 @@
  * Licensed under the MIT License. See License in the project root for license information.
  */
 
+import flintc
+import struct Diagnostic.Diagnostic
+
 import JSONLib
 import Foundation
 import LanguageServerProtocol
@@ -64,6 +67,10 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         }
 
         RunLoop.main.run()
+    }
+
+    public func diagnose(inputFiles: [URL]) throws -> [Diagnostic] {
+        return try Compiler(inputFiles: inputFiles).diagnose()
     }
 
     private func process(command: LanguageServerCommand) throws -> LanguageServerResponse? {

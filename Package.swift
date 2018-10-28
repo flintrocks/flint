@@ -93,12 +93,8 @@ let package = Package(
         name: "file-check",
         dependencies: ["FileCheck", "Commander"]),
     .target(
-      name: "langsrvlib", 
-      dependencies: ["JSONLib", "LanguageServerProtocol", "JsonRpcProtocol"],
-      path: "Sources/LSP/langsrvlib"),
-    .target(
-      name: "langsrv", 
-      dependencies: ["langsrvlib"],
-      path: "Sources/LSP/langsrv"),
+        name: "LSP",
+        dependencies: ["flintc", "JSONLib", "LanguageServerProtocol", "JsonRpcProtocol"],
+        path: "Sources/LSP")
     ]
 )
