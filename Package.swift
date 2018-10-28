@@ -94,7 +94,7 @@ let package = Package(
         dependencies: ["FileCheck", "Commander"]),
     .target(
       name: "langsrvlib", 
-      dependencies: ["JSONLib", "LanguageServerProtocol", "JsonRpcProtocol"],
+      dependencies: ["Parser", "Lexer", "SemanticAnalyzer", "TypeChecker", "Optimizer", "IRGen", "Commander", "Rainbow", "Symbolic", "Diagnostic", "JSONLib", "LanguageServerProtocol", "JsonRpcProtocol", "Parser"],
       path: "Sources/LSP/langsrvlib"),
     .target(
       name: "langsrv", 
