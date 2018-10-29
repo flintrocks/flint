@@ -18,9 +18,15 @@ import IRGen
 /// Runs the different stages of the compiler.
 public struct Compiler {
 
-  public static func diagnose(inputFiles: [URL]) throws -> [Diagnostic] {
+  public static let defaultASTPasses: [ASTPass] = [
+    SemanticAnalyzer(),
+    TypeChecker(),
+    Optimizer(),
+    IRPreprocessor()]
+
+  public static func diagnose(config: DiagnoserConfiguration) throws -> [Diagnostic] {
     var diagnoseResult: [Diagnostic] = []
-    let tokens = try tokenizeFiles(inputFiles: inputFiles)
+    let tokens = try tokenizeFiles(inputFiles: config.inputFiles)
 
     // Turn the tokens into an Abstract Syntax Tree (AST).
     let (parserAST, environment, parserDiagnostics) = Parser(tokens: tokens).parse()
@@ -29,19 +35,11 @@ public struct Compiler {
       return diagnoseResult
     }
 
-    // The AST passes to run sequentially.
-    let astPasses: [ASTPass] = [
-      SemanticAnalyzer(),
-      TypeChecker(),
-      Optimizer(),
-      IRPreprocessor()
-    ]
-
     // Run all of the passes.
     let passRunnerOutcome = ASTPassRunner(ast: ast).run(
-      passes: astPasses,
+      passes: config.astPasses,
       in: environment,
-      sourceContext: SourceContext(sourceFiles: inputFiles))
+      sourceContext: SourceContext(sourceFiles: config.inputFiles))
     diagnoseResult += passRunnerOutcome.diagnostics
 
     return diagnoseResult
@@ -69,19 +67,9 @@ public struct Compiler {
       exit(0)
     }
 
-    // The AST passes to run sequentially.
-    let astPasses: [ASTPass] = [
-      SemanticAnalyzer(),
-      TypeChecker(),
-      Optimizer(),
-      TraitResolver(),
-      FunctionCallCompleter(),
-      IRPreprocessor()
-    ]
-
     // Run all of the passes.
     let passRunnerOutcome = ASTPassRunner(ast: ast).run(
-      passes: astPasses,
+      passes: config.astPasses,
       in: environment,
       sourceContext: SourceContext(sourceFiles: config.inputFiles))
     if let failed = try config.diagnostics.checkpoint(passRunnerOutcome.diagnostics) {
@@ -119,6 +107,17 @@ public struct Compiler {
   }
 }
 
+public struct DiagnoserConfiguration {
+  public let inputFiles: [URL]
+  public let astPasses: [ASTPass]
+
+  public init(inputFiles: [URL],
+              astPasses: [ASTPass] = Compiler.defaultASTPasses) {
+    self.inputFiles = inputFiles
+    self.astPasses = astPasses
+  }
+}
+
 public struct CompilerConfiguration {
   public let inputFiles: [URL]
   public let stdlibFiles: [URL]
@@ -128,19 +127,13 @@ public struct CompilerConfiguration {
   public let diagnostics: DiagnosticPool
   public let astPasses: [ASTPass]
 
-  public static let defaultASTPasses: [ASTPass] = [
-    SemanticAnalyzer(),
-    TypeChecker(),
-    Optimizer(),
-    IRPreprocessor()]
-
   public init(inputFiles: [URL],
               stdlibFiles: [URL],
               outputDirectory: URL,
               dumpAST: Bool,
               emitBytecode: Bool,
               diagnostics: DiagnosticPool,
-              astPasses: [ASTPass] = CompilerConfiguration.defaultASTPasses) {
+              astPasses: [ASTPass] = Compiler.defaultASTPasses) {
     self.inputFiles = inputFiles
     self.stdlibFiles = stdlibFiles
     self.outputDirectory = outputDirectory

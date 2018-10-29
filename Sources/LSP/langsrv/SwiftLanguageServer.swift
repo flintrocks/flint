@@ -70,7 +70,7 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     }
 
     public func diagnose(inputFiles: [URL]) throws -> [Diagnostic] {
-        return try Compiler.diagnose(inputFiles: inputFiles)
+        return try Compiler.diagnose(config: DiagnoserConfiguration(inputFiles: inputFiles))
     }
 
     private func process(command: LanguageServerCommand) throws -> LanguageServerResponse? {
