@@ -11,7 +11,6 @@ import Lexer
 public struct Identifier: Hashable, ASTNode {
   public var identifierToken: Token
   public var enclosingType: String?
-  public var isFunctionCallArgLabel: Bool
 
   public var name: String {
     if case .self = identifierToken.kind {
@@ -21,14 +20,12 @@ public struct Identifier: Hashable, ASTNode {
     return name
   }
 
-  public init(identifierToken: Token, isFunctionCallArgLabel: Bool = false) {
+  public init(identifierToken: Token) {
     self.identifierToken = identifierToken
-    self.isFunctionCallArgLabel = isFunctionCallArgLabel
   }
 
-  public init(name: String, sourceLocation: SourceLocation, isFunctionCallArgLabel: Bool = false) {
+  public init(name: String, sourceLocation: SourceLocation) {
     self.identifierToken = Token(kind: .identifier(name), sourceLocation: sourceLocation)
-    self.isFunctionCallArgLabel = isFunctionCallArgLabel
   }
 
   public var hashValue: Int {

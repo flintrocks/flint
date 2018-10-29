@@ -10,7 +10,7 @@ import Lexer
 
 extension Parser {
   // MARK: Identifier
-  func parseIdentifier(isFunctionCallArgLabel: Bool = false) throws -> Identifier {
+  func parseIdentifier() throws -> Identifier {
     guard let token = currentToken else {
       throw raise(.expectedIdentifier(at: latestSource))
     }
@@ -18,7 +18,7 @@ extension Parser {
     case .identifier, .self:
       currentIndex += 1
       consumeNewLines()
-      return Identifier(identifierToken: token, isFunctionCallArgLabel: isFunctionCallArgLabel)
+      return Identifier(identifierToken: token)
     default:
       throw raise(.expectedIdentifier(at: latestSource))
     }
