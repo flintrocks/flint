@@ -35,7 +35,7 @@ func main() {
 
     let compilationOutcome: CompilationOutcome
     do {
-      compilationOutcome = try Compiler(
+      let compilerConfig = CompilerConfiguration(
         inputFiles: inputFiles,
         stdlibFiles: StandardLibrary.default.files,
         outputDirectory: outputDirectory,
@@ -43,8 +43,8 @@ func main() {
         emitBytecode: emitBytecode,
         diagnostics: DiagnosticPool(shouldVerify: shouldVerify,
                                     quiet: quiet,
-                                    sourceContext: SourceContext(sourceFiles: inputFiles))
-      ).compile()
+                                    sourceContext: SourceContext(sourceFiles: inputFiles)))
+      compilationOutcome = try Compiler.compile(config: compilerConfig)
     } catch let err {
       let diagnostic = Diagnostic(severity: .error,
                                   sourceLocation: nil,

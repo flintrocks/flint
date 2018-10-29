@@ -17,64 +17,10 @@ import IRGen
 
 /// Runs the different stages of the compiler.
 public struct Compiler {
-  private var diagnoseOnly: Bool
-  private var inputFiles: [URL]?
-  private var stdlibFiles: [URL]?
-  private var outputDirectory: URL?
-  private var dumpAST: Bool?
-  private var emitBytecode: Bool?
-  private var diagnostics: DiagnosticPool?
 
-  private var sourceContext: SourceContext? {
-    if let inputFiles = inputFiles {
-      return SourceContext(sourceFiles: inputFiles)
-    }
-
-    return nil
-  }
-
-  /**
-   * Constructs a Compiler that supports only diagnosis of input files
-   */
-  public init(inputFiles: [URL]) {
-    self.diagnoseOnly = true
-
-    self.inputFiles = inputFiles
-  }
-
-  /**
-   * Constructs a fully fledged Compiler
-   */
-  public init(inputFiles: [URL], stdlibFiles: [URL], outputDirectory: URL,
-       dumpAST: Bool, emitBytecode: Bool, diagnostics: DiagnosticPool) {
-    self.diagnoseOnly = false
-
-    self.inputFiles = inputFiles
-    self.stdlibFiles = stdlibFiles
-    self.outputDirectory = outputDirectory
-    self.dumpAST = dumpAST
-    self.emitBytecode = emitBytecode
-    self.diagnostics = diagnostics
-  }
-
-  func tokenizeFiles() throws -> [Token] {
-    guard let inputFiles = inputFiles else {
-      return []
-    }
-
-    let stdlibTokens = try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
-    let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
-
-    return stdlibTokens + userTokens
-  }
-
-  public func diagnose() throws -> [Diagnostic] {
-    guard let sourceContext = sourceContext else {
-      exitWithCompilerCreationError()
-    }
-
+  public static func diagnose(inputFiles: [URL]) throws -> [Diagnostic] {
     var diagnoseResult: [Diagnostic] = []
-    let tokens = try tokenizeFiles()
+    let tokens = try tokenizeFiles(inputFiles: inputFiles)
 
     // Turn the tokens into an Abstract Syntax Tree (AST).
     let (parserAST, environment, parserDiagnostics) = Parser(tokens: tokens).parse()
@@ -92,29 +38,22 @@ public struct Compiler {
     ]
 
     // Run all of the passes.
-    let passRunnerOutcome = ASTPassRunner(ast: ast)
-      .run(passes: astPasses, in: environment, sourceContext: sourceContext)
+    let passRunnerOutcome = ASTPassRunner(ast: ast).run(
+      passes: astPasses,
+      in: environment,
+      sourceContext: SourceContext(sourceFiles: inputFiles))
     diagnoseResult += passRunnerOutcome.diagnostics
 
     return diagnoseResult
   }
 
-  public func compile() throws -> CompilationOutcome {
-    guard !diagnoseOnly,
-      let outputDirectory = outputDirectory,
-      let dumpAST = dumpAST,
-      let emitBytecode = emitBytecode,
-      let diagnostics = diagnostics,
-      let sourceContext = sourceContext else {
-        exitWithCompilerCreationError()
-    }
-
-    let tokens = try tokenizeFiles()
+  public static func compile(config: CompilerConfiguration) throws -> CompilationOutcome {
+    let tokens = try tokenizeFiles(inputFiles: config.inputFiles)
 
     // Turn the tokens into an Abstract Syntax Tree (AST).
     let (parserAST, environment, parserDiagnostics) = Parser(tokens: tokens).parse()
 
-    if let failed = try diagnostics.checkpoint(parserDiagnostics) {
+    if let failed = try config.diagnostics.checkpoint(parserDiagnostics) {
       if failed {
         exitWithFailure()
       }
@@ -125,7 +64,7 @@ public struct Compiler {
       exitWithFailure()
     }
 
-    if dumpAST {
+    if config.dumpAST {
       print(ASTDumper(topLevelModule: ast).dump())
       exit(0)
     }
@@ -141,9 +80,11 @@ public struct Compiler {
     ]
 
     // Run all of the passes.
-    let passRunnerOutcome = ASTPassRunner(ast: ast)
-      .run(passes: astPasses, in: environment, sourceContext: sourceContext)
-    if let failed = try diagnostics.checkpoint(passRunnerOutcome.diagnostics) {
+    let passRunnerOutcome = ASTPassRunner(ast: ast).run(
+      passes: astPasses,
+      in: environment,
+      sourceContext: SourceContext(sourceFiles: config.inputFiles))
+    if let failed = try config.diagnostics.checkpoint(passRunnerOutcome.diagnostics) {
       if failed {
         exitWithFailure()
       }
@@ -155,22 +96,58 @@ public struct Compiler {
       .generateCode()
 
     // Compile the YUL IR code using solc.
-    try SolcCompiler(inputSource: irCode, outputDirectory: outputDirectory, emitBytecode: emitBytecode).compile()
+    try SolcCompiler(inputSource: irCode,
+                     outputDirectory: config.outputDirectory,
+                     emitBytecode: config.emitBytecode).compile()
 
-    try diagnostics.display()
+    try config.diagnostics.display()
 
-    print("Produced binary in \(outputDirectory.path.bold).")
+    print("Produced binary in \(config.outputDirectory.path.bold).")
     return CompilationOutcome(irCode: irCode, astDump: ASTDumper(topLevelModule: ast).dump())
   }
 
-  func exitWithFailure() -> Never {
+  private static func exitWithFailure() -> Never {
     print("Failed to compile.")
     exit(1)
   }
 
-  func exitWithCompilerCreationError() -> Never {
-    print("The compiler has not been initialised in a proper way.")
-    exit(1)
+  private static func tokenizeFiles(inputFiles: [URL]) throws -> [Token] {
+    let stdlibTokens = try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
+    let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
+
+    return stdlibTokens + userTokens
+  }
+}
+
+public struct CompilerConfiguration {
+  public let inputFiles: [URL]
+  public let stdlibFiles: [URL]
+  public let outputDirectory: URL
+  public let dumpAST: Bool
+  public let emitBytecode: Bool
+  public let diagnostics: DiagnosticPool
+  public let astPasses: [ASTPass]
+
+  public static let defaultASTPasses: [ASTPass] = [
+    SemanticAnalyzer(),
+    TypeChecker(),
+    Optimizer(),
+    IRPreprocessor()]
+
+  public init(inputFiles: [URL],
+              stdlibFiles: [URL],
+              outputDirectory: URL,
+              dumpAST: Bool,
+              emitBytecode: Bool,
+              diagnostics: DiagnosticPool,
+              astPasses: [ASTPass] = CompilerConfiguration.defaultASTPasses) {
+    self.inputFiles = inputFiles
+    self.stdlibFiles = stdlibFiles
+    self.outputDirectory = outputDirectory
+    self.dumpAST = dumpAST
+    self.emitBytecode = emitBytecode
+    self.diagnostics = diagnostics
+    self.astPasses = astPasses
   }
 }
 
