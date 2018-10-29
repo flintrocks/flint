@@ -192,7 +192,7 @@ extension Parser {
     // Find next colon
     if let firstPartEnd = indexOfFirstAtCurrentDepth([.punctuation(.colon)]),
       firstPartEnd < upTo {
-      let identifier = try parseIdentifier()
+      let identifier = try parseIdentifier(isFunctionCallArgLabel: true)
       try consume(.punctuation(.colon), or: .expectedColonAfterArgumentLabel(at: latestSource))
       let expression = try parseExpression(upTo: upTo)
       return FunctionArgument(identifier: identifier, expression: expression)
