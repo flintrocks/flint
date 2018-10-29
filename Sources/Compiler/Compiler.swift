@@ -21,6 +21,8 @@ public struct Compiler {
     SemanticAnalyzer(),
     TypeChecker(),
     Optimizer(),
+    TraitResolver(),
+    FunctionCallCompleter(),
     IRPreprocessor()]
 
   private static func exitWithFailure() -> Never {
