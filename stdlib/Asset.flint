@@ -15,23 +15,6 @@ struct trait Asset {
   // `source` should be left empty.
   init(source: inout Self)
 
-  // TODO: These implementations cause the compiler to crash due to calling
-  // a mutating function from the constructor.
-  // See: https://github.com/flintrocks/flint/issues/30
-  //init(unsafeRawValue: Int) {
-  //  setRawValue(unsafeRawValue)
-  //}
-  //
-  //init(source: inout Asset, amount: Int) {
-  //  transfer(&source, amount)
-  //}
-  //
-  //init(source: inout Asset) {
-  //  let value: Int = source.getRawValue()
-  //  source.setRawValue(0)
-  //  setRawValue(0)
-  //}
-
   // Moves `amount` from `source` into `this` asset.
   mutating func transfer(source: inout Self, amount: Int) {
     if source.getRawValue() < amount {
@@ -42,10 +25,9 @@ struct trait Asset {
     setRawValue(getRawValue() + amount)
   }
 
-  // Moves all funds from `source` into `this` asset.
-  // mutating func transfer(source: inout Self) {
-  //   transfer(&source, source.getRawValue())
-  // }
+  mutating func transfer(source: inout Self) {
+    transfer(&source, source.getRawValue())
+  }
 
   // Returns the funds contained in this asset, as an integer.
   mutating func setRawValue(value: Int) -> Int
@@ -62,12 +44,12 @@ struct Wei: Asset {
   }
 
   init(source: inout Wei, amount: Int) {
-    // transfer(&source, amount)
+    transfer(&source, amount)
   }
 
   init(source: inout Wei) {
     let amount: Int = source.getRawValue()
-    // transfer(&source, amount)
+    transfer(&source, amount)
   }
 
   mutating func setRawValue(value: Int) -> Int {
