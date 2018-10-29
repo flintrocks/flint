@@ -175,6 +175,6 @@ public struct Compiler {
 }
 
 public struct CompilationOutcome {
-  var irCode: String
-  var astDump: String
+  public var irCode: String
+  public var astDump: String
 }

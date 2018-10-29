@@ -5,7 +5,7 @@
  * Licensed under the MIT License. See License in the project root for license information.
  */
 
-import flintc
+import Compiler
 import struct Diagnostic.Diagnostic
 
 import JSONLib
