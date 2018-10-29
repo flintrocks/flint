@@ -17,13 +17,27 @@ import IRGen
 
 /// Runs the different stages of the compiler.
 public struct Compiler {
-
   public static let defaultASTPasses: [ASTPass] = [
     SemanticAnalyzer(),
     TypeChecker(),
     Optimizer(),
     IRPreprocessor()]
 
+  private static func exitWithFailure() -> Never {
+    print("Failed to compile.")
+    exit(1)
+  }
+
+  private static func tokenizeFiles(inputFiles: [URL]) throws -> [Token] {
+    let stdlibTokens = try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
+    let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
+
+    return stdlibTokens + userTokens
+  }
+}
+
+// MARK: - Diagnosis
+extension Compiler {
   public static func diagnose(config: DiagnoserConfiguration) throws -> [Diagnostic] {
     var diagnoseResult: [Diagnostic] = []
     let tokens = try tokenizeFiles(inputFiles: config.inputFiles)
@@ -44,7 +58,10 @@ public struct Compiler {
 
     return diagnoseResult
   }
+}
 
+// MARK: - Compilation
+extension Compiler {
   public static func compile(config: CompilerConfiguration) throws -> CompilationOutcome {
     let tokens = try tokenizeFiles(inputFiles: config.inputFiles)
 
@@ -93,20 +110,9 @@ public struct Compiler {
     print("Produced binary in \(config.outputDirectory.path.bold).")
     return CompilationOutcome(irCode: irCode, astDump: ASTDumper(topLevelModule: ast).dump())
   }
-
-  private static func exitWithFailure() -> Never {
-    print("Failed to compile.")
-    exit(1)
-  }
-
-  private static func tokenizeFiles(inputFiles: [URL]) throws -> [Token] {
-    let stdlibTokens = try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
-    let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
-
-    return stdlibTokens + userTokens
-  }
 }
 
+// MARK: - Configurations
 public struct DiagnoserConfiguration {
   public let inputFiles: [URL]
   public let astPasses: [ASTPass]
