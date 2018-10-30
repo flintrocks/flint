@@ -228,43 +228,125 @@ external trait Alpha {
   func simpleFunction()
   func functionWithArguments(value: Int, tax: Int)
   func functionWithReturn() -> Int
+  func functionWithBoolReturn() -> Bool
   
   @payable
   func expensiveFunction()
 }
 ```
 
-The trait can then be used in Flint code:
+The trait can then be used in Flint code. First, to initialise it from an `Address`, we use the implicit constructor of external contracts:
 
 ```swift
-contract Beta {
-  func useAlpha() {
-    let someAddress: Address = 0x... // deployed Alpha contract
-    let alpha: Alpha = Alpha(address: someAddress) // using the implicit constructor
-    
-    do {
-      call alpha.simpleFunction() // with default gas allocation: 2300
-      call(gas: 200) alpha.simpleFunction() // with user-specified gas allocation
-    } catch ExternalCallError {
-      // recover gracefully
-    }
-    
-    // if the call fails, this will terminate
-    call! alpha.functionWithArguments(value: 1, tax: 2)
-    
-    // error: user must specify an amount of Wei to pay
-    // call! alpha.expensiveFunction()
-    
-    call(wei: 100)! alpha.expensiveFunction()
-    
-    if let returnedValue: Int = call alpha.functionWithReturn() {
-      // function returned value, here available as `returnedValue`
-    } else {
-      // no value returned, handle gracefully
-    }
-  }
+let someAddress: Address = 0x... // deployed Alpha contract
+let alpha: Alpha = Alpha(adress: someAddress)
+```
+
+Then we can call functions on `alpha` using the `call` keyword, which is modeled to resemble the semantics of `try` in Swift. It has the following grammar:
+
+```
+externalCall =
+  "call" WSP
+  [ "(" [expression] *( "," WSP expression ) ")" ] WSP
+  [ "!" / "?" ] SP
+  functionCall
+```
+
+In other words, following the `call` keyword, hyper-parameters (`wei`, `gas`) may optionally be specified, then `!` (exit on error) or `?` (return an `Optional`) may optionally change the `call` mode, then the actual external call is specificed.
+
+If the `gas` hyper-parameter is not specified, the value defaults to `2300`.
+
+Examples of (syntactically) valid uses of the `!` mode, which will cause a transaction rollback on any error:
+
+```swift
+call! alpha.simpleFunction()
+call! alpha.functionWithArguments(value: 1, tax: 2)
+call(wei: 100)! alpha.expensiveFunction()
+call(gas: 5000)! alpha.simpleFunction()
+```
+
+Examples of (syntactically) valid uses of the default mode, which must be used in a `do-catch` block:
+
+```swift
+do {
+  call alpha.simpleFunction()
+} catch ExternalCallError {
+  // recover gracefully
+}
+
+do {
+  call(wei: 100) alpha.expensiveFunction()
+  call(gas: 5000) alpha.simpleFunction()
+} catch ExternalCallError {
+  // recover gracefully from either (!) failure
 }
 ```
+
+Examples of (syntactically) valid uses of the `?` mode, which returns an optional, and is therefore best used in a `if let ...` condition:
+
+```swift
+if let returnedValue: Int = call alpha.functionWithReturn() {
+  // function returned value, here available as `returnedValue`
+} else {
+  // no value returned, handle gracefully
+}
+
+if let example: Bool = call(gas: 5000) alpha.functionWithBoolReturn() {
+  // function returned value, here available as `example`
+} else {
+  // no value returned, handle gracefully
+}
+```
+
+Examples of invalid uses:
+
+```swift
+// error: user must specify an amount of Wei to pay (@payable)
+call! alpha.expensiveFunction()
+
+// error: must be used in `if let`
+call alpha.functionWithReturn()
+
+// error: function doesn't have a return type
+if let example: Int = call alpha.simpleFunction() {
+  // ...
+}
+
+// error: return type doesn't match expected type
+if let example: Int = call alpha.functionWithBoolReturn() {
+  // ...
+}
+
+// error: must use `call` for external calls
+alpha.simpleFunction()
+```
+
+### Implementation requirements
+
+In the parser:
+
+ - `call` keyword, grammar for `externalCall` expression (statement?)
+ - `do-catch` blocks
+ - `if let` blocks
+
+In the semantic analyser:
+
+ - check that `@payable` functions are given `wei`
+ - check that non-`@payable` functions are not given `wei`
+ - check that `if let ... = call ...` calls a function with a return type
+ - check that `if let ... = call ...` calls a function with the correct return type
+ - check that `call ...` (default mode) is used in `if let ...` (may be a parser check)
+ - put bound return variable in scope of `if let ...` block
+
+In the IR generator:
+
+ - better exception handling (stack of exception handlers / addresses for each type of exception, for now only `ExternalCallError`)
+ - rollback on unhandled exceptions / `!` mode
+ - bind optional value to a variable in `if let ...`
+
+Test suite:
+
+ - add tests
 
 ### Solidity ABI
 Behind the scenes all of these interfaces are decoded into ABI function calls. [ABI Specification](https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html)
