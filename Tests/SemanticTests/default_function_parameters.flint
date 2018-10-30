@@ -54,4 +54,20 @@ Test :: caller <- (any) {
     f(unseen_before_label2: 2)
     f(unseen_before_label1: 1, unseen_before_label2: 2)
   }
+
+  func nested(x: Int = 1) -> Int {
+    return x
+  }
+
+  func nested2(y: Int = 1) -> Int {
+    return y
+  }
+
+  func nested3(z: Int) -> Int {
+    return z
+  }
+
+  func nestedTest() -> Int {
+    return nested3(z: nested2(y: nested()))
+  }
 }
