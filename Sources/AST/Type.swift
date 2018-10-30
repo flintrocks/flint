@@ -139,6 +139,18 @@ public indirect enum RawType: Equatable {
 
     return isCompatible(with: otherType)
   }
+
+  public func replacingSelf(with enclosingType: RawTypeIdentifier) -> RawType {
+    if isSelfType {
+      if isInout {
+        return RawType.inoutType(.userDefinedType(enclosingType))
+      }
+
+      return RawType.userDefinedType(enclosingType)
+    }
+
+    return self
+  }
 }
 
 /// A Flint type.
