@@ -285,13 +285,13 @@ do {
 Examples of (syntactically) valid uses of the `?` mode, which returns an optional, and is therefore best used in a `if let ...` condition:
 
 ```swift
-if let returnedValue: Int = call alpha.functionWithReturn() {
+if let returnedValue: Int = call? alpha.functionWithReturn() {
   // function returned value, here available as `returnedValue`
 } else {
   // no value returned, handle gracefully
 }
 
-if let example: Bool = call(gas: 5000) alpha.functionWithBoolReturn() {
+if let example: Bool = call(gas: 5000)? alpha.functionWithBoolReturn() {
   // function returned value, here available as `example`
 } else {
   // no value returned, handle gracefully
@@ -305,15 +305,15 @@ Examples of invalid uses:
 call! alpha.expensiveFunction()
 
 // error: must be used in `if let`
-call alpha.functionWithReturn()
+call? alpha.functionWithReturn()
 
 // error: function doesn't have a return type
-if let example: Int = call alpha.simpleFunction() {
+if let example: Int = call? alpha.simpleFunction() {
   // ...
 }
 
 // error: return type doesn't match expected type
-if let example: Int = call alpha.functionWithBoolReturn() {
+if let example: Int = call? alpha.functionWithBoolReturn() {
   // ...
 }
 
@@ -333,9 +333,9 @@ In the semantic analyser:
 
  - check that `@payable` functions are given `wei`
  - check that non-`@payable` functions are not given `wei`
- - check that `if let ... = call ...` calls a function with a return type
- - check that `if let ... = call ...` calls a function with the correct return type
- - check that `call ...` (default mode) is used in `if let ...` (may be a parser check)
+ - check that `if let ... = call? ...` calls a function with a return type
+ - check that `if let ... = call? ...` calls a function with the correct return type
+ - check that `call? ...` is used in `if let ...` (may be a parser check)
  - put bound return variable in scope of `if let ...` block
 
 In the IR generator:
