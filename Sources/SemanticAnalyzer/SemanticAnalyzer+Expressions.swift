@@ -109,7 +109,9 @@ extension SemanticAnalyzer {
 
     var diagnostics = [Diagnostic]()
 
-    let isMutating = passContext.functionDeclarationContext?.isMutating ?? false
+    let isMutating: Bool =
+      passContext.specialDeclarationContext?.declaration.isInit ?? false ||
+        passContext.functionDeclarationContext?.isMutating ?? false
 
     if !passContext.isInEmit {
       // Find the function declaration associated with this function call.
@@ -164,17 +166,28 @@ extension SemanticAnalyzer {
         diagnostics.append(.noMatchingFunctionForFunctionCall(functionCall, candidates: candidates))
       }
     } else if case .failure(let candidates) =
-      environment.matchEventCall(functionCall,
-                                 enclosingType: enclosingType,
-                                 scopeContext: passContext.scopeContext ?? ScopeContext()) {
-      // Event call has failed to match but has candidates
-      if !candidates.isEmpty {
-        diagnostics.append(.partialMatchingEvents(functionCall, candidates: candidates))
-      } else {
-        diagnostics.append(.noMatchingEvents(functionCall))
-      }
-
+        environment.matchEventCall(functionCall,
+                                   enclosingType: enclosingType,
+                                   scopeContext: passContext.scopeContext ?? ScopeContext()) {
+        // Event call has failed to match but has candidates
+        if !candidates.isEmpty {
+          diagnostics.append(.partialMatchingEvents(functionCall, candidates: candidates))
+        } else {
+          diagnostics.append(.noMatchingEvents(functionCall))
+        }
+    } else if case .matchedEvent(_) =
+        environment.matchEventCall(functionCall,
+                                   enclosingType: enclosingType,
+                                   scopeContext: passContext.scopeContext ?? ScopeContext()) {
+        // Make sure all arguments are labeled
+        for argument in functionCall.arguments {
+          guard argument.identifier != nil else {
+            diagnostics.append(.unlabeledEventCallArguments(functionCall))
+            return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
+          }
+        }
     }
+
     return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
   }
 

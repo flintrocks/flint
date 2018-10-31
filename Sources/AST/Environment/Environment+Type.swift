@@ -40,11 +40,7 @@ extension Environment {
       }
       return functionInformation.resultType
     case .matchedInitializer:
-      let name = functionCall.identifier.name
-      if let stdlibType = RawType.StdlibType(rawValue: name) {
-        return .stdlibType(stdlibType)
-      }
-      return .userDefinedType(name)
+      return .userDefinedType(functionCall.identifier.name)
     default:
       let eventMatch = matchEventCall(functionCall, enclosingType: enclosingType, scopeContext: scopeContext)
       switch eventMatch {
@@ -235,10 +231,7 @@ extension Environment {
     case .identifier(let identifier):
       if identifier.enclosingType == nil,
         let type = scopeContext.type(for: identifier.name) {
-        if case .inoutType(let type) = type {
-          return type
-        }
-        return type
+        return type.stripInout
       }
       return type(of: identifier.name,
                   enclosingType: identifier.enclosingType ?? enclosingType,
