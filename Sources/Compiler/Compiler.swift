@@ -37,7 +37,7 @@ public struct Compiler {
       }
       return [Token]()
     }()
-    
+
     let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
 
     return stdlibTokens + userTokens
