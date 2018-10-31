@@ -157,7 +157,7 @@ extension Environment {
   }
 
   // Two signatures conflict if trait functions with the same name have equal parameters
-  // but different modifiers, label names, modifiers, etc
+  // but different modifiers, label names, etc
   public func conflictingTraitSignatures(for type: RawTypeIdentifier) -> [String: [FunctionInformation]] {
     guard let typeInfo = types[type] else {
       return [:]

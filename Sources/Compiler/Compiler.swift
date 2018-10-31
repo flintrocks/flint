@@ -31,12 +31,12 @@ public struct Compiler {
   }
 
   private static func tokenizeFiles(inputFiles: [URL], withStandardLibrary: Bool = true) throws -> [Token] {
-    let stdlibTokens: [Token] = try { () throws -> [Token] in
-      if withStandardLibrary {
-        return try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
-      }
-      return [Token]()
-    }()
+    let stdlibTokens: [Token]
+    if withStandardLibrary {
+      stdlibTokens = try StandardLibrary.default.files.flatMap { try Lexer(sourceFile: $0, isFromStdlib: true).lex() }
+    } else {
+      stdlibTokens = []
+    }
 
     let userTokens = try inputFiles.flatMap { try Lexer(sourceFile: $0).lex() }
 
