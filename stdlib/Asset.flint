@@ -21,8 +21,9 @@ struct trait Asset {
       fatalError()
     }
 
-    source.setRawValue(source.getRawValue() - amount)
-    setRawValue(getRawValue() + amount)
+    // TODO: support let _: Int = ...
+    let unused1: Int = source.setRawValue(source.getRawValue() - amount)
+    let unused2: Int = setRawValue(getRawValue() + amount)
   }
 
   mutating func transfer(source: inout Self) {
