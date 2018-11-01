@@ -125,6 +125,8 @@ In Solidity, `someAddress.send()` and `someAddress.transfer()` are considered sa
  - Prevents re-entrancy attacks but is incompatible with any contract whose `fallback` function requires 2300 gas or more.
  - Sometimes the programmer won't want this, but then has to fall back onto the dangerous raw calls.
 
+In most cases, re-entrancy is not desirable, so Flint should prevent external calls to call functions of the caller (Flint) contract.
+
 ### 3. External calls may fail silently
 
 Solidity offers low-level call methods that work on `rawAddress`: `address.call()`, `address.callcode()`, `address.delegatecall()`, `address.send()`. These low-level methods never throw an exception so they fail silently.
@@ -252,16 +254,14 @@ externalCall =
   functionCall
 ```
 
-In other words, following the `call` keyword, hyper-parameters (`wei`, `gas`) may optionally be specified, then `!` (exit on error) or `?` (return an `Optional`) may optionally change the `call` mode, then the actual external call is specificed.
-
-If the `gas` hyper-parameter is not specified, the value defaults to `2300`.
+In other words, following the `call` keyword, hyper-parameters may optionally be specified, then `!` (exit on error) or `?` (return an `Optional`) may optionally change the `call` mode, then the actual external call is specificed.
 
 Examples of (syntactically) valid uses of the `!` mode, which will cause a transaction rollback on any error:
 
 ```swift
 call! alpha.simpleFunction()
 call! alpha.functionWithArguments(value: 1, tax: 2)
-call(wei: 100)! alpha.expensiveFunction()
+call(value: Wei(100))! alpha.expensiveFunction()
 call(gas: 5000)! alpha.simpleFunction()
 ```
 
@@ -275,7 +275,7 @@ do {
 }
 
 do {
-  call(wei: 100) alpha.expensiveFunction()
+  call(value: Wei(100)) alpha.expensiveFunction()
   call(gas: 5000) alpha.simpleFunction()
 } catch ExternalCallError {
   // recover gracefully from either (!) failure
@@ -321,6 +321,20 @@ if let example: Int = call? alpha.functionWithBoolReturn() {
 alpha.simpleFunction()
 ```
 
+### Hyper parameters
+
+The `call` keyword accepts the following parameters:
+
+ - `gas` - an `Int` value, specifying the computational time allowed for the external call; default: `2300`
+ - `value` - a `Wei` value that is paid into the external contract; must be specified for functions marked `@payable`, otherwise invalid
+ - `reentrant` - a `Bool` value that specifies if it should be possible to call functions of the current (Flint) contract from the external contract _during_ an external call (see re-entrancy problem discussed in motivation and re-entrancy discussion below); default: `false`
+
+### `reentrant`
+
+Just before an external call, the Flint contract is moved into a special type state. This type state is generated automatically by the compiler, and it disallows any function to be called, preventing re-entrancy issues. After the external call is finished (no matter what the result was) the contract is placed back into the previous type state.
+
+This behaviour may be overridden if the user chooses to do so by specifying `reentrant: true` as a hyper-parameter to the `call` keyword.
+
 ### Implementation requirements
 
 In the parser:
@@ -343,6 +357,7 @@ In the IR generator:
  - better exception handling (stack of exception handlers / addresses for each type of exception, for now only `ExternalCallError`)
  - rollback on unhandled exceptions / `!` mode
  - bind optional value to a variable in `if let ...`
+ - add special external call type state, enter into it before a call, leave it after a call
 
 Test suite:
 
