@@ -140,6 +140,34 @@ extension SemanticAnalyzer {
                                                                            in: enclosingType) {
       diagnostics.append(.invalidRedeclaration(eventDeclaration.identifier, originalSource: conflict))
     }
+
+    // Check that all default arguments are at the end
+    let arguments = eventDeclaration.variableDeclarations
+
+    var currentArgumentIndex = 0
+
+    while currentArgumentIndex < arguments.count && arguments[currentArgumentIndex].assignedExpression == nil {
+      currentArgumentIndex += 1
+    }
+
+    while currentArgumentIndex < arguments.count {
+      if arguments[currentArgumentIndex].assignedExpression == nil {
+        diagnostics.append(.defaultArgumentsNotAtEnd(eventDeclaration))
+      }
+
+      currentArgumentIndex += 1
+    }
+
+    // Check there are no duplicate parameters
+    var identifiers = [String]()
+    for argument in arguments {
+      if identifiers.contains(argument.identifier.name) {
+        diagnostics.append(.duplicateParameterDeclarations(eventDeclaration))
+      }
+
+      identifiers.append(argument.identifier.name)
+    }
+
     return ASTPassResult(element: eventDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
@@ -392,6 +420,33 @@ extension SemanticAnalyzer {
       diagnostics.append(.multipleBecomes(statement))
     }
 
+    // Check that all default arguments are at the end
+    let arguments = signature.parameters
+
+    var currentArgumentIndex = 0
+
+    while currentArgumentIndex < arguments.count && arguments[currentArgumentIndex].assignedExpression == nil {
+      currentArgumentIndex += 1
+    }
+
+    while currentArgumentIndex < arguments.count {
+      if arguments[currentArgumentIndex].assignedExpression == nil {
+        diagnostics.append(.defaultArgumentsNotAtEnd(functionDeclaration))
+      }
+
+      currentArgumentIndex += 1
+    }
+
+    // Check there are no duplicate parameters
+    var identifiers = [String]()
+    for argument in arguments {
+      if identifiers.contains(argument.identifier.name) {
+        diagnostics.append(.duplicateParameterDeclarations(functionDeclaration))
+      }
+
+      identifiers.append(argument.identifier.name)
+    }
+
     return ASTPassResult(element: functionDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 
@@ -410,7 +465,7 @@ extension SemanticAnalyzer {
       diagnostics.append(.functionCanBeDeclaredNonMutating(functionDeclaration.mutatingToken))
     }
 
-    // Clear the context in preparation for the next time we visit a function declaration.
+    // Clear the context in preparation for the next time we visit a special or function declaration.
     let passContext = passContext.withUpdates { $0.mutatingExpressions = nil }
 
     var functionDeclaration = functionDeclaration
@@ -557,8 +612,12 @@ extension SemanticAnalyzer {
       }
     }
 
+    // Clear the context in preparation for the next time we visit a special or function declaration.
+    passContext = passContext.withUpdates { $0.mutatingExpressions = nil }
+
     var specialDeclaration = specialDeclaration
     specialDeclaration.scopeContext = passContext.scopeContext ?? ScopeContext()
+
     return ASTPassResult(element: specialDeclaration, diagnostics: diagnostics, passContext: passContext)
   }
 }

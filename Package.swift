@@ -10,20 +10,35 @@ let package = Package(
     .package(url: "https://github.com/kylef/Commander", from: "0.8.0"),
     .package(url: "https://github.com/llvm-swift/Lite.git", from: "0.0.3"),
     .package(url: "https://github.com/llvm-swift/FileCheck.git", from: "0.0.4"),
-    .package(url: "https://github.com/llvm-swift/Symbolic.git", from: "0.0.1")
+    .package(url: "https://github.com/llvm-swift/Symbolic.git", from: "0.0.1"),
+    .package(url: "https://github.com/theguild/json-swift.git", from: "4.0.0"),
+    .package(url: "https://github.com/theguild/swift-lsp.git", from: "4.0.0"),
   ],
   targets: [
     .target(
       name: "flintc",
-      dependencies: ["Parser", "Lexer", "SemanticAnalyzer", "TypeChecker", "Optimizer", "IRGen", "Commander", "Rainbow", "Symbolic", "Diagnostic"]),
+      dependencies: ["Compiler"]),
     .target(
       name: "Source",
       dependencies: []
     ),
     .target(
+      name: "Compiler",
+      dependencies: [
+        "Parser",
+        "Lexer",
+        "SemanticAnalyzer",
+        "TypeChecker",
+        "Optimizer",
+        "IRGen",
+        "Commander",
+        "Rainbow",
+        "Symbolic",
+        "Diagnostic"]),
+    .target(
       name: "Diagnostic",
       dependencies: [
-        "Source",
+        "Source", "Rainbow"
         ]
     ),
     .target(
@@ -89,7 +104,10 @@ let package = Package(
         dependencies: ["LiteSupport", "Rainbow", "Symbolic"]),
     .target(
         name: "file-check",
-        dependencies: ["FileCheck", "Commander"])
-
+        dependencies: ["FileCheck", "Commander"]),
+    .target(
+        name: "langsrv",
+        dependencies: ["Compiler", "JSONLib", "LanguageServerProtocol", "JsonRpcProtocol"],
+        path: "Sources/LSP/langsrv")
     ]
 )
