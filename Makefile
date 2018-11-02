@@ -14,6 +14,7 @@ zip: release
 	rm flintc
 
 test: lint release
+	swift test
 	cd Tests/Integration/BehaviorTests && ./compile_behavior_tests.sh
 	swift run -c release lite
 
