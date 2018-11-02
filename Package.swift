@@ -41,10 +41,18 @@ let package = Package(
     .package(url: "https://github.com/theguild/swift-lsp.git", from: "4.0.0"),
   ],
   targets: [
+    // MARK: Source -
     .target(
       name: "Source",
       dependencies: []
     ),
+    .testTarget(
+      name: "SourceTests",
+      dependencies: [
+        "Source",
+      ]
+    ),
+    // MARK: Compiler -
     .target(
       name: "Compiler",
       dependencies: [
@@ -60,6 +68,13 @@ let package = Package(
         "Diagnostic",
       ]
     ),
+    .testTarget(
+      name: "CompilerTests",
+      dependencies: [
+        "Compiler",
+      ]
+    ),
+    // MARK: Diagnostic -
     .target(
       name: "Diagnostic",
       dependencies: [
@@ -67,6 +82,13 @@ let package = Package(
         "Rainbow",
       ]
     ),
+    .testTarget(
+      name: "DiagnosticTests",
+      dependencies: [
+        "Diagnostic",
+      ]
+    ),
+    // MARK: Lexer -
     .target(
       name: "Lexer",
       dependencies: [
@@ -74,6 +96,13 @@ let package = Package(
         "Diagnostic",
       ]
     ),
+    .testTarget(
+      name: "LexerTests",
+      dependencies: [
+        "Lexer",
+      ]
+    ),
+    // MARK: AST -
     .target(
       name: "AST",
       dependencies: [
@@ -84,6 +113,13 @@ let package = Package(
       exclude: ["ASTPass/ASTPass.template.swift"],
       sources: [".", "../../.derived-sources/AST"]
     ),
+    .testTarget(
+      name: "ASTTests",
+      dependencies: [
+        "AST",
+      ]
+    ),
+    // MARK: Parser -
     .target(
       name: "Parser",
       dependencies: [
@@ -93,6 +129,13 @@ let package = Package(
         "Lexer",
       ]
     ),
+    .testTarget(
+      name: "ParserTests",
+      dependencies: [
+        "Parser",
+      ]
+    ),
+    // MARK: SemanticAnalyzer -
     .target(
       name: "SemanticAnalyzer",
       dependencies: [
@@ -101,6 +144,13 @@ let package = Package(
         "AST",
       ]
     ),
+    .testTarget(
+      name: "SemanticAnalyzerTests",
+      dependencies: [
+        "SemanticAnalyzer",
+      ]
+    ),
+    // MARK: TypeChecker -
     .target(
       name: "TypeChecker",
       dependencies: [
@@ -109,6 +159,13 @@ let package = Package(
         "AST",
       ]
     ),
+    .testTarget(
+      name: "TypeCheckerTests",
+      dependencies: [
+        "TypeChecker",
+      ]
+    ),
+    // MARK: Optimizer -
     .target(
       name: "Optimizer",
       dependencies: [
@@ -117,6 +174,13 @@ let package = Package(
         "AST",
       ]
     ),
+    .testTarget(
+      name: "OptimizerTests",
+      dependencies: [
+        "Optimizer",
+      ]
+    ),
+    // MARK: IRGen -
     .target(
       name: "IRGen",
       dependencies: [
@@ -126,12 +190,20 @@ let package = Package(
         "CryptoSwift",
       ]
     ),
+    .testTarget(
+      name: "IRGenTests",
+      dependencies: [
+        "IRGen",
+      ]
+    ),
+    // MARK: flintc -
     .target(
       name: "flintc",
       dependencies: [
         "Compiler",
       ]
     ),
+    // MARK: lite -
     .target(
         name: "lite",
         dependencies: [
@@ -140,6 +212,7 @@ let package = Package(
           "Symbolic",
       ]
     ),
+    // MARK: file-check
     .target(
         name: "file-check",
         dependencies: [
@@ -147,6 +220,7 @@ let package = Package(
           "Commander",
       ]
     ),
+    // MARK: langsrv
     .target(
       name: "langsrv",
       dependencies: [
