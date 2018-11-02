@@ -12,7 +12,6 @@ import OptimizerTests
 import IRGenTests
 
 var tests = [XCTestCaseEntry]()
-tests += testTests.allTests()
 tests += SourceTests.allTests()
 tests += CompilerTests.allTests()
 tests += DiagnosticTests.allTests()
