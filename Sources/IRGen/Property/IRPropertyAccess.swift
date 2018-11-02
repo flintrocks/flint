@@ -12,6 +12,15 @@ struct IRPropertyAccess {
   var rhs: Expression
   var asLValue: Bool
 
+  let mangler: Mangler
+
+  init(lhs: Expression, rhs: Expression, asLValue: Bool, mangler: Mangler = Mangler.shared) {
+    self.lhs = lhs
+    self.rhs = rhs
+    self.asLValue = asLValue
+    self.mangler = mangler
+  }
+
   func rendered(functionContext: FunctionContext) -> String {
     let environment = functionContext.environment
     let scopeContext = functionContext.scopeContext
@@ -66,9 +75,10 @@ struct IRPropertyAccess {
       }
 
       // For struct parameters, access the property by an offset to _flintSelf (the receiver's address).
-      offset = IRRuntimeFunction.addOffset(base: enclosingName.mangled,
+
+      offset = IRRuntimeFunction.addOffset(base: mangler.mangleName(enclosingName),
                                            offset: rhsOffset,
-                                           inMemory: Mangler.isMem(for: enclosingName).mangled)
+                                           inMemory: mangler.mangleName(mangler.isMem(for: enclosingName)))
     } else {
       let lhsOffset: String
       if case .identifier(let lhsIdentifier) = lhs {
@@ -76,7 +86,7 @@ struct IRPropertyAccess {
             let offset = environment.propertyOffset(for: lhsIdentifier.name, enclosingType: enclosingType) {
           lhsOffset = "\(offset)"
         } else if functionContext.scopeContext.containsVariableDeclaration(for: lhsIdentifier.name) {
-          lhsOffset = lhsIdentifier.name.mangled
+          lhsOffset = mangler.mangleName(lhsIdentifier.name)
           isMemoryAccess = true
         } else {
           lhsOffset = "\(environment.propertyOffset(for: lhsIdentifier.name, enclosingType: enclosingTypeName)!)"
@@ -93,8 +103,8 @@ struct IRPropertyAccess {
     }
 
     if isInStructFunction, !isMemoryAccess {
-      let lhsEnclosingIdentifier = lhs.enclosingIdentifier?.name.mangled ?? "flintSelf".mangled
-      return IRRuntimeFunction.load(address: offset, inMemory: Mangler.isMem(for: lhsEnclosingIdentifier))
+      let lhsEnclosingIdentifier = mangler.mangleName(lhs.enclosingIdentifier?.name ?? "flintSelf")
+      return IRRuntimeFunction.load(address: offset, inMemory: mangler.isMem(for: lhsEnclosingIdentifier))
     }
 
     return IRRuntimeFunction.load(address: offset, inMemory: isMemoryAccess)

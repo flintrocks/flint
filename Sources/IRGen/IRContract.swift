@@ -17,12 +17,16 @@ struct IRContract {
   var structDeclarations: [StructDeclaration]
   var environment: Environment
 
+  // Dependencies
+  private let mangler: Mangler
+
   init(contractDeclaration: ContractDeclaration, contractBehaviorDeclarations: [ContractBehaviorDeclaration],
-       structDeclarations: [StructDeclaration], environment: Environment) {
+       structDeclarations: [StructDeclaration], environment: Environment, mangler: Mangler = Mangler.shared) {
     self.contractDeclaration = contractDeclaration
     self.contractBehaviorDeclarations = contractBehaviorDeclarations
     self.structDeclarations = structDeclarations
     self.environment = environment
+    self.mangler = mangler
   }
 
   func rendered() -> String {
@@ -124,7 +128,7 @@ struct IRContract {
                                             isContractFunction: true).rendered()
 
     let parameters = initializerDeclaration.signature.parameters.map { parameter in
-      let parameterName = parameter.identifier.name.mangled
+      let parameterName = mangler.mangleName(parameter.identifier.name)
       return "\(CanonicalType(from: parameter.type.rawType)!.rawValue) \(parameterName)"
       }.joined(separator: ", ")
 

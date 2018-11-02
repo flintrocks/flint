@@ -10,9 +10,18 @@ import AST
 struct IRVariableDeclaration {
   var variableDeclaration: VariableDeclaration
 
+  // Dependencies
+  let mangler: Mangler
+
+  init(variableDeclaration: VariableDeclaration, mangler: Mangler = Mangler.shared) {
+    self.variableDeclaration = variableDeclaration
+    self.mangler = mangler
+  }
+
   func rendered(functionContext: FunctionContext) -> String {
     let allocate = IRRuntimeFunction.allocateMemory(
       size: functionContext.environment.size(of: variableDeclaration.type.rawType) * EVM.wordSize)
-    return "let \(variableDeclaration.identifier.name.mangled) := \(allocate)"
+    let mangledName = mangler.mangleName(variableDeclaration.identifier.name)
+    return "let \(mangledName) := \(allocate)"
   }
 }

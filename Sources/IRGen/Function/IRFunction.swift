@@ -115,18 +115,23 @@ struct IRFunctionBody {
     return functionDeclaration.scopeContext!
   }
 
+  // Dependencies
+  let mangler: Mangler
+
   init(functionDeclaration: FunctionDeclaration,
        typeIdentifier: Identifier,
        callerBinding: Identifier?,
        callerProtections: [CallerProtection],
        environment: Environment,
-       isContractFunction: Bool) {
+       isContractFunction: Bool,
+       mangler: Mangler = Mangler.shared) {
      self.functionDeclaration = functionDeclaration
      self.typeIdentifier = typeIdentifier
      self.callerProtections = callerProtections
      self.callerBinding = callerBinding
      self.environment = environment
      self.isContractFunction = isContractFunction
+     self.mangler = mangler
    }
 
   func rendered() -> String {
@@ -138,7 +143,7 @@ struct IRFunctionBody {
     // Assign a caller capaiblity binding to a local variable.
     let callerBindingDeclaration: String
     if let callerBinding = callerBinding {
-      callerBindingDeclaration = "let \(callerBinding.name.mangled) := caller()\n"
+      callerBindingDeclaration = "let \(mangler.mangleName(callerBinding.name)) := caller()\n"
     } else {
       callerBindingDeclaration = ""
     }
