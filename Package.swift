@@ -4,6 +4,32 @@ import PackageDescription
 
 let package = Package(
   name: "flintc",
+  products: [
+    .executable(
+      name: "flintc",
+      targets: [
+        "flintc",
+      ]
+    ),
+    .executable(
+      name: "lite",
+      targets: [
+        "lite",
+      ]
+    ),
+    .executable(
+      name: "langsrv",
+      targets: [
+        "langsrv",
+      ]
+    ),
+    .executable(
+      name: "file-check",
+      targets: [
+        "file-check",
+      ]
+    ),
+  ],
   dependencies: [
     .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "0.7.2"),
     .package(url: "https://github.com/onevcat/Rainbow.git", from: "3.0.0"),
