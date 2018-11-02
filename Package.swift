@@ -16,9 +16,6 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "flintc",
-      dependencies: ["Compiler"]),
-    .target(
       name: "Source",
       dependencies: []
     ),
@@ -34,19 +31,22 @@ let package = Package(
         "Commander",
         "Rainbow",
         "Symbolic",
-        "Diagnostic"]),
+        "Diagnostic",
+      ]
+    ),
     .target(
       name: "Diagnostic",
       dependencies: [
-        "Source", "Rainbow"
-        ]
+        "Source",
+        "Rainbow",
+      ]
     ),
     .target(
       name: "Lexer",
       dependencies: [
         "Source",
         "Diagnostic",
-        ]
+      ]
     ),
     .target(
       name: "AST",
@@ -64,14 +64,15 @@ let package = Package(
         "Source",
         "Diagnostic",
         "AST",
-        "Lexer"
-      ]),
+        "Lexer",
+      ]
+    ),
     .target(
       name: "SemanticAnalyzer",
       dependencies: [
         "Source",
         "Diagnostic",
-        "AST"
+        "AST",
       ]
     ),
     .target(
@@ -79,7 +80,7 @@ let package = Package(
       dependencies: [
         "Source",
         "Diagnostic",
-        "AST"
+        "AST",
       ]
     ),
     .target(
@@ -87,27 +88,47 @@ let package = Package(
       dependencies: [
         "Source",
         "Diagnostic",
-        "AST"
+        "AST",
       ]
     ),
     .target(
-        name: "IRGen",
-        dependencies: [
-          "Source",
-          "Diagnostic",
-          "AST",
-          "CryptoSwift"
+      name: "IRGen",
+      dependencies: [
+        "Source",
+        "Diagnostic",
+        "AST",
+        "CryptoSwift",
+      ]
+    ),
+    .target(
+      name: "flintc",
+      dependencies: [
+        "Compiler",
       ]
     ),
     .target(
         name: "lite",
-        dependencies: ["LiteSupport", "Rainbow", "Symbolic"]),
+        dependencies: [
+          "LiteSupport",
+          "Rainbow",
+          "Symbolic",
+      ]
+    ),
     .target(
         name: "file-check",
-        dependencies: ["FileCheck", "Commander"]),
+        dependencies: [
+          "FileCheck",
+          "Commander",
+      ]
+    ),
     .target(
-        name: "langsrv",
-        dependencies: ["Compiler", "JSONLib", "LanguageServerProtocol", "JsonRpcProtocol"],
-        path: "Sources/LSP/langsrv")
+      name: "langsrv",
+      dependencies: [
+        "Compiler",
+        "JSONLib",
+        "LanguageServerProtocol",
+        "JsonRpcProtocol",
+      ],
+      path: "Sources/LSP/langsrv")
     ]
 )
