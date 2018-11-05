@@ -393,8 +393,10 @@ public struct ASTVisitor {
     case .emitStatement(let emitStatement):
       processResult.element =
         .emitStatement(processResult.combining(visit(emitStatement, passContext: processResult.passContext)))
+    case .doCatchStatement(let doCatchStatement):
+      processResult.element =
+        .doCatchStatement(processResult.combining(visit(doCatchStatement, passContext: processResult.passContext)))
     }
-
     let postProcessResult = pass.postProcess(statement: processResult.element, passContext: processResult.passContext)
     return ASTPassResult(element: postProcessResult.element,
                          diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
@@ -505,6 +507,17 @@ public struct ASTVisitor {
     processResult.passContext.scopeContext = scopeContext
 
     let postProcessResult = pass.postProcess(forStatement: processResult.element,
+                                             passContext: processResult.passContext)
+    return ASTPassResult(element: postProcessResult.element,
+                         diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
+                         passContext: postProcessResult.passContext)
+  }
+
+  func visit(_ doCatchStatement: DoCatchStatement, passContext: ASTPassContext) -> ASTPassResult<DoCatchStatement> {
+    // TODO(ethan) implement this
+    let passContext = passContext
+    let processResult = pass.process(doCatchStatement: doCatchStatement, passContext: passContext)
+    let postProcessResult = pass.postProcess(doCatchStatement: processResult.element,
                                              passContext: processResult.passContext)
     return ASTPassResult(element: postProcessResult.element,
                          diagnostics: processResult.diagnostics + postProcessResult.diagnostics,

@@ -59,6 +59,9 @@ extension Parser {
     case .if:
       let ifStatement = try parseIfStatement()
       statement = .ifStatement(ifStatement)
+    case .do:
+      let doCatchStatement = try parseDoCatchStatement()
+      statement = .doCatchStatement(doCatchStatement)
     // Valid starting tokens for expressions
     case .identifier, .punctuation(.ampersand), .punctuation(.openSquareBracket),
          .punctuation(.openBracket), .self, .var, .let, .public, .visible, .mutating, .try:
@@ -116,6 +119,17 @@ extension Parser {
                        condition: condition,
                        statements: statements,
                        elseClauseStatements: elseClauseStatements)
+  }
+
+  func parseDoCatchStatement() throws -> DoCatchStatement {
+    let doToken = try consume(.do, or: .expectedStatement(at: latestSource))
+    let (doStatements, _) = try parseCodeBlock()
+    let catchToken = try consume(.catch, or: .expectedStatement(at: latestSource))
+    // Parse catch is Error
+    let izToken = try consume(.is, or: .expectedStatement(at: latestSource))
+    let err = try parseExpression(upTo: 2)
+    let (catchStatements, _) = try parseCodeBlock()
+    return DoCatchStatement(doBody: doStatements, catchBody: catchStatements, error: err)
   }
 
   func parseElseClause() throws -> [Statement] {
