@@ -39,6 +39,7 @@ let package = Package(
     .package(url: "https://github.com/llvm-swift/Symbolic.git", from: "0.0.1"),
     .package(url: "https://github.com/theguild/json-swift.git", from: "4.0.0"),
     .package(url: "https://github.com/theguild/swift-lsp.git", from: "4.0.0"),
+    .package(url: "Support/Cuckoo", .branch("master")),
   ],
   targets: [
     // MARK: Source -
@@ -50,6 +51,7 @@ let package = Package(
       name: "SourceTests",
       dependencies: [
         "Source",
+        "Cuckoo",
       ]
     ),
     // MARK: Compiler -
@@ -72,6 +74,7 @@ let package = Package(
       name: "CompilerTests",
       dependencies: [
         "Compiler",
+        "Cuckoo",
       ]
     ),
     // MARK: Diagnostic -
@@ -86,6 +89,7 @@ let package = Package(
       name: "DiagnosticTests",
       dependencies: [
         "Diagnostic",
+        "Cuckoo",
       ]
     ),
     // MARK: Lexer -
@@ -100,6 +104,7 @@ let package = Package(
       name: "LexerTests",
       dependencies: [
         "Lexer",
+        "Cuckoo",
       ]
     ),
     // MARK: AST -
@@ -117,6 +122,7 @@ let package = Package(
       name: "ASTTests",
       dependencies: [
         "AST",
+        "Cuckoo",
       ]
     ),
     // MARK: Parser -
@@ -133,6 +139,7 @@ let package = Package(
       name: "ParserTests",
       dependencies: [
         "Parser",
+        "Cuckoo",
       ]
     ),
     // MARK: SemanticAnalyzer -
@@ -148,6 +155,7 @@ let package = Package(
       name: "SemanticAnalyzerTests",
       dependencies: [
         "SemanticAnalyzer",
+        "Cuckoo",
       ]
     ),
     // MARK: TypeChecker -
@@ -163,6 +171,7 @@ let package = Package(
       name: "TypeCheckerTests",
       dependencies: [
         "TypeChecker",
+        "Cuckoo",
       ]
     ),
     // MARK: Optimizer -
@@ -178,6 +187,7 @@ let package = Package(
       name: "OptimizerTests",
       dependencies: [
         "Optimizer",
+        "Cuckoo",
       ]
     ),
     // MARK: IRGen -
@@ -194,6 +204,7 @@ let package = Package(
       name: "IRGenTests",
       dependencies: [
         "IRGen",
+        "Cuckoo",
       ]
     ),
     // MARK: flintc -
