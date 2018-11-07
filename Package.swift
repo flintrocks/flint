@@ -116,7 +116,6 @@ let package = Package(
         "Lexer",
       ],
       exclude: ["ASTPass/ASTPass.template.swift"],
-      sources: [".", "../../.derived-sources/AST"]
     ),
     .testTarget(
       name: "ASTTests",

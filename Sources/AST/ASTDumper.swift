@@ -11,8 +11,8 @@ import Lexer
 /// Prints an AST.
 public class ASTDumper {
   var topLevelModule: TopLevelModule
-  var indentation = 0
-  var output = ""
+  var indentation: Int = 0
+  var output: String = ""
 
   public init(topLevelModule: TopLevelModule) {
     self.topLevelModule = topLevelModule

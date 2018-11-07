@@ -12,3 +12,5 @@ Package.resolved
 bin/
 contracts/
 build/
+
+*.generated.swift

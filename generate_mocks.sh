@@ -36,7 +36,7 @@ for f in Sources/*; do
   echo " -- Creating $OUT_DIRECTORY"
   mkdir -p "$OUT_DIRECTORY"
 
-  SOURCES=(`find "$f" -name "*.swift"`)
+  SOURCES=(`find "$f" -name "*.swift" -not -name "*.template.swift"`)
   SOURCES_ONE_LINE=$(IFS=" "; echo "${SOURCES[*]}")
 
   set -x
