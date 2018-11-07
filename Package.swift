@@ -115,7 +115,7 @@ let package = Package(
         "Diagnostic",
         "Lexer",
       ],
-      exclude: ["ASTPass/ASTPass.template.swift"],
+      exclude: ["ASTPass/ASTPass.template.swift"]
     ),
     .testTarget(
       name: "ASTTests",
