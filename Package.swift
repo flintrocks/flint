@@ -39,7 +39,7 @@ let package = Package(
     .package(url: "https://github.com/llvm-swift/Symbolic.git", from: "0.0.1"),
     .package(url: "https://github.com/theguild/json-swift.git", from: "4.0.0"),
     .package(url: "https://github.com/theguild/swift-lsp.git", from: "4.0.0"),
-    .package(url: "Support/Cuckoo", .branch("master")),
+    .package(url: "https://github.com/flintrocks/Cuckoo.git", .branch("master")),
   ],
   targets: [
     // MARK: Source -
@@ -123,7 +123,8 @@ let package = Package(
       dependencies: [
         "AST",
         "Cuckoo",
-      ]
+      ],
+      sources: [".", "../../.derived-tests/AST"]
     ),
     // MARK: Parser -
     .target(
@@ -140,7 +141,8 @@ let package = Package(
       dependencies: [
         "Parser",
         "Cuckoo",
-      ]
+      ],
+      sources: [".", "../../.derived-tests/Parser"]
     ),
     // MARK: SemanticAnalyzer -
     .target(
@@ -156,7 +158,8 @@ let package = Package(
       dependencies: [
         "SemanticAnalyzer",
         "Cuckoo",
-      ]
+      ],
+      sources: [".", "../../.derived-tests/SemanticAnalyzer"]
     ),
     // MARK: TypeChecker -
     .target(
@@ -172,7 +175,8 @@ let package = Package(
       dependencies: [
         "TypeChecker",
         "Cuckoo",
-      ]
+      ],
+      sources: [".", "../../.derived-tests/TypeChecker"]
     ),
     // MARK: Optimizer -
     .target(
@@ -188,7 +192,8 @@ let package = Package(
       dependencies: [
         "Optimizer",
         "Cuckoo",
-      ]
+      ],
+      sources: [".", "../../.derived-tests/Optimizer"]
     ),
     // MARK: IRGen -
     .target(
@@ -205,7 +210,8 @@ let package = Package(
       dependencies: [
         "IRGen",
         "Cuckoo",
-      ]
+      ],
+      sources: [".", "../../.derived-tests/IRGen"]
     ),
     // MARK: flintc -
     .target(
