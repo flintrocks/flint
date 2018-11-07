@@ -13,9 +13,9 @@ struct IRIdentifier {
   var asLValue: Bool
 
   // Dependencies
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
-  init(identifier: Identifier, asLValue: Bool = false, mangler: Mangler = Mangler.shared) {
+  init(identifier: Identifier, asLValue: Bool = false, mangler: ManglerProtocol = Mangler.shared) {
     self.identifier = identifier
     self.asLValue = asLValue
     self.mangler = mangler

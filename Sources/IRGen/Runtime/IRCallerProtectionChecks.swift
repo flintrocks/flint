@@ -17,9 +17,9 @@ struct IRCallerProtectionChecks {
   let revert: Bool
 
   // Dependencies
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
-  init(callerProtections: [CallerProtection], revert: Bool = true, variableName: String = varName, mangler: Mangler = Mangler.shared) {
+  init(callerProtections: [CallerProtection], revert: Bool = true, variableName: String = varName, mangler: ManglerProtocol = Mangler.shared) {
     self.variableName = variableName
     self.callerProtections = callerProtections
     self.revert = revert

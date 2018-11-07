@@ -14,13 +14,13 @@ import Lexer
 /// A preprocessing step to update the program's AST before code generation.
 public struct IRPreprocessor: ASTPass {
 
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
   public init() {
     self.mangler = Mangler.shared
   }
 
-  init(mangler: Mangler = Mangler.shared) {
+  init(mangler: ManglerProtocol = Mangler.shared) {
     self.mangler = mangler
   }
 

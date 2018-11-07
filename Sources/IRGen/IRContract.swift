@@ -18,10 +18,10 @@ struct IRContract {
   var environment: Environment
 
   // Dependencies
-  private let mangler: Mangler
+  private let mangler: ManglerProtocol
 
   init(contractDeclaration: ContractDeclaration, contractBehaviorDeclarations: [ContractBehaviorDeclaration],
-       structDeclarations: [StructDeclaration], environment: Environment, mangler: Mangler = Mangler.shared) {
+       structDeclarations: [StructDeclaration], environment: Environment, mangler: ManglerProtocol = Mangler.shared) {
     self.contractDeclaration = contractDeclaration
     self.contractBehaviorDeclarations = contractBehaviorDeclarations
     self.structDeclarations = structDeclarations

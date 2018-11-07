@@ -12,9 +12,9 @@ struct IRPropertyAccess {
   var rhs: Expression
   var asLValue: Bool
 
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
-  init(lhs: Expression, rhs: Expression, asLValue: Bool, mangler: Mangler = Mangler.shared) {
+  init(lhs: Expression, rhs: Expression, asLValue: Bool, mangler: ManglerProtocol = Mangler.shared) {
     self.lhs = lhs
     self.rhs = rhs
     self.asLValue = asLValue

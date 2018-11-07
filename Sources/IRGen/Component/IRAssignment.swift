@@ -12,9 +12,9 @@ struct IRAssignment {
   var rhs: Expression
 
   // Dependencies
-  private let mangler: Mangler
+  private let mangler: ManglerProtocol
 
-  init(lhs: Expression, rhs: Expression, mangler: Mangler = Mangler.shared) {
+  init(lhs: Expression, rhs: Expression, mangler: ManglerProtocol = Mangler.shared) {
     self.lhs = lhs
     self.rhs = rhs
     self.mangler = mangler

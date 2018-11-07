@@ -11,9 +11,9 @@ struct IRVariableDeclaration {
   var variableDeclaration: VariableDeclaration
 
   // Dependencies
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
-  init(variableDeclaration: VariableDeclaration, mangler: Mangler = Mangler.shared) {
+  init(variableDeclaration: VariableDeclaration, mangler: ManglerProtocol = Mangler.shared) {
     self.variableDeclaration = variableDeclaration
     self.mangler = mangler
   }

@@ -116,7 +116,7 @@ struct IRFunctionBody {
   }
 
   // Dependencies
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
   init(functionDeclaration: FunctionDeclaration,
        typeIdentifier: Identifier,
@@ -124,7 +124,7 @@ struct IRFunctionBody {
        callerProtections: [CallerProtection],
        environment: Environment,
        isContractFunction: Bool,
-       mangler: Mangler = Mangler.shared) {
+       mangler: ManglerProtocol = Mangler.shared) {
      self.functionDeclaration = functionDeclaration
      self.typeIdentifier = typeIdentifier
      self.callerProtections = callerProtections

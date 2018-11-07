@@ -7,7 +7,17 @@
 
 import AST
 
-struct Mangler {
+protocol ManglerProtocol {
+  func mangleName(_ name: String) -> String
+
+  func mangleFunctionName(_ name: String, parameterTypes: [RawType], enclosingType: String) -> String
+
+  func mangleInitializerName(_ enclosingType: String, parameterTypes: [RawType]) -> String
+
+  func isMem(for parameter: String) -> String
+}
+
+struct Mangler: ManglerProtocol {
 
   // Singleton Pattern
   private init() { }

@@ -12,9 +12,9 @@ struct IRInterface {
   var contract: IRContract
   var environment: Environment
 
-  let mangler: Mangler
+  let mangler: ManglerProtocol
 
-  init(contract: IRContract, environment: Environment, mangler: Mangler = Mangler.shared) {
+  init(contract: IRContract, environment: Environment, mangler: ManglerProtocol = Mangler.shared) {
     self.contract = contract
     self.environment = environment
     self.mangler = mangler
