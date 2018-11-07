@@ -46,4 +46,7 @@ for f in Sources/*; do
   set -x
   $CUCKOO_BIN generate --no-header --testable "$TESTABLE" --exclude "$EXCLUDE" --output "$OUTPUT" $SOURCES_ONE_LINE
   { set +x; } 2>/dev/null
+
+  sed "s/import struct$TESTABLE/import struct $TESTABLE/g" "$OUTPUT" > "$OUTPUT.sed"
+  mv "$OUTPUT.sed" "$OUTPUT"
 done

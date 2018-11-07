@@ -5,6 +5,12 @@
 //  Created by Franklin Schrans on 1/8/18.
 //
 
+/*
+ // Shadow Swift RangeExpression and DictionaryLiteral for stub Generation
+ import structAST.RangeExpression
+ import structAST.DictionaryLiteral
+*/
+
 import Foundation
 import Lexer
 
