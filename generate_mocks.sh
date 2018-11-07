@@ -1,5 +1,7 @@
 #!/bin/bash
 
+EXCLUDE="ASTNode,PassContextEntry"
+
 # Locate Cuckoo
 shopt -s nullglob
 CUCKOO_DIR=(./.build/checkouts/Cuckoo.git-*)
@@ -42,6 +44,6 @@ for f in Sources/*; do
   SOURCES_ONE_LINE=$(IFS=" "; echo "${SOURCES[*]}")
 
   set -x
-  $CUCKOO_BIN generate --no-header --testable "$TESTABLE" --output "$OUTPUT" $SOURCES_ONE_LINE
+  $CUCKOO_BIN generate --no-header --testable "$TESTABLE" --exclude "$EXCLUDE" --output "$OUTPUT" $SOURCES_ONE_LINE
   { set +x; } 2>/dev/null
 done
