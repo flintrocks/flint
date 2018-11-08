@@ -16,14 +16,10 @@ struct IRCallerProtectionChecks {
   var callerProtections: [CallerProtection]
   let revert: Bool
 
-  // Dependencies
-  let mangler: ManglerProtocol
-
-  init(callerProtections: [CallerProtection], revert: Bool = true, variableName: String = varName, mangler: ManglerProtocol = Mangler.shared) {
+  init(callerProtections: [CallerProtection], revert: Bool = true, variableName: String = varName) {
     self.variableName = variableName
     self.callerProtections = callerProtections
     self.revert = revert
-    self.mangler = mangler
   }
 
   func rendered(enclosingType: RawTypeIdentifier, environment: Environment) -> String {
@@ -38,7 +34,7 @@ struct IRCallerProtectionChecks {
       switch type {
       case .functionType(parameters: [], result: .basicType(.address)):
         var identifier = callerProtection.identifier
-        let name = mangler.mangleFunctionName(identifier.name, parameterTypes: [], enclosingType: enclosingType)
+        let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [], enclosingType: enclosingType)
         identifier.identifierToken.kind = .identifier(name)
         // swiftlint:disable line_length
         let functionCall = IRFunctionCall(functionCall: FunctionCall(identifier: identifier, arguments: [], closeBracketToken: .init(kind: .punctuation(.closeBracket), sourceLocation: .DUMMY), isAttempted: false))
@@ -47,7 +43,7 @@ struct IRCallerProtectionChecks {
         return "\(variableName) := add(\(variableName), \(check))"
       case .functionType(parameters: [.basicType(.address)], result: .basicType(.bool)):
         var identifier = callerProtection.identifier
-        let name = mangler.mangleFunctionName(identifier.name, parameterTypes: [.basicType(.address)],
+        let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [.basicType(.address)],
                                               enclosingType: enclosingType)
         identifier.identifierToken.kind = .identifier(name)
         // swiftlint:disable line_length

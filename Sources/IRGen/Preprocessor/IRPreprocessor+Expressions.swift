@@ -190,13 +190,13 @@ extension IRPreprocessor {
           scopeContext.containsParameterDeclaration(for: enclosingIdentifier.name) {
           // If the argument is a parameter to the enclosing function, use its isMem parameter.
           isMem = .identifier(
-            Identifier(identifierToken: Token(kind: .identifier(mangler.isMem(for: enclosingIdentifier.name)),
+            Identifier(identifierToken: Token(kind: .identifier(Mangler.isMem(for: enclosingIdentifier.name)),
                                               sourceLocation: argument.sourceLocation)))
         } else if case .inoutExpression(let inoutExpression) = argument.expression,
           case .self(_) = inoutExpression.expression {
           // If the argument is self, use flintSelf
           isMem = .identifier(
-            Identifier(identifierToken: Token(kind: .identifier(mangler.isMem(for: "flintSelf")),
+            Identifier(identifierToken: Token(kind: .identifier(Mangler.isMem(for: "flintSelf")),
                                               sourceLocation: argument.sourceLocation)))
         } else {
           // Otherwise, the argument refers to a property, which is not in memory.
@@ -242,7 +242,7 @@ extension IRPreprocessor {
     case .matchedFunction(let functionInformation):
       let declaration = functionInformation.declaration
       let parameterTypes = declaration.signature.parameters.rawTypes
-      return mangler.mangleFunctionName(declaration.identifier.name,
+      return Mangler.mangleFunctionName(declaration.identifier.name,
                                         parameterTypes: parameterTypes,
                                         enclosingType: enclosingType)
     case .matchedFunctionWithoutCaller(let candidates):
@@ -254,18 +254,18 @@ extension IRPreprocessor {
       }
       let declaration = candidate.declaration
       let parameterTypes = declaration.signature.parameters.rawTypes
-      return mangler.mangleFunctionName(declaration.identifier.name,
+      return Mangler.mangleFunctionName(declaration.identifier.name,
                                         parameterTypes: parameterTypes,
                                         enclosingType: enclosingType)
     case .matchedInitializer(let initializerInformation):
       let declaration = initializerInformation.declaration
       let parameterTypes = declaration.signature.parameters.rawTypes
-      return mangler.mangleInitializerName(functionCall.identifier.name, parameterTypes: parameterTypes)
+      return Mangler.mangleInitializerName(functionCall.identifier.name, parameterTypes: parameterTypes)
     case .matchedFallback:
-      return mangler.mangleInitializerName(functionCall.identifier.name, parameterTypes: [])
+      return Mangler.mangleInitializerName(functionCall.identifier.name, parameterTypes: [])
     case .matchedGlobalFunction(let functionInformation):
       let parameterTypes = functionInformation.declaration.signature.parameters.rawTypes
-      return mangler.mangleFunctionName(functionCall.identifier.name,
+      return Mangler.mangleFunctionName(functionCall.identifier.name,
                                         parameterTypes: parameterTypes,
                                         enclosingType: Environment.globalFunctionStructName)
     case .failure:

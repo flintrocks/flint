@@ -11,29 +11,19 @@ struct IRAssignment {
   var lhs: Expression
   var rhs: Expression
 
-  // Dependencies
-  private let mangler: ManglerProtocol
-
-  init(lhs: Expression, rhs: Expression, mangler: ManglerProtocol = Mangler.shared) {
-    self.lhs = lhs
-    self.rhs = rhs
-    self.mangler = mangler
-  }
-
   func rendered(functionContext: FunctionContext, asTypeProperty: Bool = false) -> String {
     let rhsCode = IRExpression(expression: rhs).rendered(functionContext: functionContext)
 
     switch lhs {
     case .variableDeclaration(let variableDeclaration):
-      let mangledName = mangler.mangleName(variableDeclaration.identifier.name)
+      let mangledName = Mangler.mangleName(variableDeclaration.identifier.name)
       // Shadowed variables shouldn't be redeclared
       if mangledName == rhsCode {
         return ""
       }
       return "let \(mangledName) := \(rhsCode)"
     case .identifier(let identifier) where identifier.enclosingType == nil:
-      let mangledName = mangler.mangleName(identifier.name)
-      return "\(mangledName) := \(rhsCode)"
+      return "\(identifier.name.mangled) := \(rhsCode)"
     default:
       // LHS refers to a property in storage or memory.
       let lhsCode = IRExpression(expression: lhs, asLValue: true).rendered(functionContext: functionContext)
@@ -49,7 +39,7 @@ struct IRAssignment {
         }
         return IRRuntimeFunction.store(address: lhsCode,
                                        value: rhsCode,
-                                       inMemory: mangler.mangleName(mangler.isMem(for: enclosingName)))
+                                       inMemory: Mangler.isMem(for: enclosingName).mangled)
       } else if let enclosingIdentifier = lhs.enclosingIdentifier,
         functionContext.scopeContext.containsVariableDeclaration(for: enclosingIdentifier.name) {
         return IRRuntimeFunction.store(address: lhsCode, value: rhsCode, inMemory: true)

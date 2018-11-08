@@ -12,13 +12,9 @@ struct IRIdentifier {
   var identifier: Identifier
   var asLValue: Bool
 
-  // Dependencies
-  let mangler: ManglerProtocol
-
-  init(identifier: Identifier, asLValue: Bool = false, mangler: ManglerProtocol = Mangler.shared) {
+  init(identifier: Identifier, asLValue: Bool = false) {
     self.identifier = identifier
     self.asLValue = asLValue
-    self.mangler = mangler
   }
 
   func rendered(functionContext: FunctionContext) -> String {
@@ -27,7 +23,7 @@ struct IRIdentifier {
                               rhs: .identifier(identifier), asLValue: asLValue)
         .rendered(functionContext: functionContext)
     }
-    return mangler.mangleName(identifier.name)
+    return identifier.name.mangled
   }
 
   static func mangleName(_ name: String) -> String {

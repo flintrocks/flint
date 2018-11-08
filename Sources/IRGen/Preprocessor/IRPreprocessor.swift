@@ -14,15 +14,7 @@ import Lexer
 /// A preprocessing step to update the program's AST before code generation.
 public struct IRPreprocessor: ASTPass {
 
-  let mangler: ManglerProtocol
-
-  public init() {
-    self.mangler = Mangler.shared
-  }
-
-  init(mangler: ManglerProtocol = Mangler.shared) {
-    self.mangler = mangler
-  }
+  public init() {}
 
   public func process(structMember: StructMember, passContext: ASTPassContext) -> ASTPassResult<StructMember> {
     var structMember = structMember
@@ -75,7 +67,7 @@ public struct IRPreprocessor: ASTPass {
 
     // Mangle the function name in the declaration.
     let parameters = functionDeclaration.signature.parameters.rawTypes
-    let name = mangler.mangleFunctionName(functionDeclaration.identifier.name,
+    let name = Mangler.mangleFunctionName(functionDeclaration.identifier.name,
                                           parameterTypes: parameters,
                                           enclosingType: passContext.enclosingTypeIdentifier!.name)
     functionDeclaration.mangledIdentifier = name
@@ -124,7 +116,7 @@ public struct IRPreprocessor: ASTPass {
 
     var offset = 0
     for (index, parameter) in dynamicParameters where !parameter.isImplicit {
-      let isMemParameter = constructParameter(name: mangler.isMem(for: parameter.identifier.name),
+      let isMemParameter = constructParameter(name: Mangler.isMem(for: parameter.identifier.name),
                                               type: .basicType(.bool),
                                               sourceLocation: parameter.sourceLocation)
       functionDeclaration.signature.parameters.insert(isMemParameter, at: index + 1 + offset)

@@ -12,14 +12,6 @@ struct IRInterface {
   var contract: IRContract
   var environment: Environment
 
-  let mangler: ManglerProtocol
-
-  init(contract: IRContract, environment: Environment, mangler: ManglerProtocol = Mangler.shared) {
-    self.contract = contract
-    self.environment = environment
-    self.mangler = mangler
-  }
-
   func rendered() -> String {
     let functionSignatures = contract.contractBehaviorDeclarations.flatMap { contractBehaviorDeclaration in
       return contractBehaviorDeclaration.members.compactMap { member in
@@ -81,7 +73,7 @@ struct IRInterface {
 
   func render(_ functionParameter: Parameter) -> String {
     let canonicalType = CanonicalType(from: functionParameter.type.rawType)!.rawValue
-    let mangledName = mangler.mangleName(functionParameter.identifier.name)
+    let mangledName = functionParameter.identifier.name.mangled
     return "\(canonicalType) \(mangledName)"
   }
 }
