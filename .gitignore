@@ -1,6 +1,5 @@
 .DS_Store
 /.build
-/.derived-sources
 /.derived-tests
 /Packages
 /*.xcodeproj
