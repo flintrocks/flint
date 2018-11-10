@@ -41,6 +41,18 @@ Test :: caller <- (any) {
       return 4
     }
 
+    if let x: Int = 5 { // expected-error {{Invalid redeclaration of 'x'}}
+      return 5
+    }
+
+    if let y: Int = 5 {
+      return 5
+    }
+
+    if var y: Int = 5 { // expected-error {{Condition has invalid type: must be Bool or a let statement}}
+      return 5
+    }
+
     if double(x: x) { // expected-error {{Condition has invalid type: must be Bool or a let statement}}
       return 0
     }

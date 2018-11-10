@@ -20,6 +20,25 @@ extension SemanticAnalyzer {
     let callerProtections = passContext.contractBehaviorDeclarationContext?.callerProtections ?? []
     var diagnostics = [Diagnostic]()
 
+    // Allow let statements
+    switch condition {
+    case .variableDeclaration(let variableDeclaration):
+      if !variableDeclaration.isConstant {
+        diagnostics.append(.invalidConditionTypeInIfStatement(ifStatement))
+      }
+      return ASTPassResult(element: ifStatement, diagnostics: diagnostics, passContext: passContext)
+    case .binaryExpression(let binaryExpression):
+      let lhs = binaryExpression.lhs
+      if case let .variableDeclaration(variableDeclaration) = lhs {
+        if !variableDeclaration.isConstant {
+          diagnostics.append(.invalidConditionTypeInIfStatement(ifStatement))
+        }
+        return ASTPassResult(element: ifStatement, diagnostics: diagnostics, passContext: passContext)
+      }
+    default:
+      break
+    }
+
     let expressionType = environment.type(of: condition,
                                           enclosingType: enclosingTypeIdentifier.name,
                                           typeStates: typeStates,
