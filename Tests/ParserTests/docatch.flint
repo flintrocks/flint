@@ -1,0 +1,22 @@
+// RUN: %flintc %s --dump-ast | %FileCheck %s --prefix CHECK-AST
+
+contract Foo {
+  var arr: [Int] = []
+}
+
+Foo :: (any) {
+  public init() {}
+
+  func foo() -> Int {
+    // CHECK-AST: DoCatchStatement
+
+    do {
+      let x: Int = 3
+    } catch is Error {
+      let y: Int = 4
+    }
+
+    return 0;
+
+  }
+}

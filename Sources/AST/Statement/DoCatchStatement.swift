@@ -9,6 +9,7 @@ import Lexer
 
 /// A do catch block.
 public struct DoCatchStatement: ASTNode {
+  // TODO(ethan): Once we have exceptions, change this error to have type `Exceptions`
   public var error: Expression
   public var doBody: [Statement]
   public var catchBody: [Statement]
@@ -25,6 +26,8 @@ public struct DoCatchStatement: ASTNode {
   }
 
   public var description: String {
-    return "do { \(doBody) } catch { \(catchBody) }"
+    let doBodyText = doBody.map({ $0.description }).joined(separator: "\n")
+    let catchBodyText = catchBody.map({ $0.description }).joined(separator: "\n")
+    return "do {\(doBodyText)} catch {\(catchBodyText)}"
   }
 }
