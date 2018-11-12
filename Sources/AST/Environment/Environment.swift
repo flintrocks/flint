@@ -8,22 +8,22 @@ import Source
 import Lexer
 
 /// Information about the source program.
-public struct Environment {
+public class Environment {
   /// Information about each type (contracts, structs and traits) which the program define, such as its properties and
   /// functions.
-  var types = [RawTypeIdentifier: TypeInformation]()
+  var types: [RawTypeIdentifier: TypeInformation] = [:]
 
   /// A list of the names of the contracts which have been declared in the program.
-  var declaredContracts = [Identifier]()
+  var declaredContracts: [Identifier] = []
 
   /// A list of the names of the structs which have been declared in the program.
-  var declaredStructs = [Identifier]()
+  var declaredStructs: [Identifier] = []
 
   /// A list of the names of the enums which have been declared in the program.
-  var declaredEnums = [Identifier]()
+  var declaredEnums: [Identifier] = []
 
   // A list of the names of the traits which have been declared in the program.
-  var declaredTraits = [Identifier]()
+  var declaredTraits: [Identifier] = []
 
   /// The name of the stdlib struct which contains all global functions.
   public static let globalFunctionStructName = "Flint$Global"
