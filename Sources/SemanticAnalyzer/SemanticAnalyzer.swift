@@ -20,6 +20,9 @@ public struct SemanticAnalyzer: ASTPass {
     if !environment.hasDeclaredContract() {
       diagnostics.append(.contractNotDeclaredInModule())
     }
+
+    // Check each declaration in the module. We check these after the TopLevelModule
+    // has been processed so that we capture all definitions
     for declaration in topLevelModule.declarations {
       if case .contractDeclaration(let contractDeclaration) = declaration {
         // Check for unique public fallback
@@ -51,6 +54,7 @@ public struct SemanticAnalyzer: ASTPass {
     passContext.mutatingExpressions = mutatingExpressions
   }
 }
+
 extension ASTPassContext {
   /// The list of mutating expressions in a function.
   var mutatingExpressions: [Expression]? {
@@ -58,6 +62,7 @@ extension ASTPassContext {
     set { self[MutatingExpressionContextEntry.self] = newValue }
   }
 }
+
 struct MutatingExpressionContextEntry: PassContextEntry {
   typealias Value = [Expression]
 }
