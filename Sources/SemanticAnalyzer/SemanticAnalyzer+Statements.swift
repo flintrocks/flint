@@ -41,7 +41,7 @@ extension SemanticAnalyzer {
                                           scopeContext: passContext.scopeContext!)
 
     // Check that expression inside If statement is a Bool
-    if expressionType != RawType.basicType(RawType.BasicType.bool) {
+    if expressionType != .basicType(.bool) {
       diagnostics.append(.invalidConditionTypeInIfStatement(ifStatement))
     }
 
