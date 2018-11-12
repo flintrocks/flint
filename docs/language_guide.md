@@ -340,7 +340,7 @@ for var i: Int in fixedLen {}
 for let value: String in dictionary {}
 ```
 ### If Statements
-The `if` statement has a single condition  i.e. `x == 2`. It executes a set of statements only if that condition evaluates to `true`
+The `if` statement has a single condition, which should be either a Boolean expression (i.e. `x == 2`), or a let statement (i.e. `let y: Int = 5`). It executes a set of statements only if that condition evaluates to `true`.
 ```swift
 if x == 2 {
   // ...
