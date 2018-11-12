@@ -578,6 +578,6 @@ extension Diagnostic {
 
   static func invalidConditionTypeInIfStatement(_ ifStatement: IfStatement) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: ifStatement.condition.sourceLocation,
-      message: "Condition has invalid type: must be Bool or a let statement")
+      message: "Condition has invalid type: must be Bool or a valid let statement")
   }
 }
