@@ -56,6 +56,9 @@ extension Parser {
     case .for:
       let forStatement = try parseForStatement()
       statement = .forStatement(forStatement)
+    case .call:
+      let externalCall = try parseExternalCall()
+      statement = .externalCall(externalCall)
     case .if:
       let ifStatement = try parseIfStatement()
       statement = .ifStatement(ifStatement)

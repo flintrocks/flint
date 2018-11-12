@@ -52,6 +52,18 @@ extension Environment {
     }
   }
 
+  public func type(of externalCall: ExternalCall,
+                   enclosingType: RawTypeIdentifier,
+                   typeStates: [TypeState],
+                   callerProtections: [CallerProtection],
+                   scopeContext: ScopeContext) -> RawType? {
+    return type(of: externalCall.functionCall,
+                enclosingType: enclosingType,
+                typeStates: typeStates,
+                callerProtections: callerProtections,
+                scopeContext: scopeContext)
+  }
+
   /// The types a literal token can be.
   public func type(ofLiteralToken literalToken: Token) -> RawType {
     guard case .literal(let literal) = literalToken.kind else { fatalError() }
@@ -224,6 +236,13 @@ extension Environment {
     case .functionCall(let functionCall):
       return type(of: functionCall,
                   enclosingType: functionCall.identifier.enclosingType ?? enclosingType,
+                  typeStates: typeStates,
+                  callerProtections: callerProtections,
+                  scopeContext: scopeContext) ?? .errorType
+
+    case .externalCall(let externalCall):
+      return type(of: externalCall,
+                  enclosingType: externalCall.functionCall.identifier.enclosingType ?? enclosingType,
                   typeStates: typeStates,
                   callerProtections: callerProtections,
                   scopeContext: scopeContext) ?? .errorType

@@ -396,6 +396,9 @@ public struct ASTVisitor {
     case .doCatchStatement(let doCatchStatement):
       processResult.element =
         .doCatchStatement(processResult.combining(visit(doCatchStatement, passContext: processResult.passContext)))
+    case .externalCall(let externalCall):
+      processResult.element =
+        .externalCall(processResult.combining(visit(externalCall, passContext: processResult.passContext)))
     }
     let postProcessResult = pass.postProcess(statement: processResult.element, passContext: processResult.passContext)
     return ASTPassResult(element: postProcessResult.element,
@@ -716,6 +719,9 @@ public struct ASTVisitor {
     case .functionCall(let functionCall):
       processResult.element = .functionCall(processResult.combining(visit(functionCall,
                                                                           passContext: processResult.passContext)))
+    case .externalCall(let externalCall):
+      processResult.element = .externalCall(processResult.combining(visit(externalCall,
+                                                                          passContext: processResult.passContext)))
     case .arrayLiteral(let arrayLiteral):
       processResult.element = .arrayLiteral(processResult.combining(visit(arrayLiteral,
                                                                           passContext: processResult.passContext)))
@@ -823,6 +829,29 @@ public struct ASTVisitor {
     }
 
     let postProcessResult = pass.postProcess(functionCall: processResult.element,
+                                             passContext: processResult.passContext)
+
+    return ASTPassResult(element: postProcessResult.element,
+                         diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
+                         passContext: postProcessResult.passContext)
+  }
+
+  func visit(_ externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
+    var processResult = pass.process(externalCall: externalCall, passContext: passContext)
+
+    processResult.passContext.isExternalConfigurationParam = true
+    processResult.element.configurationParameters = processResult.element.configurationParameters.map { param in
+      let x = visit(param, passContext: processResult.passContext)
+      return processResult.combining(x)
+    }
+    processResult.passContext.isExternalConfigurationParam = false
+
+    processResult.passContext.isExternalCall = true
+    processResult.element.functionCall = processResult.combining(visit(processResult.element.functionCall,
+                                                                       passContext: processResult.passContext))
+    processResult.passContext.isExternalCall = false
+
+    let postProcessResult = pass.postProcess(externalCall: externalCall,
                                              passContext: processResult.passContext)
 
     return ASTPassResult(element: postProcessResult.element,

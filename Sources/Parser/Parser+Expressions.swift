@@ -74,6 +74,9 @@ extension Parser {
       // Try to parse a bracketed expression.
       return .bracketedExpression(try parseBracketedExpression())
     }
+    if case .emit = first {
+      return .externalCall(try parseExternalCall())
+    }
     if case .punctuation(.openSquareBracket) = first {
       // Check for a dictionary by descending into the open bracket and looking for a colon
       currentIndex+=1
@@ -149,6 +152,30 @@ extension Parser {
     }
     let expression = try parseExpression(upTo: statementEndIndex)
     return InoutExpression(ampersandToken: ampersandToken, expression: expression)
+  }
+
+  // MARK: External Calls
+  func parseExternalCall() throws -> ExternalCall {
+    var returnsOptional = false
+    var forced = false
+
+    try consume(.call, or: .badDeclaration(at: latestSource))
+    let token = try consume(anyOf: [.punctuation(.question), .punctuation(.bang)], or: .dummy())
+
+    if token.kind == .punctuation(.bang) {
+      forced = true
+    } else if token.kind == .punctuation(.question) {
+      returnsOptional = true
+    }
+
+    let (arguments, closingBracket) = try parseFunctionCallArgumentList()
+    let functionCall = try parseFunctionCall()
+
+    return ExternalCall(configurationParameters: arguments,
+                        closeBracketToken: closingBracket,
+                        functionCall: functionCall,
+                        returnsOptional: returnsOptional,
+                        forced: forced)
   }
 
   // MARK: Function Call
