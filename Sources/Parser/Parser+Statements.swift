@@ -122,19 +122,25 @@ extension Parser {
   }
 
   func parseDoCatchStatement() throws -> DoCatchStatement {
+    // Parse do block
     try consume(.do, or: .expectedStatement(at: latestSource))
     let (doStatements, _) = try parseCodeBlock()
-    try consume(.catch, or: .expectedStatement(at: latestSource))
     // Parse catch is Error
+    try consume(.catch, or: .expectedStatement(at: latestSource))
     try consume(.is, or: .expectedStatement(at: latestSource))
+    let err = try parseErrorType()
 
+    let (catchStatements, _) = try parseCodeBlock()
+    return DoCatchStatement(doBody: doStatements, catchBody: catchStatements, error: err)
+  }
+
+  func parseErrorType() throws -> Expression {
     guard let nextOpenBraceIndex = indexOfFirstAtCurrentDepth([.punctuation(.openBrace)]) else {
       throw raise(.leftBraceExpected(in: "Do-catch Statement", at: latestSource))
     }
 
     let err = try parseExpression(upTo: nextOpenBraceIndex)
-    let (catchStatements, _) = try parseCodeBlock()
-    return DoCatchStatement(doBody: doStatements, catchBody: catchStatements, error: err)
+    return err
   }
 
   func parseElseClause() throws -> [Statement] {

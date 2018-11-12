@@ -289,7 +289,6 @@ struct IRDoCatchStatement {
   var doCatchStatement: DoCatchStatement
 
   func rendered(functionContext: FunctionContext) -> String {
-    // TODO(ethan) implement exception handling codegen
-    return ""
+    fatalError("Not implemented")
   }
 }

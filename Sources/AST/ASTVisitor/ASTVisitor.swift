@@ -514,11 +514,22 @@ public struct ASTVisitor {
   }
 
   func visit(_ doCatchStatement: DoCatchStatement, passContext: ASTPassContext) -> ASTPassResult<DoCatchStatement> {
-    // TODO(ethan) implement this
-    let passContext = passContext
-    let processResult = pass.process(doCatchStatement: doCatchStatement, passContext: passContext)
+    var passContext = passContext
+    var processResult = pass.process(doCatchStatement: doCatchStatement, passContext: passContext)
+
+    let scopeContext = passContext.scopeContext
+    processResult.element.doBody = processResult.element.doBody.map { statement in
+      return processResult.combining(visit(statement, passContext: processResult.passContext))
+    }
+
+    processResult.element.catchBody = processResult.element.catchBody.map { statement in
+      return processResult.combining(visit(statement, passContext: processResult.passContext))
+    }
+
+    processResult.passContext.scopeContext = scopeContext
     let postProcessResult = pass.postProcess(doCatchStatement: processResult.element,
                                              passContext: processResult.passContext)
+
     return ASTPassResult(element: postProcessResult.element,
                          diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
                          passContext: postProcessResult.passContext)

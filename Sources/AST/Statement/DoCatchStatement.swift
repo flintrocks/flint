@@ -9,10 +9,9 @@ import Lexer
 
 /// A do catch block.
 public struct DoCatchStatement: ASTNode {
-  // TODO(ethan): Once we have exceptions, change this error to have type `Exceptions`
-  public var error: Expression
   public var doBody: [Statement]
   public var catchBody: [Statement]
+  public var error: Expression
 
   public init(doBody: [Statement], catchBody: [Statement], error: Expression) {
     self.doBody = doBody

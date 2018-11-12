@@ -9,11 +9,23 @@ Foo :: (any) {
 
   func foo() -> Int {
     // CHECK-AST: DoCatchStatement
-
+    // CHECK-AST:    VariableDeclaration
+    // CHECK-AST:      let
+    // CHECK-AST:      identifier "x"
+    // CHECK-AST:      built-in type Int
+    // CHECK-AST:    =
+    // CHECK-AST:      literal 3
+    // CHECK-AST:    VariableDeclaration
+    // CHECK-AST:      let
+    // CHECK-AST:      identifier "x"
+    // CHECK-AST:      built-in type Int
+    // CHECK-AST:    =
+    // CHECK-AST:      literal 4
+    // CHECK-AST:    Expression
     do {
       let x: Int = 3
     } catch is Error {
-      let y: Int = 4
+      let x: Int = 4 // x is in a different block
     }
 
     return 0;
