@@ -530,7 +530,7 @@ extension SemanticAnalyzer {
           return false
         }
         return true
-      case .externalCall(let externalCall):
+      case .externalCall(_):
         fatalError()
       case .identifier, .inoutExpression, .literal, .arrayLiteral,
            .dictionaryLiteral, .self, .variableDeclaration, .bracketedExpression,
