@@ -19,7 +19,7 @@ public struct Token: Equatable, SourceEntity, CustomStringConvertible {
   // MARK: - Kind
   public enum Kind: Equatable, CustomStringConvertible {
     // Newline
-    case `newline`
+    case newline
 
     // Punctuation
     case punctuation(Punctuation)
@@ -31,13 +31,13 @@ public struct Token: Equatable, SourceEntity, CustomStringConvertible {
     case literal(Literal)
 
     // Keywords
-    case `contract`, `enum`, `case`, `struct`, `func`, `event`, `trait`
-    case `init`, `fallback`
-    case `public`, `visible`, `mutating`, `external`
-    case `return`, `become`, `try`, `emit`, `call`
+    case contract, `enum`, `case`, `struct`, `func`, event, trait
+    case `init`, fallback
+    case `public`, visible, mutating, external
+    case `return`, become, `try`, emit, call
     case `if`, `else`, `for`, `in`
-    case `self`, `selfType`
-    case `implicit`, `inout`
+    case `self`, selfType
+    case implicit, `inout`
     case `var`, `let`
     case `catch`, `do`, `is`
 
