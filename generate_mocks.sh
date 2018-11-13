@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EXCLUDE="ASTNode,PassContextEntry"
+EXCLUDE="ASTNode,PassContextEntry,SourceEntity"
 
 # Locate Cuckoo
 shopt -s nullglob
