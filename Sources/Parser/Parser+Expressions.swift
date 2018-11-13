@@ -74,8 +74,8 @@ extension Parser {
       // Try to parse a bracketed expression.
       return .bracketedExpression(try parseBracketedExpression())
     }
-    if case .emit = first {
-      return .externalCall(try parseExternalCall())
+    if case .call = first {
+      return .externalCall(try parseExternalCall(upTo: limitTokenIndex))
     }
     if case .punctuation(.openSquareBracket) = first {
       // Check for a dictionary by descending into the open bracket and looking for a colon
@@ -155,24 +155,33 @@ extension Parser {
   }
 
   // MARK: External Calls
-  func parseExternalCall() throws -> ExternalCall {
+  func parseExternalCall(upTo limitTokenIndex: Int) throws -> ExternalCall {
     var returnsOptional = false
     var forced = false
 
     try consume(.call, or: .badDeclaration(at: latestSource))
-    let token = try consume(anyOf: [.punctuation(.question), .punctuation(.bang)], or: .dummy())
 
-    if token.kind == .punctuation(.bang) {
-      forced = true
-    } else if token.kind == .punctuation(.question) {
-      returnsOptional = true
+    var arguments: [FunctionArgument] = []
+    if tokens[currentIndex].kind == .punctuation(.openBracket) {
+      (arguments, _) = try parseFunctionCallArgumentList()
     }
 
-    let (arguments, closingBracket) = try parseFunctionCallArgumentList()
-    let functionCall = try parseFunctionCall()
+    if tokens[currentIndex].kind == .punctuation(.question) ||
+      tokens[currentIndex].kind == .punctuation(.bang) {
+      let token = try consume(anyOf: [.punctuation(.question), .punctuation(.bang)], or: .dummy())
+
+      if token.kind == .punctuation(.bang) {
+        forced = true
+      } else if token.kind == .punctuation(.question) {
+        returnsOptional = true
+      }
+    }
+
+    guard let functionCall = try parseBinaryExpression(upTo: limitTokenIndex) else {
+      throw raise(.badDeclaration(at: tokens[currentIndex].sourceLocation))
+    }
 
     return ExternalCall(configurationParameters: arguments,
-                        closeBracketToken: closingBracket,
                         functionCall: functionCall,
                         returnsOptional: returnsOptional,
                         forced: forced)

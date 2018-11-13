@@ -481,7 +481,6 @@ public class ASTDumper {
       for argument in externalCall.configurationParameters {
         self.dump(argument)
       }
-      self.dump(externalCall.closeBracketToken)
 
       if externalCall.forced {
         self.writeNode("Forced execution")

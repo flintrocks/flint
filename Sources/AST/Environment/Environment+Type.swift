@@ -57,7 +57,7 @@ extension Environment {
                    typeStates: [TypeState],
                    callerProtections: [CallerProtection],
                    scopeContext: ScopeContext) -> RawType? {
-    return type(of: externalCall.functionCall,
+    return type(of: externalCall.functionCall.lhs,
                 enclosingType: enclosingType,
                 typeStates: typeStates,
                 callerProtections: callerProtections,
@@ -242,7 +242,7 @@ extension Environment {
 
     case .externalCall(let externalCall):
       return type(of: externalCall,
-                  enclosingType: externalCall.functionCall.identifier.enclosingType ?? enclosingType,
+                  enclosingType: externalCall.functionCall.lhs.enclosingType ?? enclosingType,
                   typeStates: typeStates,
                   callerProtections: callerProtections,
                   scopeContext: scopeContext) ?? .errorType

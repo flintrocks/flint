@@ -44,7 +44,7 @@ public indirect enum Expression: ASTNode {
       functionCall.identifier.enclosingType = type
       return .functionCall(functionCall)
     case .externalCall(var externalCall):
-      externalCall.functionCall.identifier.enclosingType = type
+      externalCall.functionCall.lhs = externalCall.functionCall.lhs.assigningEnclosingType(type: type)
       return .externalCall(externalCall)
     default:
       return self
@@ -59,7 +59,7 @@ public indirect enum Expression: ASTNode {
     case .bracketedExpression(let bracketedExpression): return bracketedExpression.expression.enclosingType
     case .variableDeclaration(let variableDeclaration): return variableDeclaration.identifier.name
     case .functionCall(let functionCall): return functionCall.identifier.enclosingType
-    case .externalCall(let externalCall): return externalCall.functionCall.identifier.enclosingType
+    case .externalCall(let externalCall): return externalCall.functionCall.lhs.enclosingType
     case .subscriptExpression(let subscriptExpression):
       if case .identifier(let identifier) = subscriptExpression.baseExpression {
         return identifier.enclosingType
@@ -77,7 +77,7 @@ public indirect enum Expression: ASTNode {
     case .binaryExpression(let binaryExpression): return binaryExpression.lhs.enclosingIdentifier
     case .bracketedExpression(let bracketedExpression): return bracketedExpression.expression.enclosingIdentifier
     case .functionCall(let functionCall): return functionCall.identifier
-    case .externalCall(let externalCall): return externalCall.functionCall.identifier
+    case .externalCall(let externalCall): return externalCall.functionCall.lhs.enclosingIdentifier
     case .subscriptExpression(let subscriptExpression): return subscriptExpression.baseExpression.enclosingIdentifier
     default : return nil
     }
