@@ -157,6 +157,8 @@ extension ASTPassContext {
   }
 
   /// When visiting an external configuration parameter, this property is set to `true`.
+  /// External configuration params are hyper-parameters to the call, like the gas, the
+  /// wei used for the external call or reentrancy.
   public var isExternalConfigurationParam: Bool {
     get { return self[IsExternalConfigurationParam.self] ?? false }
     set { self[IsExternalConfigurationParam.self] = newValue }
@@ -294,6 +296,9 @@ private struct IsFunctionCallArgumentLabel: PassContextEntry {
   typealias Value = Bool
 }
 
+/// See the 'isExternalConfigurationParam' property
+/// External configuration params are hyper-parameters to the call, like the gas, the
+/// wei used for the external call or reentrancy.
 private struct IsExternalConfigurationParam: PassContextEntry {
   typealias Value = Bool
 }
