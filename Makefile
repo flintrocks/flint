@@ -1,6 +1,6 @@
 .PHONY: all debug release zip test lint generate-sources generate-mocks test-nogen clean
 
-all: debug;
+all: debug
 
 debug: generate-sources
 	swift build
