@@ -7,7 +7,7 @@
 import Source
 
 /// A lexical token valid in Flint.
-public class Token: SourceEntity, CustomStringConvertible {
+public struct Token: Equatable, SourceEntity, CustomStringConvertible {
   /// The kind of token.
   public var kind: Kind
 
@@ -89,12 +89,4 @@ public class Token: SourceEntity, CustomStringConvertible {
 
   // MARK: - SourceEntity
   public var sourceLocation: SourceLocation
-}
-
-extension Token: Equatable {
-  public static func == (lhs: Token, rhs: Token) -> Bool {
-    return lhs.description == rhs.description &&
-      lhs.kind == rhs.kind &&
-      lhs.sourceLocation == rhs.sourceLocation
-  }
 }
