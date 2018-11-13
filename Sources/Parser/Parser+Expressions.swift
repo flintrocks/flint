@@ -156,9 +156,6 @@ extension Parser {
 
   // MARK: External Calls
   func parseExternalCall(upTo limitTokenIndex: Int) throws -> ExternalCall {
-    var returnsOptional = false
-    var forced = false
-
     try consume(.call, or: .badDeclaration(at: latestSource))
 
     var arguments: [FunctionArgument] = []
@@ -166,14 +163,15 @@ extension Parser {
       (arguments, _) = try parseFunctionCallArgumentList()
     }
 
+    var mode = ExternalCall.Mode.normal
     if tokens[currentIndex].kind == .punctuation(.question) ||
       tokens[currentIndex].kind == .punctuation(.bang) {
       let token = try consume(anyOf: [.punctuation(.question), .punctuation(.bang)], or: .dummy())
 
       if token.kind == .punctuation(.bang) {
-        forced = true
+        mode = ExternalCall.Mode.isForced
       } else if token.kind == .punctuation(.question) {
-        returnsOptional = true
+        mode = ExternalCall.Mode.returnsGracefullyOptional
       }
     }
 
@@ -183,8 +181,7 @@ extension Parser {
 
     return ExternalCall(configurationParameters: arguments,
                         functionCall: functionCall,
-                        returnsOptional: returnsOptional,
-                        forced: forced)
+                        mode: mode)
   }
 
   // MARK: Function Call

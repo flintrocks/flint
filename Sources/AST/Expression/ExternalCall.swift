@@ -9,19 +9,20 @@ import Lexer
 
 /// A call to an external function
 public struct ExternalCall: ASTNode {
+  public enum Mode {
+    case normal, returnsGracefullyOptional, isForced
+  }
+
   public var configurationParameters: [FunctionArgument]
   public var functionCall: BinaryExpression
-  public var returnsOptional: Bool // used for representing call?
-  public var forced: Bool // used for representing call!
+  public var mode: Mode
 
   public init(configurationParameters: [FunctionArgument],
               functionCall: BinaryExpression,
-              returnsOptional: Bool,
-              forced: Bool) {
+              mode: Mode) {
     self.configurationParameters = configurationParameters
     self.functionCall = functionCall
-    self.returnsOptional = returnsOptional
-    self.forced = forced
+    self.mode = mode
   }
 
   // MARK: - ASTNode

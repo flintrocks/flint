@@ -482,9 +482,9 @@ public class ASTDumper {
         self.dump(argument)
       }
 
-      if externalCall.forced {
+      if externalCall.mode == .isForced {
         self.writeNode("Forced execution")
-      } else if externalCall.returnsOptional {
+      } else if externalCall.mode == .returnsGracefullyOptional {
         self.writeNode("Returns optional")
       }
 
