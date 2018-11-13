@@ -163,15 +163,15 @@ extension Parser {
       (arguments, _) = try parseFunctionCallArgumentList()
     }
 
-    var mode = ExternalCall.Mode.normal
+    var mode: ExternalCall.Mode = .normal
     if tokens[currentIndex].kind == .punctuation(.question) ||
       tokens[currentIndex].kind == .punctuation(.bang) {
       let token = try consume(anyOf: [.punctuation(.question), .punctuation(.bang)], or: .dummy())
 
       if token.kind == .punctuation(.bang) {
-        mode = ExternalCall.Mode.isForced
+        mode = .isForced
       } else if token.kind == .punctuation(.question) {
-        mode = ExternalCall.Mode.returnsGracefullyOptional
+        mode = .returnsGracefullyOptional
       }
     }
 
