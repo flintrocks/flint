@@ -306,7 +306,7 @@ public class Environment {
   }
 
 // MARK: Environment - Checks -
-  
+
   /// The prefix for Flint runtime functions.
   public static var runtimeFunctionPrefix = "flint$"
 
