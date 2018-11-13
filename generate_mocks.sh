@@ -56,4 +56,6 @@ echo "Symlinking..."
 pushd .derived-tests/SemanticAnalyzer
 rm ASTGeneratedMocks.swift
 ln -s ../AST/ASTGeneratedMocks.swift
+rm LexerGeneratedMocks.swift
+ln -s ../Lexer/LexerGeneratedMocks.swift
 popd

@@ -3,6 +3,8 @@ import XCTest
 import Cuckoo
 import AST
 import Diagnostic
+import Source
+import Lexer
 
 final class SemanticAnalyzerTests: XCTestCase {
 
@@ -33,6 +35,15 @@ final class SemanticAnalyzerTests: XCTestCase {
     // Then
     XCTAssertEqual(result.diagnostics.count, 1)
     XCTAssertEqual(result.diagnostics.first!, Diagnostic.contractNotDeclaredInModule())
+  }
+
+  func testTopLevelModule_privateFallbackNotUniqueForContract_diagnosticEmitted() {
+    // Given
+    let f = Fixture()
+
+//    let contract = ContractDeclaration(contractToken: TokenStub(), identifier: Identifier(name: "", sourceLocation: ),
+    //conformances: [], states: [], members: [])
+//    let module = TopLevelModule(declarations: [.contractDeclaration(contract)])
   }
 
 //  static var allTests = [

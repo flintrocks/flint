@@ -33,7 +33,7 @@ struct IRCallerProtectionChecks {
 
       switch type {
       case .functionType(parameters: [], result: .basicType(.address)):
-        let identifier = callerProtection.identifier
+        var identifier = callerProtection.identifier
         let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [], enclosingType: enclosingType)
         identifier.identifierToken.kind = .identifier(name)
         // swiftlint:disable line_length
@@ -42,7 +42,7 @@ struct IRCallerProtectionChecks {
         let check = "eq(caller(), \(functionCall.rendered(functionContext: functionContext)))"
         return "\(variableName) := add(\(variableName), \(check))"
       case .functionType(parameters: [.basicType(.address)], result: .basicType(.bool)):
-        let identifier = callerProtection.identifier
+        var identifier = callerProtection.identifier
         let name = Mangler.mangleFunctionName(identifier.name, parameterTypes: [.basicType(.address)],
                                               enclosingType: enclosingType)
         identifier.identifierToken.kind = .identifier(name)
