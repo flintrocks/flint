@@ -20,6 +20,8 @@ extension Parser {
       fatalError("Limit Token Index should be smaller than the current token's index")
     }
 
+    print("Parsing expression with limit index \(limitTokenIndex)")
+
     guard let first = currentToken?.kind else {
       throw raise(.unexpectedEOF())
     }
@@ -27,6 +29,10 @@ extension Parser {
     // Try to parse an expression passed by inout (e.g., '&a').
     if case .punctuation(.ampersand) = first {
       return .inoutExpression(try parseInoutExpression())
+    }
+
+    if case .call = first {
+      return .externalCall(try parseExternalCall(upTo: limitTokenIndex))
     }
 
     // Try to parse a binary expression.
@@ -74,9 +80,6 @@ extension Parser {
       // Try to parse a bracketed expression.
       return .bracketedExpression(try parseBracketedExpression())
     }
-    if case .call = first {
-      return .externalCall(try parseExternalCall(upTo: limitTokenIndex))
-    }
     if case .punctuation(.openSquareBracket) = first {
       // Check for a dictionary by descending into the open bracket and looking for a colon
       currentIndex+=1
@@ -106,10 +109,12 @@ extension Parser {
 
   // MARK: Binary
   func parseBinaryExpression(upTo limitTokenIndex: Int) throws -> BinaryExpression? {
+    print("Parsing binary expression with limit index \(limitTokenIndex)")
     for op in Token.Kind.Punctuation.allBinaryOperatorsByIncreasingPrecedence {
       guard let index = indexOfFirstAtCurrentDepth([.punctuation(op)], maxIndex: limitTokenIndex) else { continue }
       let lhs = try parseExpression(upTo: index)
       let operatorToken = try consume(.punctuation(op), or: .expectedValidOperator(at: latestSource))
+      print("Binary expression token: \(operatorToken)")
       let rhs = try parseExpression(upTo: limitTokenIndex)
       return BinaryExpression(lhs: lhs, op: operatorToken, rhs: rhs)
     }
@@ -156,6 +161,7 @@ extension Parser {
 
   // MARK: External Calls
   func parseExternalCall(upTo limitTokenIndex: Int) throws -> ExternalCall {
+    print("Parsing external call with limit \(limitTokenIndex)")
     try consume(.call, or: .badDeclaration(at: latestSource))
 
     var arguments: [FunctionArgument] = []
@@ -186,6 +192,8 @@ extension Parser {
 
   // MARK: Function Call
   func parseFunctionCall() throws -> FunctionCall {
+
+    print("Parsing function call")
     let identifier = try parseIdentifier()
     let (arguments, closeBracketToken) = try parseFunctionCallArgumentList()
 
@@ -226,6 +234,7 @@ extension Parser {
     if let firstPartEnd = indexOfFirstAtCurrentDepth([.punctuation(.colon)]),
       firstPartEnd < upTo {
       let identifier = try parseIdentifier()
+      print("Parsing param with identifier \(identifier)")
       try consume(.punctuation(.colon), or: .expectedColonAfterArgumentLabel(at: latestSource))
       let expression = try parseExpression(upTo: upTo)
       return FunctionArgument(identifier: identifier, expression: expression)
