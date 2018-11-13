@@ -823,9 +823,8 @@ public struct ASTVisitor {
     processResult.passContext.isFunctionCall = false
 
     processResult.element.arguments = processResult.element.arguments.map { argument in
-
-      let x = visit(argument, passContext: processResult.passContext)
-      return processResult.combining(x)
+      let paramVisit = visit(argument, passContext: processResult.passContext)
+      return processResult.combining(paramVisit)
     }
 
     let postProcessResult = pass.postProcess(functionCall: processResult.element,
@@ -841,8 +840,8 @@ public struct ASTVisitor {
 
     processResult.passContext.isExternalConfigurationParam = true
     processResult.element.configurationParameters = processResult.element.configurationParameters.map { param in
-      let x = visit(param, passContext: processResult.passContext)
-      return processResult.combining(x)
+      let paramVisit = visit(param, passContext: processResult.passContext)
+      return processResult.combining(paramVisit)
     }
     processResult.passContext.isExternalConfigurationParam = false
 
