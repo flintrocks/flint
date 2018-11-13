@@ -233,7 +233,7 @@ extension Environment {
                   enclosingType: enclosingType,
                   typeStates: typeStates,
                   callerProtections: callerProtections,
-                  scopeContext: scopeContext) 
+                  scopeContext: scopeContext)
 
     case .identifier(let identifier):
       if identifier.enclosingType == nil,

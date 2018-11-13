@@ -218,6 +218,6 @@ final class SemanticAnalyzerTests: XCTestCase {
     ("testTopLevelModule_contractHasUndefinedInitializers_diagnosticEmitted",
      testTopLevelModule_contractHasUndefinedInitializers_diagnosticEmitted),
     ("testTopLevelModule_contractHasNoUndefinedInitializers_noDiagnosticEmitted",
-     testTopLevelModule_contractHasNoUndefinedInitializers_noDiagnosticEmitted),
+     testTopLevelModule_contractHasNoUndefinedInitializers_noDiagnosticEmitted)
   ]
 }
