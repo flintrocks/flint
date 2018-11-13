@@ -522,11 +522,11 @@ public struct ASTVisitor {
       return processResult.combining(visit(statement, passContext: processResult.passContext))
     }
 
+    processResult.passContext.scopeContext = scopeContext
     processResult.element.catchBody = processResult.element.catchBody.map { statement in
       return processResult.combining(visit(statement, passContext: processResult.passContext))
     }
 
-    processResult.passContext.scopeContext = scopeContext
     let postProcessResult = pass.postProcess(doCatchStatement: processResult.element,
                                              passContext: processResult.passContext)
 
