@@ -35,7 +35,7 @@ echo "Generating Mocks..."
 for f in Sources/*; do
   TESTABLE=`basename $f`
   OUT_DIRECTORY=".derived-tests/$TESTABLE"
-  OUTPUT="$OUT_DIRECTORY/GeneratedMocks.swift"
+  OUTPUT="$OUT_DIRECTORY/${TESTABLE}GeneratedMocks.swift"
 
   echo " -- Creating $OUT_DIRECTORY"
   mkdir -p "$OUT_DIRECTORY"
@@ -50,3 +50,10 @@ for f in Sources/*; do
   sed "s/import struct$TESTABLE/import struct $TESTABLE/g" "$OUTPUT" > "$OUTPUT.sed"
   mv "$OUTPUT.sed" "$OUTPUT"
 done
+
+# Perform necessary symbolic linking in order to support cross-module Mock/Stub sharing
+echo "Symlinking..."
+pushd .derived-tests/SemanticAnalyzer
+rm ASTGeneratedMocks.swift
+ln -s ../AST/ASTGeneratedMocks.swift
+popd

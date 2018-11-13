@@ -10,9 +10,11 @@ final class SemanticAnalyzerTests: XCTestCase {
     let pass = SemanticAnalyzer()
   }
 
-  private var emptyPassContext: ASTPassContext {
+  private func buildPassContext(stubEnvironment: (MockEnvironment.Stubbing) -> Void) -> ASTPassContext {
     var context = ASTPassContext()
-    context.environment = Environment()
+    let environment = MockEnvironment()
+    stub(environment, block: stubEnvironment)
+    context.environment = environment
     return context
   }
 
@@ -21,9 +23,12 @@ final class SemanticAnalyzerTests: XCTestCase {
     // Given
     let f = Fixture()
     let module = TopLevelModule(declarations: [])
+    let passContext = buildPassContext { (environment) in
+      environment.hasDeclaredContract().thenReturn(false)
+    }
 
     // When
-    let result = f.pass.postProcess(topLevelModule: module, passContext: emptyPassContext)
+    let result = f.pass.postProcess(topLevelModule: module, passContext: passContext)
 
     // Then
     XCTAssertEqual(result.diagnostics.count, 1)
