@@ -484,6 +484,22 @@ extension Diagnostic {
   static func renderGroup(_ states: [TypeState]) -> String {
     return "\(states.map({ $0.name }).joined(separator: ", "))"
   }
+
+  // EXTERNAL CALL ERRORS //
+  static func normalExternalCallOutsideDoCatch(_ externalCall: ExternalCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+                      message: "Cannot use `call` outside do-catch block. ")
+  }
+
+  static func optionalExternalCallOutsideIfLet(_ externalCall: ExternalCall) -> Diagnostic {
+    var notes = [Diagnostic]()
+    notes.append(Diagnostic(severity: .note, sourceLocation: externalCall.sourceLocation,
+                            message: "Consider using `call` or `call!`."))
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+                      message: "Cannot use `call?` outside `if let ...` construct. ",
+                      notes: notes)
+  }
+
 }
 
 // MARK: Warnings
