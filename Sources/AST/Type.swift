@@ -31,6 +31,17 @@ public indirect enum RawType: Equatable {
     case void = "Void"
     case bool = "Bool"
     case event = "Event"
+
+    private static let solidityParallels: [BasicType: SolidityType] = [
+      .address : .address,
+      .int : .int256,
+      .string : .string,
+      .bool : .bool
+    ]
+
+    public var solidityParallel: RawTypeIdentifier? {
+      return BasicType.solidityParallels[self]?.rawValue
+    }
   }
 
   public enum StdlibType: RawTypeIdentifier {
@@ -114,6 +125,80 @@ public indirect enum RawType: Equatable {
     case uint240 = "uint240"
     case uint248 = "uint248"
     case uint256 = "uint256"
+
+    private static let basicParallels: [SolidityType: BasicType] = [
+      .address : .address,
+      .string : .string,
+      .bool : .bool,
+      .int8: .int,
+      .int16: .int,
+      .int24: .int,
+      .int32: .int,
+      .int40: .int,
+      .int48: .int,
+      .int56: .int,
+      .int64: .int,
+      .int72: .int,
+      .int80: .int,
+      .int88: .int,
+      .int96: .int,
+      .int104: .int,
+      .int112: .int,
+      .int120: .int,
+      .int128: .int,
+      .int136: .int,
+      .int144: .int,
+      .int152: .int,
+      .int160: .int,
+      .int168: .int,
+      .int176: .int,
+      .int184: .int,
+      .int192: .int,
+      .int200: .int,
+      .int208: .int,
+      .int216: .int,
+      .int224: .int,
+      .int232: .int,
+      .int240: .int,
+      .int248: .int,
+      .int256: .int,
+      .uint8: .int,
+      .uint16: .int,
+      .uint24: .int,
+      .uint32: .int,
+      .uint40: .int,
+      .uint48: .int,
+      .uint56: .int,
+      .uint64: .int,
+      .uint72: .int,
+      .uint80: .int,
+      .uint88: .int,
+      .uint96: .int,
+      .uint104: .int,
+      .uint112: .int,
+      .uint120: .int,
+      .uint128: .int,
+      .uint136: .int,
+      .uint144: .int,
+      .uint152: .int,
+      .uint160: .int,
+      .uint168: .int,
+      .uint176: .int,
+      .uint184: .int,
+      .uint192: .int,
+      .uint200: .int,
+      .uint208: .int,
+      .uint216: .int,
+      .uint224: .int,
+      .uint232: .int,
+      .uint240: .int,
+      .uint248: .int,
+      .uint256: .int
+    ]
+
+    public var basicParallel: RawTypeIdentifier? {
+      return SolidityType.basicParallels[self]?.rawValue
+    }
   }
 
   public var name: String {
@@ -130,8 +215,7 @@ public indirect enum RawType: Equatable {
     case .errorType: return "Flint$ErrorType"
     case .functionType(let parameters, let result):
       return "(\(parameters.map { $0.name }.joined(separator: ", ")) -> \(result)"
-    case .solidityType(let solidityType):
-      return "External(\(solidityType.rawValue))"
+    case .solidityType(let solidityType): return solidityType.rawValue
     }
   }
 

@@ -221,7 +221,8 @@ public struct ASTVisitor {
       processResult.combining(visit(processResult.element.identifier,
                                     passContext: processResult.passContext))
 
-    let traitDeclarationContext = TraitDeclarationContext(traitIdentifier: processResult.element.identifier)
+    let traitDeclarationContext = TraitDeclarationContext(traitIdentifier: processResult.element.identifier,
+                                                          traitKind: processResult.element.traitKind)
     let traitScopeContext = ScopeContext()
 
     processResult.passContext = processResult.passContext.withUpdates {

@@ -296,6 +296,11 @@ extension SemanticAnalyzer {
       diagnostics.append(.useOfSelfOutsideTrait(at: variableDeclaration.sourceLocation))
     }
 
+    // Check whether Solidity types are allowed in the current context
+    checkWhetherSolidityTypesAreAllowedInContext(type: variableDeclaration.type,
+                                                 passContext: passContext,
+                                                 diagnostics: &diagnostics)
+
     if passContext.inFunctionOrInitializer {
       if let conflict = passContext.scopeContext!.declaration(for: variableDeclaration.identifier.name),
         !isShadowing(conflict, variableDeclaration) {
@@ -345,6 +350,18 @@ extension SemanticAnalyzer {
   }
 
   // MARK: Function
+  public func process(functionSignatureDeclaration: FunctionSignatureDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<FunctionSignatureDeclaration> {
+    var diagnostics: [Diagnostic] = []
+    if let resultType = functionSignatureDeclaration.resultType {
+        checkWhetherSolidityTypesAreAllowedInContext(type: resultType,
+                                                     passContext: passContext,
+                                                     diagnostics: &diagnostics)
+    }
+
+    return ASTPassResult(element: functionSignatureDeclaration, diagnostics: diagnostics, passContext: passContext)
+  }
+
   public func process(functionDeclaration: FunctionDeclaration,
                       passContext: ASTPassContext) -> ASTPassResult<FunctionDeclaration> {
     var diagnostics = [Diagnostic]()
