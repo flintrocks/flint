@@ -33,6 +33,11 @@ extension Parser {
       return .externalCall(try parseExternalCall(upTo: limitTokenIndex))
     }
 
+    // Try to parse a type conversion expression.
+    if let expr = try parseTypeConversionExpression(upTo: limitTokenIndex) {
+      return .typeConversionExpression(expr)
+    }
+
     // Try to parse a binary expression.
     // For each Flint binary operator, try to find it in the tokens ahead, and parse the tokens before and after as
     // the LHS and RHS expressions.
@@ -115,6 +120,29 @@ extension Parser {
       return BinaryExpression(lhs: lhs, op: operatorToken, rhs: rhs)
     }
     return nil
+  }
+
+  // MARK: Casting
+  func parseTypeConversionExpression(upTo limitTokenIndex: Int) throws -> TypeConversionExpression? {
+    guard let index = indexOfFirstAtCurrentDepth([.as], maxIndex: limitTokenIndex) else {
+      return nil
+    }
+
+    let expression = try parseExpression(upTo: index)
+    let asToken = try consume(.as, or: .dummy())
+    var kind: TypeConversionExpression.Kind = .coerce
+    if let currentToken = currentToken {
+      if currentToken.kind == .punctuation(.bang) {
+        kind = .cast
+        try consume(.punctuation(.bang), or: .dummy())
+      } else if currentToken.kind == .punctuation(.question) {
+        kind = .castOptional
+        try consume(.punctuation(.question), or: .dummy())
+      }
+    }
+    let type = try parseType()
+
+    return TypeConversionExpression(expression: expression, asToken: asToken, kind: kind, type: type)
   }
 
   // MARK: Bracketed

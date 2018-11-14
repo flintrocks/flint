@@ -707,6 +707,10 @@ public struct ASTVisitor {
     case .inoutExpression(let inoutExpression):
       processResult.element = .inoutExpression(processResult.combining(visit(inoutExpression,
                                                                              passContext: processResult.passContext)))
+    case .typeConversionExpression(let typeConversionExpression):
+      processResult.element = .typeConversionExpression(
+        processResult.combining(visit(typeConversionExpression, passContext: processResult.passContext)))
+
     case .binaryExpression(let binaryExpression):
       processResult.element = .binaryExpression(processResult.combining(visit(binaryExpression,
                                                                               passContext: processResult.passContext)))

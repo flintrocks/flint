@@ -173,7 +173,8 @@ extension Environment {
                              typeStates: typeStates,
                              callerProtections: callerProtections,
                              scopeContext: scopeContext))
-
+    case .typeConversionExpression(let typeConversionExpression):
+      return typeConversionExpression.type.rawType
     case .binaryExpression(let binaryExpression):
       if binaryExpression.opToken.isBooleanOperator {
         return .basicType(.bool)
