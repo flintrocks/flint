@@ -379,6 +379,8 @@ public class ASTDumper {
       writeLine("Flint error type \(rawType.name)")
     case .functionType:
       writeLine("function type \(rawType.name)")
+    case .externalType(let externalType):
+      writeLine("external type \(externalType.rawValue)")
     }
   }
 
