@@ -159,14 +159,19 @@ extension Diagnostic {
                       message: "Cannot use signatures in contracts, only in traits")
   }
 
-  static func contractTraitMemberInStructTrait(_ member: TraitMember) -> Diagnostic {
+  static func invalidStructTraitMember(_ member: TraitMember) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: member.sourceLocation,
-                      message: "Use of contract trait member in struct trait")
+                      message: "Member invalid in struct trait context")
   }
 
-  static func structTraitMemberInContractTrait(_ member: TraitMember) -> Diagnostic {
+  static func invalidContractTraitMember(_ member: TraitMember) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: member.sourceLocation,
-                      message: "Use of struct trait member in contract trait")
+                      message: "Member invalid in contract trait context")
+  }
+
+  static func invalidExternalTraitMember(_ member: TraitMember) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: member.sourceLocation,
+                      message: "Member invalid in external trait context")
   }
 
   static func undeclaredCallerProtection(_ callerProtection: CallerProtection,
