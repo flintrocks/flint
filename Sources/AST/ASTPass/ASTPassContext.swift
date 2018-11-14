@@ -162,6 +162,12 @@ extension ASTPassContext {
     set { self[IsInsideIf.self] = newValue }
   }
 
+  /// When inside a do-block, this property is set to `true`.
+  public var isInsideDo: Bool {
+    get { return self[IsInsideDo.self] ?? false }
+    set { self[IsInsideDo.self] = newValue }
+  }
+
   /// When visiting argument labels in a function call, this property is set to `true`.
   public var isFunctionCallArgumentLabel: Bool {
     get { return self[IsFunctionCallArgumentLabel.self] ?? false }
@@ -301,6 +307,10 @@ private struct IsExternalFunctionCallContextEntry: PassContextEntry {
 }
 
 private struct IsInsideIf: PassContextEntry {
+  typealias Value = Bool
+}
+
+private struct IsInsideDo: PassContextEntry {
   typealias Value = Bool
 }
 
