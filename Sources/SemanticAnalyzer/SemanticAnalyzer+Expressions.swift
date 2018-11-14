@@ -95,6 +95,16 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: rangeExpression, diagnostics: diagnostics, passContext: passContext)
   }
 
+  public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
+    let environment = passContext.environment!
+    var diagnostics = [Diagnostic]()
+    
+    // TODO: For `call` and `call!`, ensure that not called inside `if let ...`
+    // TODO: For `call?`, ensure that called only inside `if let ...`
+    
+    return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
+  }
+  
   public func postProcess(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
     guard !Environment.isRuntimeFunctionCall(functionCall) else {
       return ASTPassResult(element: functionCall, diagnostics: [], passContext: passContext)

@@ -26,7 +26,11 @@ extension SemanticAnalyzer {
       let lhs = binaryExpression.lhs
       if case let .variableDeclaration(variableDeclaration) = lhs {
         if !variableDeclaration.isConstant {
+          // `if var ...`
           diagnostics.append(.invalidConditionTypeInIfStatement(ifStatement))
+        } else {
+          // `if let ...`
+          // TODO: Ensure that type matches with `call?` return type
         }
         return ASTPassResult(element: ifStatement, diagnostics: diagnostics, passContext: passContext)
       }
