@@ -33,10 +33,10 @@ public indirect enum RawType: Equatable {
     case event = "Event"
 
     private static let solidityParallels: [BasicType: SolidityType] = [
-      .address : .address,
-      .int : .int256,
-      .string : .string,
-      .bool : .bool
+      .address: .address,
+      .int: .int256,
+      .string: .string,
+      .bool: .bool
     ]
 
     public var solidityParallel: RawTypeIdentifier? {
@@ -127,9 +127,9 @@ public indirect enum RawType: Equatable {
     case uint256 = "uint256"
 
     private static let basicParallels: [SolidityType: BasicType] = [
-      .address : .address,
-      .string : .string,
-      .bool : .bool,
+      .address: .address,
+      .string: .string,
+      .bool: .bool,
       .int8: .int,
       .int16: .int,
       .int24: .int,
