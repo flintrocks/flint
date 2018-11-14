@@ -23,7 +23,7 @@ final class SemanticAnalyzerTests: XCTestCase {
   }
 
   // MARK: Dummies
-  var dummyFunctionDeclaration: FunctionDeclaration {
+  func buildDummyFunctionDeclaration() -> FunctionDeclaration {
     return FunctionDeclaration(
       signature: FunctionSignatureDeclaration(
         funcToken: .DUMMY,
@@ -37,20 +37,20 @@ final class SemanticAnalyzerTests: XCTestCase {
       closeBraceToken: .DUMMY)
   }
 
-  var dummySpecialInformation: SpecialInformation {
-    let declaration = SpecialDeclaration(dummyFunctionDeclaration)
+  func buildDummySpecialInformation() -> SpecialInformation {
+    let declaration = SpecialDeclaration(buildDummyFunctionDeclaration())
     return SpecialInformation(declaration: declaration, callerProtections: [], isSignature: false)
   }
 
-  var dummyFunctionInformation: FunctionInformation {
-    return FunctionInformation(declaration: dummyFunctionDeclaration,
+  func buildDummyFunctionInformation() -> FunctionInformation {
+    return FunctionInformation(declaration: buildDummyFunctionDeclaration(),
                                typeStates: [],
                                callerProtections: [],
                                isMutating: false,
                                isSignature: false)
   }
 
-  var dummyContractDeclaration: ContractDeclaration {
+  func buildDummyContractDeclaration() -> ContractDeclaration {
     return ContractDeclaration(contractToken: .DUMMY, identifier: .DUMMY, conformances: [], states: [], members: [])
   }
 
@@ -76,10 +76,10 @@ final class SemanticAnalyzerTests: XCTestCase {
   func testTopLevelModule_publicFallbackNotUnqiueButHasPrivate_diagnosticEmitted() {
     // Given
     let f = Fixture()
-    let contract = dummyContractDeclaration
+    let contract = buildDummyContractDeclaration()
     let passContext = buildPassContext { (environment) in
       environment.publicFallback(forContract: equal(to: contract.identifier.name)).thenReturn(nil)
-      environment.fallbacks(in: equal(to: contract.identifier.name)).thenReturn([dummySpecialInformation])
+      environment.fallbacks(in: equal(to: contract.identifier.name)).thenReturn([buildDummySpecialInformation()])
     }
     var diagnostics: [Diagnostic] = []
 
@@ -92,14 +92,14 @@ final class SemanticAnalyzerTests: XCTestCase {
     XCTAssertEqual(diagnostics.count, 1)
     XCTAssertEqual(diagnostics.first!,
                    Diagnostic.contractOnlyHasPrivateFallbacks(contractIdentifier: contract.identifier,
-                                                              [dummySpecialInformation.declaration]))
+                                                              [buildDummySpecialInformation().declaration]))
   }
 
   // Do not emit a diagnostic when there are no public nor private fallback functions
   func testTopLevelModule_publicFallbackNotUniqueNoPrivate_noDiagnosticEmitted() {
     // Given
     let f = Fixture()
-    let contract = dummyContractDeclaration
+    let contract = buildDummyContractDeclaration()
     let passContext = buildPassContext { (environment) in
       environment.publicFallback(forContract: equal(to: contract.identifier.name)).thenReturn(nil)
       environment.fallbacks(in: equal(to: contract.identifier.name)).thenReturn([])
@@ -119,9 +119,9 @@ final class SemanticAnalyzerTests: XCTestCase {
   func testTopLevelModule_contractHasUndefinedFunctions_diagnosticEmitted() {
     // Given
     let f = Fixture()
-    let contract = dummyContractDeclaration
+    let contract = buildDummyContractDeclaration()
     let passContext = buildPassContext { (environment) in
-      environment.undefinedFunctions(in: equal(to: contract.identifier)).thenReturn([dummyFunctionInformation])
+      environment.undefinedFunctions(in: equal(to: contract.identifier)).thenReturn([buildDummyFunctionInformation()])
     }
     var diagnostics: [Diagnostic] = []
 
@@ -132,14 +132,15 @@ final class SemanticAnalyzerTests: XCTestCase {
 
     // Then
     XCTAssertEqual(diagnostics.count, 1)
-    XCTAssertEqual(diagnostics.first!, Diagnostic.notImplementedFunctions([dummyFunctionInformation], in: contract))
+    XCTAssertEqual(diagnostics.first!,
+                   Diagnostic.notImplementedFunctions([buildDummyFunctionInformation()], in: contract))
   }
 
   // Do not emit a diagnostic when there are no undefined functions in a contract
   func testTopLevelModule_contractHasNoUndefinedFunctions_noDiagnosticEmitted() {
     // Given
     let f = Fixture()
-    let contract = dummyContractDeclaration
+    let contract = buildDummyContractDeclaration()
     let passContext = buildPassContext { (environment) in
       environment.undefinedFunctions(in: equal(to: contract.identifier)).thenReturn([])
     }
@@ -158,9 +159,9 @@ final class SemanticAnalyzerTests: XCTestCase {
   func testTopLevelModule_contractHasUndefinedInitializers_diagnosticEmitted() {
     // Given
     let f = Fixture()
-    let contract = dummyContractDeclaration
+    let contract = buildDummyContractDeclaration()
     let passContext = buildPassContext { (environment) in
-      environment.undefinedInitialisers(in: equal(to: contract.identifier)).thenReturn([dummySpecialInformation])
+      environment.undefinedInitialisers(in: equal(to: contract.identifier)).thenReturn([buildDummySpecialInformation()])
     }
     var diagnostics: [Diagnostic] = []
 
@@ -171,14 +172,15 @@ final class SemanticAnalyzerTests: XCTestCase {
 
     // Then
     XCTAssertEqual(diagnostics.count, 1)
-    XCTAssertEqual(diagnostics.first!, Diagnostic.notImplementedInitialiser([dummySpecialInformation], in: contract))
+    XCTAssertEqual(diagnostics.first!,
+                   Diagnostic.notImplementedInitialiser([buildDummySpecialInformation()], in: contract))
   }
 
   // Do not emit a diagnostic when there are no undefined initializers in a contract
   func testTopLevelModule_contractHasNoUndefinedInitializers_noDiagnosticEmitted() {
     // Given
     let f = Fixture()
-    let contract = dummyContractDeclaration
+    let contract = buildDummyContractDeclaration()
     let passContext = buildPassContext { (environment) in
       environment.undefinedInitialisers(in: equal(to: contract.identifier)).thenReturn([])
     }
