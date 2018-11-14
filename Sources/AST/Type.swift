@@ -333,6 +333,8 @@ public struct Type: ASTNode {
     let name = identifier.name
     if let builtInType = RawType.BasicType(rawValue: name) {
       rawType = .basicType(builtInType)
+    } else if let externalType = RawType.ExternalType(rawValue: name) {
+      rawType = .externalType(externalType)
     } else {
       rawType = .userDefinedType(name)
     }

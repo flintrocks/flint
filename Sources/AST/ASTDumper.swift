@@ -380,7 +380,7 @@ public class ASTDumper {
     case .functionType:
       writeLine("function type \(rawType.name)")
     case .externalType(let externalType):
-      writeLine("external type \(externalType.rawValue)")
+      writeLine("ExternalType \(externalType.rawValue)")
     }
   }
 
