@@ -173,6 +173,15 @@ extension TypeChecker {
     return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
   }
 
+  public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
+    let diagnostics = [Diagnostic]()
+    // TODO: Check `call?` not called without return type: optionalExternalCallWithoutReturnType
+    // TODO: Check `call?` has matching type: incompatibleReturnType
+    // TODO: Check `call` and `call!` not called with return type: ignoredExternalCallReturnType
+
+    return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
+  }
+
   public func process(subscriptExpression: SubscriptExpression,
                       passContext: ASTPassContext) -> ASTPassResult<SubscriptExpression> {
     var diagnostics = [Diagnostic]()
