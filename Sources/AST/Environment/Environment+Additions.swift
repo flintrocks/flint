@@ -5,6 +5,7 @@
 //  Created by Hails, Daniel J R on 22/08/2018.
 //
 import Source
+import Lexer
 
 extension Environment {
   /// Add a contract declaration to the environment.
@@ -207,10 +208,28 @@ extension Environment {
     }
   }
 
+  private func externalTraitInitializer(_ externalTrait: TraitDeclaration) -> SpecialSignatureDeclaration {
+    return SpecialSignatureDeclaration(
+      specialToken: .init(kind: .punctuation(.closeBrace),
+                          sourceLocation: .DUMMY),
+      attributes: [],
+      modifiers: [],
+      parameters: [],
+      closeBracketToken: .init(kind:.punctuation(.closeBrace), sourceLocation: .DUMMY)
+    )
+  }
+  
   /// Add a trait to the environment.
   public func addTrait(_ trait: TraitDeclaration) {
     declaredTraits.append(trait.identifier)
     types[trait.identifier.name] = TypeInformation()
+    // We insert a generated constructor
+    if case .external = trait.traitKind.kind {
+      let special = externalTraitInitializer(trait)
+      addInitializerSignature(special, enclosingType: trait.identifier.name, callerProtections: [])
+      // addSpecial(special, enclosingType: trait.identifier, callerProtections: [])
+    }
+    
     for member in trait.members {
       if case .eventDeclaration(let eventDeclaration) = member {
         addEvent(eventDeclaration, enclosingType: trait.identifier.name)
