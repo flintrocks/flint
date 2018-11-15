@@ -289,33 +289,35 @@ public indirect enum RawType: Equatable {
 
   // Can we reinterpret this type as `other`?
   public func canReinterpret(as other: RawType) -> Bool {
-    switch self {
-    case .basicType(let basicType):
-      <#code#>
-    case .solidityType(let solidityType):
-      <#code#>
-    case .rangeType:
-      return false
-    case .arrayType:
-      return false
-    case .fixedSizeArrayType:
-      return false
-    case .dictionaryType:
-      return false
-    case .userDefinedType:
-      return true
-    case .inoutType:
-      return true
-    case .functionType:
-      return false
-    case .selfType:
-      return true
-    case .any:
-      return false
-    case .errorType:
-      return false
+    // If other is basic, we can reinterpret to other if we are basic or solidity
+    if case .basicType(let basic) = other {
+      // Other is solidity
+      if case .solidityType(let solidity) = self {
+        return basic.isIntegral && solidity.isIntegral ||
+          basic == .string && solidity == .string ||
+          basic == .address && solidity == .address ||
+          basic == .bool && solidity == .bool
+      }
+
+      // Otherwise we need equality of types (basic == basic)
+      return self == other
     }
+
+    // Two solidity types
+    if case .solidityType(let x) = self,
+      case .solidityType(let y) = other {
+      // Allow integral types to eachother, but equality otherwise
+      return x.isIntegral && y.isIntegral || x == y
+    }
+
+    // If other is solidity type, for now we treat this identically to the above
+    if case .solidityType(_) = other {
+      return other.canReinterpret(as: self)
+    }
+
+    return false
   }
+
 }
 
 /// A Flint type.
