@@ -1,0 +1,13 @@
+external trait Ext {
+//  init(address: Int)
+  func someFunc()
+}
+
+contract FlintContract {}
+
+FlintContract :: (any) {
+  public init() {
+    let ext: Ext = Ext(address: 00000000000000000000)
+    call! ext.someFunc()
+  }
+}
