@@ -601,19 +601,9 @@ extension Diagnostic {
       message: "Condition has invalid type: must be Bool or a valid let statement")
   }
 
-  static func valueParameterWithWrongType(_ valueParameter: FunctionArgument) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: valueParameter.sourceLocation,
-      message: "Value hyper-parameter of an external call must be of type Wei")
-  }
-
   static func valueParameterForUnpayableFunction(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
       message: "Attempting to call a non-payable function with a value hyper-parameter")
-  }
-
-  static func gasParameterWithWrongType(_ gasParameter: FunctionArgument) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: gasParameter.sourceLocation,
-      message: "Gas hyper-parameter of an external call must be of type Int")
   }
 
   static func flintTypeUsedInExternalTrait(_ type: Type, at location: SourceLocation) -> Diagnostic {

@@ -163,38 +163,12 @@ extension SemanticAnalyzer {
           }
         }
 
-        if passContext.isExternalCall {
-          let externalCall = passContext.externalCall!
+        if let externalCall = passContext.externalCall {
 
-          // check value parameter (appropriate usage and type)
+          // check value parameter (appropriate usage)
           if !matchingFunction.declaration.isPayable {
             if externalCall.hasHyperParameter(parameterName: "value") {
               diagnostics.append(.valueParameterForUnpayableFunction(externalCall))
-            }
-          } else {
-            if let valueParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "value") {
-              let parameterType = environment.type(of: valueParameter.expression,
-                                                   enclosingType: enclosingType,
-                                                   typeStates: typeStates,
-                                                   callerProtections: callerProtections,
-                                                   scopeContext: passContext.scopeContext!)
-
-              if parameterType != .userDefinedType("Wei") {
-                diagnostics.append(.valueParameterWithWrongType(valueParameter))
-              }
-            }
-          }
-
-          // check gas parameter (type)
-          if let gasParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "gas") {
-            let parameterType = environment.type(of: gasParameter.expression,
-                                                 enclosingType: enclosingType,
-                                                 typeStates: typeStates,
-                                                 callerProtections: callerProtections,
-                                                 scopeContext: passContext.scopeContext!)
-
-            if parameterType != .basicType(.int) {
-              diagnostics.append(.gasParameterWithWrongType(gasParameter))
             }
           }
         }
