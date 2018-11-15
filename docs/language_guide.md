@@ -123,7 +123,7 @@ The `language-flint` package can be downloaded to have syntax highlighting for f
 
 ---
 ## Compilation
-Flint compiles to EVM bytecode (internally compiled to YUL IR, then to EVM bytecode using the Solidity compiler), which can be deployed to the Ethereum blockchain using a standard client, or Truffle.
+Flint compiles to EVM bytecode via YUL IR using the Solidity compiler, which can be deployed to the Ethereum blockchain using a standard client, or Truffle.
 
 For testing purposes, the recommended way of running a contract is by using the Remix IDE.
 
@@ -573,7 +573,7 @@ Struct values can be declared as state properties or local variables/constants t
 ### Structs as function arguments
 Structs can be passed _by reference_ using the *inout* keyword. The struct is then treated as an implicit reference to the value in the caller.
 
-Passing structs by value (copying the struct into storage or memory) is a planned feature.
+Passing structs by value (copying the struct into storage or memory) is a planned feature. (See https://github.com/flintlang/flint/issues/133)
 
 ```
 func foo() {
@@ -718,11 +718,11 @@ struct MyWei : Asset {
     self.rawValue = unsafeRawValue
   }
 
-  init(source: inout Wei, amount: Int) {
+  init(source: inout MyWei, amount: Int) {
     transfer(source: &source, amount: amount)
   }
 
-  init(source: inout Wei) {
+  init(source: inout MyWei) {
     let amount: Int = source.getRawValue()
     transfer(source: &source, amount: amount)
   }
