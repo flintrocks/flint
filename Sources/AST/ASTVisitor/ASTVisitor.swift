@@ -847,8 +847,10 @@ public struct ASTVisitor {
     processResult.passContext.isExternalConfigurationParam = false
 
     processResult.passContext.isExternalCall = true
+    processResult.passContext.externalCall = processResult.element
     processResult.element.functionCall = processResult.combining(visit(processResult.element.functionCall,
                                                                        passContext: processResult.passContext))
+    processResult.passContext.externalCall = nil
     processResult.passContext.isExternalCall = false
 
     let postProcessResult = pass.postProcess(externalCall: externalCall,
