@@ -1,0 +1,12 @@
+// RUN: %flintc %s --verify
+
+contract Contract {
+}
+
+Contract :: (any) {
+  public init() {
+    let x: Int = 1 as Int // expected-error {{Type conversions with 'as' are not yet implemented}}
+    let y: Int = 1 as! Int
+    let z: Int = 1 as? Int // expected-error {{Type conversions with 'as?' are not yet implemented}}
+  }
+}

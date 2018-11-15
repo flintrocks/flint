@@ -30,6 +30,17 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: binaryExpression, diagnostics: diagnostics, passContext: passContext)
   }
 
+  public func process(typeConversionExpression: TypeConversionExpression,
+                      passContext: ASTPassContext) -> ASTPassResult<TypeConversionExpression> {
+    var diagnostics: [Diagnostic] = []
+    if typeConversionExpression.kind != .cast {
+      // Not implemented yet
+      diagnostics.append(.notImplementedAs(typeConversionExpression))
+    }
+
+    return ASTPassResult(element: typeConversionExpression, diagnostics: diagnostics, passContext: passContext)
+  }
+
   public func process(attemptExpression: AttemptExpression,
                       passContext: ASTPassContext) -> ASTPassResult<AttemptExpression> {
     var diagnostics = [Diagnostic]()

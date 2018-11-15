@@ -638,4 +638,15 @@ extension Diagnostic {
                       message: "Solidity types may not be used outside of external traits. '\(type.name)' is a Solidity type", notes: notes)
                       // swiftlint:enable line_length
   }
+
+  static func notImplementedAs(_ typeConversionExpression: TypeConversionExpression) -> Diagnostic {
+    let notes = [
+      Diagnostic(severity: .note, sourceLocation: typeConversionExpression.sourceLocation,
+                 message: "You may wish to use '\(TypeConversionExpression.Kind.cast.description)' instead")
+    ]
+    return Diagnostic(severity: .error, sourceLocation: typeConversionExpression.sourceLocation,
+                      // swiftlint:disable line_length
+                      message: "Type conversions with '\(typeConversionExpression.kind.description)' are not yet implemented", notes: notes)
+                      // swiftlint:enable line_length
+  }
 }
