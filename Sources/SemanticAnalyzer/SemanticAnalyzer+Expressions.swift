@@ -83,7 +83,7 @@ extension SemanticAnalyzer {
     var diagnostics = [Diagnostic]()
 
     // ensure only one instance of value and gas hyper-parameters
-    for parameter in externalCall.configurationParameters {
+    for parameter in externalCall.hyperParameters {
       if let identifier: Identifier = parameter.identifier {
         let name: String = identifier.name
         if let valueGiven: Bool = parametersGiven[name] {
