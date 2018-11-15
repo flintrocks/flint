@@ -170,6 +170,10 @@ extension SemanticAnalyzer {
             if externalCall.hasHyperParameter(parameterName: "value") {
               diagnostics.append(.valueParameterForUnpayableFunction(externalCall))
             }
+          } else {
+            if !externalCall.hasHyperParameter(parameterName: "value") {
+              diagnostics.append(.missingValueParameterForPayableFunction(externalCall))
+            }
           }
         }
 

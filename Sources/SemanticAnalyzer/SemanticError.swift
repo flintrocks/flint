@@ -606,6 +606,11 @@ extension Diagnostic {
       message: "Attempting to call a non-payable function with a value hyper-parameter")
   }
 
+  static func missingValueParameterForPayableFunction(_ externalCall: ExternalCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+      message: "Attempting to call a payable function without specifying a value hyper-parameter")
+  }
+
   static func flintTypeUsedInExternalTrait(_ type: Type, at location: SourceLocation) -> Diagnostic {
     var notes: [Diagnostic] = []
     if case .basicType(let basicType) = type.rawType,

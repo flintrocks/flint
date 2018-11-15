@@ -19,6 +19,7 @@ Contract :: (any) {
     call(gas: 100)! self.someFunc()
     call(value: Wei(100), gas: 100)! self.payableFunc(parameter: Wei(1))
 
+    call(gas: 100)! self.payableFunc(parameter: Wei(120)) // expected-error {{Attempting to call a payable function without specifying a value hyper-parameter}}
     call(gas: Wei(100))! self.someFunc() // expected-error {{Gas hyper-parameter of an external call must be of type Int}}
     call(value: Wei(100))! self.someFunc() // expected-error {{Attempting to call a non-payable function with a value hyper-parameter}}
     call(value: 100) self.payableFunc(parameter: Wei(1)) // expected-error {{Value hyper-parameter of an external call must be of type Wei}}
