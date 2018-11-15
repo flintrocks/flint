@@ -174,10 +174,24 @@ extension TypeChecker {
   }
 
   public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
-    let diagnostics = [Diagnostic]()
-    // TODO: Check `call?` not called without return type: optionalExternalCallWithoutReturnType
-    // TODO: Check `call?` has matching type: incompatibleReturnType
-    // TODO: Check `call` and `call!` not called with return type: ignoredExternalCallReturnType
+    var diagnostics = [Diagnostic]()
+    let environment = passContext.environment!
+    let enclosingType = passContext.enclosingTypeIdentifier!.name
+
+    switch externalCall.mode {
+    case .returnsGracefullyOptional:
+      if environment.type(of: externalCall.functionCall.rhs,
+                          enclosingType: enclosingType,
+                          scopeContext: passContext.scopeContext!) == .basicType(.void) {
+        diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall: externalCall))
+      }
+    case .normal, .isForced:
+      if environment.type(of: externalCall.functionCall.rhs,
+                          enclosingType: enclosingType,
+                          scopeContext: passContext.scopeContext!) != .basicType(.void) {
+        diagnostics.append(.ignoredExternalCallReturnType(externalCall: externalCall))
+      }
+    }
 
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
   }

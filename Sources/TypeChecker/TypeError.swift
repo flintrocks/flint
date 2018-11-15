@@ -16,10 +16,11 @@ extension Diagnostic {
       message: "Cannot convert expression of type '\(actualType.name)' to expected return type '\(expectedType.name)'")
   }
 
-  static func ignoredExternalCallReturnType(callString: String, externalCall: ExternalCall) -> Diagnostic {
+  static func ignoredExternalCallReturnType(externalCall: ExternalCall) -> Diagnostic {
     var notes = [Diagnostic]()
     notes.append(Diagnostic(severity: .note, sourceLocation: externalCall.sourceLocation,
                             message: "Consider using `if let ... = call? ...`."))
+    let callString = externalCall.mode == .isForced ? "call!" : "call"
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
                       message: "Cannot use `\(callString)` with returning external function.", notes: notes)
   }
