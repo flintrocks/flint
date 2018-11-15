@@ -230,6 +230,14 @@ public indirect enum RawType: Equatable {
     return self == .selfType
   }
 
+  public var isSolidityType: Bool {
+    if case .solidityType(_) = self {
+      return true
+    }
+
+    return false
+  }
+
   public var isCurrencyType: Bool {
     if case .userDefinedType(let typeIdentifier) = self, RawType.StdlibType(rawValue: typeIdentifier) == .wei {
       return true
@@ -311,7 +319,7 @@ public indirect enum RawType: Equatable {
     }
 
     // If other is solidity type, for now we treat this identically to the above
-    if case .solidityType(_) = other {
+    if other.isSolidityType {
       return other.canReinterpret(as: self)
     }
 
