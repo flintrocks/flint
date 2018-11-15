@@ -105,7 +105,6 @@ extension TypeChecker {
     let typeStates = passContext.contractBehaviorDeclarationContext?.typeStates ?? []
     let callerProtections = passContext.contractBehaviorDeclarationContext?.callerProtections ?? []
 
-
     if case .matchedEvent(let eventInformation) =
       environment.matchEventCall(functionCall,
                                  enclosingType: enclosingType,
