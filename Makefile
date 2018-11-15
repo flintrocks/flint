@@ -26,8 +26,7 @@ test-nogen: lint release
 	swift run -c release lite
 
 lint:
-	#swiftlint lint --strict
-	true
+	swiftlint lint --strict
 
 generate-mocks:
 	 swift package resolve
