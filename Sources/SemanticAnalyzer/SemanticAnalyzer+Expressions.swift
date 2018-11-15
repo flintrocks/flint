@@ -76,7 +76,7 @@ extension SemanticAnalyzer {
   }
 
   public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
-    var parametersGiven: [String : Bool] = [
+    var parametersGiven: [String: Bool] = [
       "value": false,
       "gas": false
     ]
