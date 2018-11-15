@@ -44,7 +44,6 @@ Contract :: (any) {
     call(Wei(100))! self.someFunc() // expected-error {{External call hyper-parameter was not labeled}}
 
     call(money: Wei(100))! self.someFunc() // expected-error {{'money' is not a valid external call hyper-parameter}}
-
     call(value: Wei(100))! self.testFunc2(y: call! self.testFunc1(), z: call! self.testFunc1(), w: Wei(1))
     call()! self.testFunc2(y: call! self.testFunc1(), z: call! self.testFunc1(), w: Wei(1)) // expected-error {{Attempting to call a payable function without specifying a 'value' hyper-parameter}}
     call(value: Wei(100))! self.testFunc2(y: call(value: Wei(1))! self.testFunc1(), z: call! self.testFunc1(), w: Wei(1)) // expected-error {{Attempting to call a non-payable function with a 'value' hyper-parameter}}
