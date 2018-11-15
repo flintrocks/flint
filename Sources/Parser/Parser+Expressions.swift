@@ -39,7 +39,7 @@ extension Parser {
     if let expr = try parseBinaryExpression(upTo: limitTokenIndex) {
       return .binaryExpression(expr)
     }
-    
+
     // Try to parse a type conversion expression.
     if let expr = try parseTypeConversionExpression(upTo: limitTokenIndex) {
       return .typeConversionExpression(expr)
