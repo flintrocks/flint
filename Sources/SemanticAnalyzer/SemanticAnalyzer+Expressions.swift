@@ -38,6 +38,13 @@ extension SemanticAnalyzer {
       diagnostics.append(.notImplementedAs(typeConversionExpression))
     }
 
+    // Check casting compatibility
+    // Valid if matches elementary casting constraint AND
+    // 1. casting a solidity type to a flint type as part of an external call (return expression); OR
+    // 2. casting a flint type to a solidity type as part of an external call (parameter list)
+
+    // Check the elementary casting constraint
+
     return ASTPassResult(element: typeConversionExpression, diagnostics: diagnostics, passContext: passContext)
   }
 
