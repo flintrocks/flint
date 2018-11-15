@@ -96,10 +96,13 @@ extension SemanticAnalyzer {
   }
 
   public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
-    let diagnostics = [Diagnostic]()
+    var diagnostics = [Diagnostic]()
 
-    // TODO: check `call` not used outside do catch: normalExternalCallOutsideDoCatch
-    // TODO: check `call?` not used outside if let construct: optionalExternalCallOutsideIfLet
+    if externalCall.mode == .normal && !passContext.isInsideDo {
+      diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
+    } else if externalCall.mode == .returnsGracefullyOptional && !passContext.isInsideIfCondition {
+      diagnostics.append(.optionalExternalCallOutsideIfLet(externalCall))
+    }
 
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
   }
