@@ -33,16 +33,16 @@ extension Parser {
       return .externalCall(try parseExternalCall(upTo: limitTokenIndex))
     }
 
-    // Try to parse a type conversion expression.
-    if let expr = try parseTypeConversionExpression(upTo: limitTokenIndex) {
-      return .typeConversionExpression(expr)
-    }
-
     // Try to parse a binary expression.
     // For each Flint binary operator, try to find it in the tokens ahead, and parse the tokens before and after as
     // the LHS and RHS expressions.
     if let expr = try parseBinaryExpression(upTo: limitTokenIndex) {
       return .binaryExpression(expr)
+    }
+    
+    // Try to parse a type conversion expression.
+    if let expr = try parseTypeConversionExpression(upTo: limitTokenIndex) {
+      return .typeConversionExpression(expr)
     }
 
     if case .try = first {
@@ -99,6 +99,7 @@ extension Parser {
       // Try to parse a literal.
       return .literal(try parseLiteral())
     }
+
     switch first {
     case .public, .visible, .var, .let:
       // Try to parse a variable declaration.

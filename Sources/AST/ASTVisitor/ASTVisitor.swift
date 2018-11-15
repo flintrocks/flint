@@ -823,6 +823,21 @@ public struct ASTVisitor {
                          passContext: postProcessResult.passContext)
   }
 
+  func visit(_ typeConversionExpression: TypeConversionExpression,
+             passContext: ASTPassContext) -> ASTPassResult<TypeConversionExpression> {
+    var processResult = pass.process(typeConversionExpression: typeConversionExpression, passContext: passContext)
+
+    processResult.element.expression = processResult.combining(visit(processResult.element.expression,
+                                                                     passContext: passContext))
+    processResult.element.type = processResult.combining(visit(processResult.element.type, passContext: passContext))
+
+    let postProcessResult = pass.postProcess(typeConversionExpression: processResult.element,
+                                             passContext: processResult.passContext)
+    return ASTPassResult(element: postProcessResult.element,
+                         diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
+                         passContext: postProcessResult.passContext)
+  }
+
   func visit(_ functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
     var processResult = pass.process(functionCall: functionCall, passContext: passContext)
 
