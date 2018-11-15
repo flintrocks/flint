@@ -603,12 +603,12 @@ extension Diagnostic {
 
   static func valueParameterForUnpayableFunction(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-      message: "Attempting to call a non-payable function with a value hyper-parameter")
+      message: "Attempting to call a non-payable function with a 'value' hyper-parameter")
   }
 
   static func missingValueParameterForPayableFunction(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-      message: "Attempting to call a payable function without specifying a value hyper-parameter")
+      message: "Attempting to call a payable function without specifying a 'value' hyper-parameter")
   }
 
   static func flintTypeUsedInExternalTrait(_ type: Type, at location: SourceLocation) -> Diagnostic {

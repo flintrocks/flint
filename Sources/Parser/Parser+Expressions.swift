@@ -15,7 +15,7 @@ extension Parser {
   ///
   /// - Parameter limitTokenIndex: The index of the token to parse up to.
   /// - Throws: If an expression couldn't be parsed.
-  func parseExpression(upTo limitTokenIndex: Int) throws -> Expression {
+  func parseExpression(upTo limitTokenIndex: Int, markExternalFunctionCall: Bool = false) throws -> Expression {
     guard limitTokenIndex >= currentIndex else {
       fatalError("Limit Token Index should be smaller than the current token's index")
     }
@@ -53,7 +53,7 @@ extension Parser {
     if case .identifier(_) = first {
       // Try to parse a functon call.
       if case .punctuation(.openBracket) = tokens[currentIndex + 1].kind {
-        return .functionCall(try parseFunctionCall())
+        return .functionCall(try parseFunctionCall(markExternalFunctionCall: markExternalFunctionCall))
       }
 
       // Try to parse a subscript expression.
@@ -106,12 +106,13 @@ extension Parser {
   }
 
   // MARK: Binary
-  func parseBinaryExpression(upTo limitTokenIndex: Int) throws -> BinaryExpression? {
+  func parseBinaryExpression(upTo limitTokenIndex: Int,
+                             markExternalFunctionCall: Bool = false) throws -> BinaryExpression? {
     for op in Token.Kind.Punctuation.allBinaryOperatorsByIncreasingPrecedence {
       guard let index = indexOfFirstAtCurrentDepth([.punctuation(op)], maxIndex: limitTokenIndex) else { continue }
       let lhs = try parseExpression(upTo: index)
       let operatorToken = try consume(.punctuation(op), or: .expectedValidOperator(at: latestSource))
-      let rhs = try parseExpression(upTo: limitTokenIndex)
+      let rhs = try parseExpression(upTo: limitTokenIndex, markExternalFunctionCall: markExternalFunctionCall)
       return BinaryExpression(lhs: lhs, op: operatorToken, rhs: rhs)
     }
     return nil
@@ -176,7 +177,7 @@ extension Parser {
       }
     }
 
-    guard let functionCall = try parseBinaryExpression(upTo: limitTokenIndex) else {
+    guard let functionCall = try parseBinaryExpression(upTo: limitTokenIndex, markExternalFunctionCall: true) else {
       throw raise(.badDeclaration(at: tokens[currentIndex].sourceLocation))
     }
 
@@ -186,14 +187,15 @@ extension Parser {
   }
 
   // MARK: Function Call
-  func parseFunctionCall() throws -> FunctionCall {
+  func parseFunctionCall(markExternalFunctionCall: Bool = false) throws -> FunctionCall {
     let identifier = try parseIdentifier()
     let (arguments, closeBracketToken) = try parseFunctionCallArgumentList()
 
     return FunctionCall(identifier: identifier,
                         arguments: arguments,
                         closeBracketToken: closeBracketToken,
-                        isAttempted: false)
+                        isAttempted: false,
+                        isOuterExternalCallFunctionCall: markExternalFunctionCall)
   }
 
   func parseFunctionCallArgumentList() throws -> ([FunctionArgument], closeBracketToken: Token) {

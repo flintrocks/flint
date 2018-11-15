@@ -41,9 +41,8 @@ public struct ExternalCall: ASTNode {
 
   public func getHyperParameter(parameterName: String) -> FunctionArgument? {
     for parameter in hyperParameters {
-      if let identifier: Identifier = parameter.identifier {
-        let name: String = identifier.name
-        if name == parameterName {
+      if let identifier = parameter.identifier {
+        if identifier.name == parameterName {
           return parameter
         }
       }

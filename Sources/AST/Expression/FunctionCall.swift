@@ -13,14 +13,20 @@ public struct FunctionCall: ASTNode {
   public var arguments: [FunctionArgument]
   public var closeBracketToken: Token
   public var isAttempted: Bool
+  public var isOuterExternalCallFunctionCall: Bool
 
   public var mangledIdentifier: String?
 
-  public init(identifier: Identifier, arguments: [FunctionArgument], closeBracketToken: Token, isAttempted: Bool) {
+  public init(identifier: Identifier,
+              arguments: [FunctionArgument],
+              closeBracketToken: Token,
+              isAttempted: Bool,
+              isOuterExternalCallFunctionCall: Bool = false) {
     self.identifier = identifier
     self.arguments = arguments
     self.closeBracketToken = closeBracketToken
     self.isAttempted = isAttempted
+    self.isOuterExternalCallFunctionCall = isOuterExternalCallFunctionCall
   }
 
   // MARK: - ASTNode

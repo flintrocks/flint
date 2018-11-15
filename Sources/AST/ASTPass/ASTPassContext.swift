@@ -150,7 +150,7 @@ extension ASTPassContext {
     set { self[IsExternalCallContextEntry.self] = newValue }
   }
 
-  public var externalCall: ExternalCall? {
+  public var externalCallContext: ExternalCall? {
     get { return self[ExternalCallContext.self] }
     set { self[ExternalCallContext.self] = newValue }
   }
