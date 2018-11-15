@@ -708,6 +708,38 @@ Wallet :: (owner) {
 }
 ```
 
+`Wei` is an example of an asset, and it is a `struct` conforming to the `struct trait Asset`, available in the standard library. It is possible to declare custom structs which will behave like assets:
+
+```swift
+struct MyWei : Asset {
+  var rawValue: Int = 0
+
+  init(unsafeRawValue: Int) {
+    self.rawValue = unsafeRawValue
+  }
+
+  init(source: inout Wei, amount: Int) {
+    transfer(source: &source, amount: amount)
+  }
+
+  init(source: inout Wei) {
+    let amount: Int = source.getRawValue()
+    transfer(source: &source, amount: amount)
+  }
+
+  mutating func setRawValue(value: Int) -> Int {
+    rawValue = value
+    return rawValue
+  }
+
+  func getRawValue() -> Int {
+    return rawValue
+  }
+}
+```
+
+The `transfer` functions are declared in the `Asset` trait and are inherited automatically. For the time being, traits do not support default implementations for initialisers or variables, so custom assets have to include the code above.
+
 ---
 
 ## Protection Blocks
