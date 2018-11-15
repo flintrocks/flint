@@ -649,4 +649,12 @@ extension Diagnostic {
                       message: "Type conversions with '\(typeConversionExpression.kind.description)' are not yet implemented", notes: notes)
                       // swiftlint:enable line_length
   }
+
+  static func typesNotReinterpretable(_ typeConversionExpression: TypeConversionExpression,
+                                      expressionType: RawType) -> Diagnostic{
+    return Diagnostic(severity: .error, sourceLocation: typeConversionExpression.sourceLocation,
+                      // swiftlint:disable line_length
+                      message: "'\(expressionType.name)' cannot be reinterpreted as '\(typeConversionExpression.type.name)'")
+                      // swiftlint:enable line_length
+  }
 }

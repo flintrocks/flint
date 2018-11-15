@@ -38,12 +38,23 @@ extension SemanticAnalyzer {
       diagnostics.append(.notImplementedAs(typeConversionExpression))
     }
 
-    // Check casting compatibility
-    // Valid if matches elementary casting constraint AND
-    // 1. casting a solidity type to a flint type as part of an external call (return expression); OR
-    // 2. casting a flint type to a solidity type as part of an external call (parameter list)
+    guard let environment = passContext.environment,
+      let enclosingType = passContext.enclosingTypeIdentifier,
+      let scopeContext = passContext.scopeContext else {
+        fatalError("No context available at callsite, unable to determine validity of as")
+    }
 
-    // Check the elementary casting constraint
+    let expressionType = environment.type(of: typeConversionExpression.expression,
+                                             enclosingType: enclosingType.name,
+                                             scopeContext: scopeContext)
+
+    // Check elementary casting constraint
+    if expressionType.canReinterpret(as: typeConversionExpression.type.rawType) {
+      // 1. casting a solidity type to a flint type as part of an external call (return expression); OR
+      // 2. casting a flint type to a solidity type as part of an external call (parameter list)
+    } else {
+      diagnostics.append(.typesNotReinterpretable(typeConversionExpression, expressionType: expressionType))
+    }
 
     return ASTPassResult(element: typeConversionExpression, diagnostics: diagnostics, passContext: passContext)
   }

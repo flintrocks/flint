@@ -13,4 +13,30 @@ Contract :: (any) {
     let y: Int = 1 as! Int
     let z: Int = 1 as? Int // expected-error {{Type conversions with 'as?' are not yet implemented}}
   }
+
+  func typeReinterpretation() {
+    let x: Int = 1
+
+    let x0: Int = x as! Int
+    let x1: String = x as! String // expected-error {{'Int' cannot be reinterpreted as 'String'}}
+    let x2: Event = x as! Event // expected-error {{'Int' cannot be reinterpreted as 'Event'}}
+    let x3: Address = x as! Address // expected-error {{'Int' cannot be reinterpreted as 'Address'}}
+    let x4: Bool = x as! Bool // expected-error {{'Int' cannot be reinterpreted as 'Bool'}}
+
+    let y: String = "test"
+
+    let y0: String = y as! String
+    let y1: Int = y as! Int // expected-error {{'String' cannot be reinterpreted as 'Int'}}
+    let y2: Address = y as! Address // expected-error {{'String' cannot be reinterpreted as 'Address'}}
+    let y3: Bool = y as! Bool // expected-error {{'String' cannot be reinterpreted as 'Bool'}}
+
+    let z: Bool = true
+
+    let z0: Bool = z as! Bool
+    let z1: Int = z as! Int // expected-error {{'Bool' cannot be reinterpreted as 'Int'}}
+    let z2: Address = z as! Address // expected-error {{'Bool' cannot be reinterpreted as 'Address'}}
+    let z3: String = z as! String // expected-error {{'Bool' cannot be reinterpreted as 'String'}}
+
+    // Unable to test reinterpretation of Solidity types
+  }
 }
