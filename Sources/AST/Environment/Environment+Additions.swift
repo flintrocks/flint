@@ -210,26 +210,30 @@ extension Environment {
 
   private func externalTraitInitializer(_ externalTrait: TraitDeclaration) -> SpecialSignatureDeclaration {
     return SpecialSignatureDeclaration(
-      specialToken: .init(kind: .punctuation(.closeBrace),
-                          sourceLocation: .DUMMY),
+      specialToken: .init(kind: .punctuation(.openBrace),
+                          sourceLocation: externalTrait.traitToken.sourceLocation),
       attributes: [],
       modifiers: [],
-      parameters: [],
-      closeBracketToken: .init(kind:.punctuation(.closeBrace), sourceLocation: .DUMMY)
+      parameters: [Parameter(identifier: Identifier(identifierToken: Token(kind: .identifier("address"),
+                                                    sourceLocation: externalTrait.traitToken.sourceLocation)),
+                             type: Type(inferredType: .basicType(.int), identifier: externalTrait.identifier),
+                             implicitToken: nil,
+                             assignedExpression: nil)],
+      closeBracketToken: .init(kind:.punctuation(.closeBrace), sourceLocation: externalTrait.traitToken.sourceLocation)
     )
   }
-  
+
   /// Add a trait to the environment.
   public func addTrait(_ trait: TraitDeclaration) {
     declaredTraits.append(trait.identifier)
     types[trait.identifier.name] = TypeInformation()
-    // We insert a generated constructor
+
+    // We insert a generated constructor for external traits
     if case .external = trait.traitKind.kind {
       let special = externalTraitInitializer(trait)
       addInitializerSignature(special, enclosingType: trait.identifier.name, callerProtections: [])
-      // addSpecial(special, enclosingType: trait.identifier, callerProtections: [])
     }
-    
+
     for member in trait.members {
       if case .eventDeclaration(let eventDeclaration) = member {
         addEvent(eventDeclaration, enclosingType: trait.identifier.name)
