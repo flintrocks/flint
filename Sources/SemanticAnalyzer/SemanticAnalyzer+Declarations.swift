@@ -585,8 +585,6 @@ extension SemanticAnalyzer {
       return true
     case .emitStatement:
       return false
-    case .externalCall:
-      fatalError()
     }
     return true
   }
