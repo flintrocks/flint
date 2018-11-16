@@ -491,15 +491,6 @@ extension Diagnostic {
                       message: "Cannot use `call` outside do-catch block. ")
   }
 
-  static func optionalExternalCallOutsideIfLet(_ externalCall: ExternalCall) -> Diagnostic {
-    var notes = [Diagnostic]()
-    notes.append(Diagnostic(severity: .note, sourceLocation: externalCall.sourceLocation,
-                            message: "Consider using `call` or `call!`."))
-    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "Cannot use `call?` outside `if let ...` construct. ",
-                      notes: notes)
-  }
-
 }
 
 // MARK: Warnings

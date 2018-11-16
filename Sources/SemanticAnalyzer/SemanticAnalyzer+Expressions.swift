@@ -100,8 +100,6 @@ extension SemanticAnalyzer {
 
     if externalCall.mode == .normal && !passContext.isInsideDo {
       diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
-    } else if externalCall.mode == .returnsGracefullyOptional && !passContext.isInsideIfCondition {
-      diagnostics.append(.optionalExternalCallOutsideIfLet(externalCall))
     }
 
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)

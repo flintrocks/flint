@@ -140,19 +140,10 @@ extension TypeChecker {
     let environment = passContext.environment!
     let enclosingType = passContext.enclosingTypeIdentifier!.name
 
-    switch externalCall.mode {
-    case .returnsGracefullyOptional:
-      if environment.type(of: externalCall.functionCall.rhs,
+    if externalCall.mode == .returnsGracefullyOptional && environment.type(of: externalCall.functionCall.rhs,
                           enclosingType: enclosingType,
                           scopeContext: passContext.scopeContext!) == .basicType(.void) {
-        diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall: externalCall))
-      }
-    case .normal, .isForced:
-      if environment.type(of: externalCall.functionCall.rhs,
-                          enclosingType: enclosingType,
-                          scopeContext: passContext.scopeContext!) != .basicType(.void) {
-        diagnostics.append(.ignoredExternalCallReturnType(externalCall: externalCall))
-      }
+      diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall: externalCall))
     }
 
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
