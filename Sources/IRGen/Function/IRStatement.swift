@@ -317,12 +317,6 @@ struct IRDoCatchStatement {
     })
     functionContext.pop()
 
-    return """
-    // do-catch block
-    {
-      \(code.indented(by: 2))
-    }
-    """
   }
 }
 
