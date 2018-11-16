@@ -18,7 +18,7 @@ Contract :: (any) {
     let addr: Address = 0x0000000000000000000000000000000000000000
     let contr: Test = Test(address: addr)
 
-    //   CHECK-AST: Statement (
+    //   CHECK-AST: Expression (
     //   CHECK-AST:   ExternalCall (
     //   CHECK-AST:     BinaryExpression (
     //   CHECK-AST:       Expression (
@@ -40,7 +40,7 @@ Contract :: (any) {
     //   CHECK-AST: )
     call contr.f()
 
-    //   CHECK-AST: Statement (
+    //   CHECK-AST: Expression (
     //   CHECK-AST:   ExternalCall (
     //   CHECK-AST:     FunctionArgument (
     //   CHECK-AST:       Identifier (
@@ -70,7 +70,7 @@ Contract :: (any) {
     //   CHECK-AST: )
     call(wei: 100) contr.f()
 
-    //   CHECK-AST: Statement (
+    //   CHECK-AST: Expression (
     //   CHECK-AST:   ExternalCall (
     //   CHECK-AST:     FunctionArgument (
     //   CHECK-AST:      Identifier (
@@ -102,7 +102,7 @@ Contract :: (any) {
     //   CHECK-AST: )
     call(wei: 100)! contr.f()
 
-    //   CHECK-AST: Statement (
+    //   CHECK-AST: Expression (
     //   CHECK-AST:   ExternalCall (
     //   CHECK-AST:     Forced execution (
     //   CHECK-AST:     )
@@ -126,7 +126,7 @@ Contract :: (any) {
     //   CHECK-AST: )
     call! contr.f()
 
-    //   CHECK-AST: Statement (
+    //   CHECK-AST: Expression (
     //   CHECK-AST:   ExternalCall (
     //   CHECK-AST:     Returns optional (
     //   CHECK-AST:     )
@@ -150,7 +150,7 @@ Contract :: (any) {
     //   CHECK-AST: )
     call? contr.f()
 
-    //   CHECK-AST: Statement (
+    //   CHECK-AST: Expression (
     //   CHECK-AST:   ExternalCall (
     //   CHECK-AST:     Forced execution (
     //   CHECK-AST:     )

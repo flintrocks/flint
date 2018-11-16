@@ -396,9 +396,6 @@ public struct ASTVisitor {
     case .doCatchStatement(let doCatchStatement):
       processResult.element =
         .doCatchStatement(processResult.combining(visit(doCatchStatement, passContext: processResult.passContext)))
-    case .externalCall(let externalCall):
-      processResult.element =
-        .externalCall(processResult.combining(visit(externalCall, passContext: processResult.passContext)))
     }
     let postProcessResult = pass.postProcess(statement: processResult.element, passContext: processResult.passContext)
     return ASTPassResult(element: postProcessResult.element,
