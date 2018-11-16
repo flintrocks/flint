@@ -221,7 +221,8 @@ public struct ASTVisitor {
       processResult.combining(visit(processResult.element.identifier,
                                     passContext: processResult.passContext))
 
-    let traitDeclarationContext = TraitDeclarationContext(traitIdentifier: processResult.element.identifier)
+    let traitDeclarationContext = TraitDeclarationContext(traitIdentifier: processResult.element.identifier,
+                                                          traitKind: processResult.element.traitKind)
     let traitScopeContext = ScopeContext()
 
     processResult.passContext = processResult.passContext.withUpdates {
@@ -716,6 +717,9 @@ public struct ASTVisitor {
     case .functionCall(let functionCall):
       processResult.element = .functionCall(processResult.combining(visit(functionCall,
                                                                           passContext: processResult.passContext)))
+    case .externalCall(let externalCall):
+      processResult.element = .externalCall(processResult.combining(visit(externalCall,
+                                                                          passContext: processResult.passContext)))
     case .arrayLiteral(let arrayLiteral):
       processResult.element = .arrayLiteral(processResult.combining(visit(arrayLiteral,
                                                                           passContext: processResult.passContext)))
@@ -817,12 +821,34 @@ public struct ASTVisitor {
     processResult.passContext.isFunctionCall = false
 
     processResult.element.arguments = processResult.element.arguments.map { argument in
-
-      let x = visit(argument, passContext: processResult.passContext)
-      return processResult.combining(x)
+      let paramVisit = visit(argument, passContext: processResult.passContext)
+      return processResult.combining(paramVisit)
     }
 
     let postProcessResult = pass.postProcess(functionCall: processResult.element,
+                                             passContext: processResult.passContext)
+
+    return ASTPassResult(element: postProcessResult.element,
+                         diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
+                         passContext: postProcessResult.passContext)
+  }
+
+  func visit(_ externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
+    var processResult = pass.process(externalCall: externalCall, passContext: passContext)
+
+    processResult.passContext.isExternalConfigurationParam = true
+    processResult.element.hyperParameters = processResult.element.hyperParameters.map { param in
+      let paramVisit = visit(param, passContext: processResult.passContext)
+      return processResult.combining(paramVisit)
+    }
+    processResult.passContext.isExternalConfigurationParam = false
+
+    processResult.passContext.isExternalCall = true
+    processResult.element.functionCall = processResult.combining(visit(processResult.element.functionCall,
+                                                                       passContext: processResult.passContext))
+    processResult.passContext.isExternalCall = false
+
+    let postProcessResult = pass.postProcess(externalCall: externalCall,
                                              passContext: processResult.passContext)
 
     return ASTPassResult(element: postProcessResult.element,
@@ -923,18 +949,6 @@ public struct ASTVisitor {
                                                                passContext: processResult.passContext))
 
     let postProcessResult = pass.postProcess(parameter: processResult.element, passContext: processResult.passContext)
-    return ASTPassResult(element: postProcessResult.element,
-                         diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
-                         passContext: postProcessResult.passContext)
-  }
-
-  func visit(_ typeAnnotation: TypeAnnotation, passContext: ASTPassContext) -> ASTPassResult<TypeAnnotation> {
-    var processResult = pass.process(typeAnnotation: typeAnnotation, passContext: passContext)
-    processResult.element.type = processResult.combining(visit(processResult.element.type,
-                                                               passContext: processResult.passContext))
-
-    let postProcessResult = pass.postProcess(typeAnnotation: processResult.element,
-                                             passContext: processResult.passContext)
     return ASTPassResult(element: postProcessResult.element,
                          diagnostics: processResult.diagnostics + postProcessResult.diagnostics,
                          passContext: postProcessResult.passContext)

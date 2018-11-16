@@ -17,7 +17,8 @@ extension Parser {
       case .punctuation(.semicolon), .newline:
         currentIndex+=1
      // Valid starting tokens for statements
-      case .return, .become, .emit, .for, .if, .identifier, .punctuation(.ampersand), .punctuation(.openSquareBracket),
+      case .return, .become, .emit, .call, .for, .if, .identifier,
+           .punctuation(.ampersand), .punctuation(.openSquareBracket),
            .punctuation(.openBracket), .self, .var, .let, .public, .visible, .mutating, .try, .do:
         statements.append(try parseStatement())
       default:

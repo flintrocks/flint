@@ -379,6 +379,10 @@ public class ASTDumper {
       writeLine("Flint error type \(rawType.name)")
     case .functionType:
       writeLine("function type \(rawType.name)")
+    case .solidityType(let solidityType):
+      writeNode("SolidityType") {
+        self.dump(solidityType)
+      }
     }
   }
 
@@ -405,6 +409,7 @@ public class ASTDumper {
       case .binaryExpression(let binaryExpression): self.dump(binaryExpression)
       case .bracketedExpression(let bracketedExpression): self.dump(bracketedExpression)
       case .functionCall(let functionCall): self.dump(functionCall)
+      case .externalCall(let externalCall): self.dump(externalCall)
       case .identifier(let identifier): self.dump(identifier)
       case .literal(let token): self.dump(token)
       case .arrayLiteral(let arrayLiteral): self.dump(arrayLiteral)
@@ -471,6 +476,22 @@ public class ASTDumper {
       }
 
       self.dump(functionCall.closeBracketToken)
+    }
+  }
+
+  func dump(_ externalCall: ExternalCall) {
+    writeNode("ExternalCall") {
+      for argument in externalCall.hyperParameters {
+        self.dump(argument)
+      }
+
+      if externalCall.mode == .isForced {
+        self.writeNode("Forced execution")
+      } else if externalCall.mode == .returnsGracefullyOptional {
+        self.writeNode("Returns optional")
+      }
+
+      self.dump(externalCall.functionCall)
     }
   }
 
@@ -581,5 +602,9 @@ public class ASTDumper {
         self.dump(element.value)
       }
     }
+  }
+
+  func dump(_ solidityType: RawType.SolidityType) {
+    writeLine("solidity type \(solidityType.rawValue)")
   }
 }

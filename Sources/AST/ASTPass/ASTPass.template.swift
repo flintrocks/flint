@@ -17,7 +17,7 @@ public protocol ASTPass {
   {%- set nodes = [
     "TopLevelModule"
   ] -%}
-  
+
   {# Declarations #}
   {%- set nodes = nodes.concat([
     "TopLevelDeclaration",
@@ -36,7 +36,7 @@ public protocol ASTPass {
     "TraitMember",
     "ContractBehaviorMember"
   ]) -%}
-  
+
   {# Statements #}
   {%- set nodes = nodes.concat([
     "Statement",
@@ -47,7 +47,7 @@ public protocol ASTPass {
     "ForStatement",
     "DoCatchStatement"
   ]) -%}
-  
+
   {# Declarations #}
   {%- set nodes = nodes.concat([
     "VariableDeclaration",
@@ -57,13 +57,14 @@ public protocol ASTPass {
     "SpecialSignatureDeclaration",
     "EventDeclaration"
   ]) -%}
-  
+
   {# Expression #}
   {%- set nodes = nodes.concat([
     "Expression",
     "InoutExpression",
     "BinaryExpression",
     "FunctionCall",
+    "ExternalCall",
     "ArrayLiteral",
     "DictionaryLiteral",
     "RangeExpression",
@@ -75,7 +76,6 @@ public protocol ASTPass {
   {%- set nodes = nodes.concat([
     "Attribute",
     "Parameter",
-    "TypeAnnotation",
     "Identifier",
     "Type",
     "Token",
