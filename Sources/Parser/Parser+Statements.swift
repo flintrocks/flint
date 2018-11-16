@@ -65,7 +65,7 @@ extension Parser {
       statement = .doCatchStatement(doCatchStatement)
     // Valid starting tokens for expressions
     case .identifier, .punctuation(.ampersand), .punctuation(.openSquareBracket),
-         .punctuation(.openBracket), .self, .var, .let, .public, .visible, .mutating, .try:
+         .punctuation(.openBracket), .self, .var, .let, .public, .visible, .mutating, .try, .call:
       let expression = try parseExpression(upTo: statementEndIndex)
       statement = .expression(expression)
     default:
