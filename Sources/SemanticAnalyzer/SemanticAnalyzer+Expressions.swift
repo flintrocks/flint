@@ -76,11 +76,12 @@ extension SemanticAnalyzer {
   }
 
   public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
+    var diagnostics = [Diagnostic]()
+
     var parametersGiven: [String: Bool] = [
       "value": false,
       "gas": false
     ]
-    var diagnostics = [Diagnostic]()
 
     // ensure only one instance of value and gas hyper-parameters
     for parameter in externalCall.hyperParameters {
@@ -97,6 +98,11 @@ extension SemanticAnalyzer {
       } else {
         diagnostics.append(.unlabeledExternalCallHyperParameter(externalCall))
       }
+    }
+
+    // Ensure `call` is only used inside do-catch block
+    if externalCall.mode == .normal && !passContext.isInsideDo {
+      diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
     }
 
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
@@ -120,16 +126,6 @@ extension SemanticAnalyzer {
     }
 
     return ASTPassResult(element: rangeExpression, diagnostics: diagnostics, passContext: passContext)
-  }
-
-  public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
-    var diagnostics = [Diagnostic]()
-
-    if externalCall.mode == .normal && !passContext.isInsideDo {
-      diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
-    }
-
-    return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
   }
 
   public func postProcess(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
