@@ -268,7 +268,7 @@ extension SemanticAnalyzer {
     let environment = passContext.environment!
 
     // Check valid modifiers
-     if variableDeclaration.isMutating {
+    if variableDeclaration.isMutating {
        if variableDeclaration.isConstant {
           diagnostics.append(.mutatingConstant(variableDeclaration))
        } else if variableDeclaration.isVariable {
@@ -276,7 +276,7 @@ extension SemanticAnalyzer {
        }
      }
 
-     if variableDeclaration.isPublic {
+    if variableDeclaration.isPublic {
        if variableDeclaration.isConstant {
         diagnostics.append(.publicLet(variableDeclaration))
        }
@@ -284,6 +284,14 @@ extension SemanticAnalyzer {
          diagnostics.append(.publicAndVisible(variableDeclaration))
        }
      }
+
+    // Check if `call?` assignment
+    if let assignedExpression = variableDeclaration.assignedExpression,
+      case .externalCall(let externalCall) = assignedExpression,
+      variableDeclaration.isConstant,
+      externalCall.mode == .returnsGracefullyOptional {
+      diagnostics.append(.externalCallOptionalAssingmentNotImplemented(variableDeclaration))
+    }
 
     // Ensure that the type is declared.
     if case .userDefinedType(let typeIdentifier) = variableDeclaration.type.rawType,
