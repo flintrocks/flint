@@ -508,12 +508,12 @@ extension Diagnostic {
   // EXTERNAL CALL ERRORS //
   static func normalExternalCallOutsideDoCatch(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "Cannot use `call` outside do-catch block. ")
+                      message: "Cannot use `call` outside do-catch block")
   }
 
   static func externalCallOptionalAssingmentNotImplemented(_ variableDeclaration: VariableDeclaration) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: variableDeclaration.sourceLocation,
-                      message: "Assignment to the optional result of `call?` is not implemnted. ")
+                      message: "Assignment to the optional result of `call?` is not implemented")
   }
 
 }
