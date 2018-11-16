@@ -161,12 +161,15 @@ extension Environment {
   /// protections is expected.
   public func addInitializerSignature(_ initalizerSignature: SpecialSignatureDeclaration,
                                       enclosingType: RawTypeIdentifier,
-                                      callerProtections: [CallerProtection] = []) {
+                                      callerProtections: [CallerProtection] = [],
+                                      generated: Bool = false
+    ) {
 
     let specialDeclaration = SpecialDeclaration(signature: initalizerSignature,
                                                 body: [],
                                                 closeBraceToken: .init(kind: .punctuation(.closeBrace),
-                                                                       sourceLocation: .DUMMY))
+                                                                       sourceLocation: .DUMMY),
+                                                generated: generated)
 
     types[enclosingType, default: TypeInformation()]
       .initializers
@@ -216,11 +219,10 @@ extension Environment {
       modifiers: [],
       parameters: [Parameter(identifier: Identifier(identifierToken: Token(kind: .identifier("address"),
                                                     sourceLocation: externalTrait.traitToken.sourceLocation)),
-                             type: Type(inferredType: .basicType(.int), identifier: externalTrait.identifier),
+                             type: Type(inferredType: .basicType(.address), identifier: externalTrait.identifier),
                              implicitToken: nil,
                              assignedExpression: nil)],
-      closeBracketToken: .init(kind:.punctuation(.closeBrace), sourceLocation: externalTrait.traitToken.sourceLocation)
-    )
+      closeBracketToken: .init(kind:.punctuation(.closeBrace), sourceLocation: externalTrait.traitToken.sourceLocation))
   }
 
   /// Add a trait to the environment.
@@ -231,7 +233,8 @@ extension Environment {
     // We insert a generated constructor for external traits
     if case .external = trait.traitKind.kind {
       let special = externalTraitInitializer(trait)
-      addInitializerSignature(special, enclosingType: trait.identifier.name, callerProtections: [])
+      addInitializerSignature(special, enclosingType: trait.identifier.name, callerProtections: [],
+                              generated: true)
     }
 
     for member in trait.members {

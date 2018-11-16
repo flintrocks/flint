@@ -20,9 +20,9 @@ class FunctionContext {
 
   /// Whether the function is declared in a struct.
   var isInStructFunction: Bool
-  
+
   var doCatchStatementStack: [DoCatchStatement]
-  
+
   init(environment: Environment,
        scopeContext: ScopeContext,
        enclosingTypeName: String,
@@ -34,18 +34,18 @@ class FunctionContext {
     self.isInStructFunction = isInStructFunction
     self.doCatchStatementStack = doCatchStatementStack
   }
-  
+
   func push(doCatch stmt: DoCatchStatement) {
     doCatchStatementStack.append(stmt)
   }
-  
+
   @discardableResult
   func pop() -> DoCatchStatement? {
     return doCatchStatementStack.popLast()
   }
-  
+
   var top: DoCatchStatement? {
     return doCatchStatementStack.last
   }
-  
+
 }

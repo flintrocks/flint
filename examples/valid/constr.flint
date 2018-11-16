@@ -7,7 +7,7 @@ contract FlintContract {}
 
 FlintContract :: (any) {
   public init() {
-    let ext: Ext = Ext(address: 00000000000000000000)
+    let ext: Ext = Ext(address: 0x0000000000000000000000000000000000000000)
     call! ext.someFunc()
   }
 }

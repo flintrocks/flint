@@ -294,7 +294,7 @@ struct IRDoCatchStatement {
     functionContext.push(doCatch: doCatchStatement)
     let code = doCatchStatement.doBody.reversed().reduce("", { acc, statement in
       switch statement {
-      case .expression(.functionCall(let _)):
+      case .expression(.functionCall):
         var elseCode = ""
         if let elseBlock = functionContext.top {
           elseCode = elseBlock.catchBody.map { statement in
@@ -316,7 +316,7 @@ struct IRDoCatchStatement {
       }
     })
     functionContext.pop()
-    
+
     return """
     // do-catch block
     {
@@ -331,6 +331,7 @@ struct IRExternalCallStatement {
   var externalCall: ExternalCall
 
   func rendered(functionContext: FunctionContext) -> String {
-    fatalError()
+    // fatalError()
+    return "external call"
   }
 }

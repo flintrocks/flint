@@ -15,6 +15,7 @@ public struct SpecialDeclaration: ASTNode {
 
   // Contextual information for the scope defined by the function.
   public var scopeContext: ScopeContext
+  public var generated: Bool
 
   /// The non-implicit parameters of the initializer.
   public var explicitParameters: [Parameter] {
@@ -56,11 +57,14 @@ public struct SpecialDeclaration: ASTNode {
   public init(signature: SpecialSignatureDeclaration,
               body: [Statement],
               closeBraceToken: Token,
-              scopeContext: ScopeContext = ScopeContext()) {
+              scopeContext: ScopeContext = ScopeContext(),
+              generated: Bool = false
+              ) {
     self.signature = signature
     self.body = body
     self.closeBraceToken = closeBraceToken
     self.scopeContext = scopeContext
+    self.generated = generated
   }
 
   public init(_ functionDeclaration: FunctionDeclaration) {
@@ -72,6 +76,7 @@ public struct SpecialDeclaration: ASTNode {
     self.body = functionDeclaration.body
     self.closeBraceToken = functionDeclaration.closeBraceToken
     self.scopeContext = functionDeclaration.scopeContext ?? ScopeContext()
+    self.generated = false
   }
 
   // MARK: - ASTNode
