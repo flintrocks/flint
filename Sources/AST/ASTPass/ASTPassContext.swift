@@ -155,7 +155,7 @@ extension ASTPassContext {
     get { return self[ExternalCallContext.self] }
     set { self[ExternalCallContext.self] = newValue }
   }
-  
+
   /// When visiting argument labels in a function call, this property is set to `true`.
   public var isFunctionCallArgumentLabel: Bool {
     get { return self[IsFunctionCallArgumentLabel.self] ?? false }
