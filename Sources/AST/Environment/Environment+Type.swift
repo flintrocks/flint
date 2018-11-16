@@ -229,7 +229,7 @@ extension Environment {
                   scopeContext: scopeContext) ?? .errorType
 
     case .externalCall(let externalCall):
-      return type(of: externalCall.functionCall.lhs,
+      return type(of: externalCall.functionCall.rhs,
                   enclosingType: enclosingType,
                   typeStates: typeStates,
                   callerProtections: callerProtections,

@@ -520,7 +520,7 @@ public struct ASTVisitor {
     var passContext = passContext
     var processResult = pass.process(doCatchStatement: doCatchStatement, passContext: passContext)
 
-    passContext.isInsideDo = true
+    processResult.passContext.isInsideDo = true
     let scopeContext = passContext.scopeContext
     processResult.element.doBody = processResult.element.doBody.map { statement in
       return processResult.combining(visit(statement, passContext: processResult.passContext))
