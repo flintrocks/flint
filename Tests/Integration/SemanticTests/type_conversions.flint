@@ -4,7 +4,8 @@ contract Contract {
 }
 
 external trait External {
-  func test(param: int48) -> int24
+  func test() -> int256
+  func test2(param: int48) -> int24
 }
 
 Contract :: (any) {
@@ -38,5 +39,21 @@ Contract :: (any) {
     let z3: String = z as! String // expected-error {{'Bool' cannot be reinterpreted as 'String'}}
 
     // Unable to test reinterpretation of Solidity types
+  }
+
+  func typeReinterpretationWithExternalCall() {
+    let fake: External = External(address: 0x0000000000000000000000000000000000000000)
+    let x0: Int = (call! fake.test()) as! Int
+    let x1: Int = ((call! fake.test()) as! int64) as! Int // expected-error {{Conversion from 'int256' to 'int64' only allowed in external call context or from a Solidity to a Flint type}}
+    // let x2: Int = (call! fake.test2(param: (call! fake.test()) as! int64)) as! Int
+    let x3: Int = (call! fake.test()) as! int64 // expected-error {{Conversion from 'int256' to 'int64' only allowed in external call context or from a Solidity to a Flint type}}
+    let myValue: Int = 100
+    let x4: Int = (call! fake.test2(param: myValue as! int24)) as! Int
+
+    // let x: Int = (call fake.fakeExternalCall()) as! Int
+    // Solidity type to Flint Type
+    // Solidity type to Solidity type (in call by never converting it back)
+    // Solidity type to Flint type to Solidity type (just in case)
+    // Flint type to Solidity type (only allowed in parameter list, and only one way)
   }
 }

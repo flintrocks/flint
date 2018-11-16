@@ -651,10 +651,18 @@ extension Diagnostic {
   }
 
   static func typesNotReinterpretable(_ typeConversionExpression: TypeConversionExpression,
-                                      expressionType: RawType) -> Diagnostic{
+                                      expressionType: RawType) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: typeConversionExpression.sourceLocation,
                       // swiftlint:disable line_length
                       message: "'\(expressionType.name)' cannot be reinterpreted as '\(typeConversionExpression.type.name)'")
+                      // swiftlint:enable line_length
+  }
+
+  static func badSolidityTypeConversion(_ typeConversionExpression: TypeConversionExpression,
+                                        expressionType: RawType) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: typeConversionExpression.sourceLocation,
+                      // swiftlint:disable line_length
+                      message: "Conversion from '\(expressionType.name)' to '\(typeConversionExpression.type.name)' only allowed in external call context or from a Solidity to a Flint type")
                       // swiftlint:enable line_length
   }
 }

@@ -50,8 +50,12 @@ extension SemanticAnalyzer {
 
     // Check elementary casting constraint
     if expressionType.canReinterpret(as: typeConversionExpression.type.rawType) {
-      // 1. casting a solidity type to a flint type as part of an external call (return expression); OR
-      // 2. casting a flint type to a solidity type as part of an external call (parameter list)
+      // 1. If we have an external function call, we allow conversions between any kind of type
+      // 2. If we have a solidity type conversion to a non-solidity type conversion we always allow it as the
+      //    only place where we can get a Solidity type is from an external call
+      if !passContext.isExternalFunctionCall && typeConversionExpression.type.rawType.isSolidityType {
+        diagnostics.append(.badSolidityTypeConversion(typeConversionExpression, expressionType: expressionType))
+      }
     } else {
       diagnostics.append(.typesNotReinterpretable(typeConversionExpression, expressionType: expressionType))
     }
