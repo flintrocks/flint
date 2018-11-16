@@ -325,7 +325,6 @@ struct IRExternalCallStatement {
   var externalCall: ExternalCall
 
   func rendered(functionContext: FunctionContext) -> String {
-    // fatalError()
-    return "external call"
+    fatalError()
   }
 }

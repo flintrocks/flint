@@ -15,6 +15,6 @@ struct IRExternalCall {
   }
 
   func rendered(functionContext: FunctionContext) -> String {
-    return "success of call"
+    fatalError()
   }
 }
