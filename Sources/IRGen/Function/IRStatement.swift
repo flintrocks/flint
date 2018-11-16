@@ -303,7 +303,7 @@ struct IRDoCatchStatement {
         } else {
           elseCode = ""
         }
-        // TODO(ethan): handling of checking external call success is not implemented
+
         return """
         if (true) {
           \(acc.indented(by: 2))
@@ -316,7 +316,7 @@ struct IRDoCatchStatement {
       }
     })
     functionContext.pop()
-
+    return code
   }
 }
 

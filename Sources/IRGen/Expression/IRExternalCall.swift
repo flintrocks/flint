@@ -6,7 +6,7 @@
 //
 import AST
 
-/// Generates code for a binary expression.
+/// Generates code for an external call.
 struct IRExternalCall {
   var externalCall: ExternalCall
 
@@ -15,25 +15,6 @@ struct IRExternalCall {
   }
 
   func rendered(functionContext: FunctionContext) -> String {
-
-    var elseCode = ""
-    if let elseBlock = functionContext.top {
-      elseCode = elseBlock.catchBody.map { statement in
-        return IRStatement(statement: statement).rendered(functionContext: functionContext)
-      }.joined(separator: "\n")
-    } else {
-      elseCode = ""
-    }
-
-    var code = """
-    if (success of call) {
-
-    } else {
-      \(elseCode)
-    }
-
-    """
-
-    return code
+    return "success of call"
   }
 }

@@ -1,5 +1,4 @@
 external trait Ext {
-//  init(address: Int)
   func someFunc()
 }
 

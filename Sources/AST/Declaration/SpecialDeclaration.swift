@@ -15,6 +15,10 @@ public struct SpecialDeclaration: ASTNode {
 
   // Contextual information for the scope defined by the function.
   public var scopeContext: ScopeContext
+
+  // Flag indicating whether this declaration is generated.
+  // This is currently used for external traits where we 
+  // generate an initializer.
   public var generated: Bool
 
   /// The non-implicit parameters of the initializer.
@@ -58,8 +62,7 @@ public struct SpecialDeclaration: ASTNode {
               body: [Statement],
               closeBraceToken: Token,
               scopeContext: ScopeContext = ScopeContext(),
-              generated: Bool = false
-              ) {
+              generated: Bool = false) {
     self.signature = signature
     self.body = body
     self.closeBraceToken = closeBraceToken

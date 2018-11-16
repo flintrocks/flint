@@ -162,8 +162,7 @@ extension Environment {
   public func addInitializerSignature(_ initalizerSignature: SpecialSignatureDeclaration,
                                       enclosingType: RawTypeIdentifier,
                                       callerProtections: [CallerProtection] = [],
-                                      generated: Bool = false
-    ) {
+                                      generated: Bool = false) {
 
     let specialDeclaration = SpecialDeclaration(signature: initalizerSignature,
                                                 body: [],
