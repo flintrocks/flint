@@ -18,7 +18,7 @@ extension Diagnostic {
 
   static func optionalExternalCallWithoutReturnType(externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "Cannot use `call?` with external function that has no return type.")
+                      message: "Cannot use `call?` with external function that has no return type")
   }
 
   static func invalidState(falseState: Expression, contract: RawTypeIdentifier) -> Diagnostic {

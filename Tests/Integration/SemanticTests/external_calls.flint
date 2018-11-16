@@ -1,7 +1,11 @@
 // RUN: %flintc %s --verify
 
-contract Contract {
+external trait Test {
+  public func f()
 
+  func g() -> Int
+
+  public init(c: Bool)
 }
 
 Contract :: (any) {
@@ -29,6 +33,7 @@ Contract :: (any) {
   }
   
   public init() {
+    // PARAMETER TESTS
     call! self.someFunc()
     call(gas: 100)! self.someFunc()
     call(value: Wei(100), gas: 100)! self.payableFunc(parameter: Wei(1))
@@ -40,6 +45,9 @@ Contract :: (any) {
     call(gas: 100, value: Wei(200), gas: 300)! self.payableFunc(parameter: Wei(1)) // expected-error {{'gas' hyper-parameter was already specified}}
     call(value: Wei(100), value: Wei(200), value: Wei(300))! self.payableFunc(parameter: Wei(1)) // expected-error {{'value' hyper-parameter was already specified}}
                                                                                                  // expected-error@-1 {{'value' hyper-parameter was already specified}}
+    call(gas: 100, value: Wei(200), gas: 300)! self.someFunc() // expected-error {{'gas' hyper-parameter was already specified}}
+    call(value: Wei(100), value: Wei(200), value: Wei(300))! self.someFunc() // expected-error {{'value' hyper-parameter was already specified}}
+    // expected-error@-1 {{'value' hyper-parameter was already specified}}
 
     call(Wei(100))! self.someFunc() // expected-error {{External call hyper-parameter was not labeled}}
 
@@ -55,6 +63,38 @@ Contract :: (any) {
 
     call(value: Wei(100))! self.testFunc2(y: self.testFunc1(), z: call()! self.testFunc3(w: Wei(1)), w: Wei(1)) //expected-error {{Attempting to call a payable function without specifying a 'value' hyper-parameter}}
     call(value: Wei(100))! self.testFunc2(y: self.testFunc1(), z: call(value: Wei(50))! self.testFunc3(w: Wei(1)), w: Wei(1))
+
+    // EXTERNAL TRAIT CALL TESTS
+    let addr: Address = 0x0000000000000000000000000000000000000000
+    let contr: Test = Test(address: addr)
+
+    call contr.f() // expected-error {{Cannot use `call` outside do-catch blok}}
+
+    call contr.g() // expected-error {{Cannot use `call` outside do-catch blok}}
+
+    do {
+        call contr.f()
+
+        call contr.g()
+
+        let x: Int = call contr.g()
+
+        let y: Bool = call contr.g() // expected-error {{Incompatible assignment between values of type 'Bool' and 'Int'}}
+    } catch is Error {
+
+    }
+
+    call! contr.f()
+
+    call! contr.g()
+
+    let x2: Int = call! contr.g()
+
+    let y2: Bool = call contr.g() // expected-error {{Incompatible assignment between values of type 'Bool' and 'Int'}}
+
+    call? contr.f() // expected-error {{Cannot use `call?` with external function that has no return type}}
+
+    let x: Int = call? contr.g() 
   }
 }
 
