@@ -123,7 +123,7 @@ extension SemanticAnalyzer {
     }
 
     // Ensure `call` is only used inside do-catch block
-    if externalCall.mode == .normal && !passContext.isInsideDo {
+    if externalCall.mode == .normal && !passContext.isInsideDoBlock {
       diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
     }
 
