@@ -16,7 +16,8 @@ extension SemanticAnalyzer {
     let environment = passContext.environment!
     var diagnostics = [Diagnostic]()
 
-    if case .dot = binaryExpression.opToken {
+    switch binaryExpression.opToken {
+    case .dot:
       // The identifier explicitly refers to a state property, such as in `self.foo`.
       // We set its enclosing type to the type it is declared in.
       let enclosingType = passContext.enclosingTypeIdentifier!
@@ -36,6 +37,15 @@ extension SemanticAnalyzer {
       } else {
         binaryExpression.rhs = binaryExpression.rhs.assigningEnclosingType(type: lhsType.name)
       }
+    case .equal:
+      // Check if `call?` assignment
+      if case .externalCall(let externalCall) = binaryExpression.rhs,
+        externalCall.mode == .returnsGracefullyOptional {
+        diagnostics.append(.externalCallOptionalAssignmentNotImplemented(binaryExpression))
+      }
+
+    default:
+      break
     }
 
     return ASTPassResult(element: binaryExpression, diagnostics: diagnostics, passContext: passContext)

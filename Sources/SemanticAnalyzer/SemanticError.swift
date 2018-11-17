@@ -511,8 +511,8 @@ extension Diagnostic {
                       message: "Cannot use `call` outside do-catch block")
   }
 
-  static func externalCallOptionalAssingmentNotImplemented(_ variableDeclaration: VariableDeclaration) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: variableDeclaration.sourceLocation,
+  static func externalCallOptionalAssignmentNotImplemented(_ variableDeclarationExpr: BinaryExpression) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: variableDeclarationExpr.sourceLocation,
                       message: "Assignment to the optional result of `call?` is not implemented")
   }
 

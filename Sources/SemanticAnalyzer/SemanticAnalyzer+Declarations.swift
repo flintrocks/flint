@@ -285,14 +285,6 @@ extension SemanticAnalyzer {
        }
      }
 
-    // Check if `call?` assignment
-    if let assignedExpression = variableDeclaration.assignedExpression,
-      case .externalCall(let externalCall) = assignedExpression,
-      variableDeclaration.isConstant,
-      externalCall.mode == .returnsGracefullyOptional {
-      diagnostics.append(.externalCallOptionalAssingmentNotImplemented(variableDeclaration))
-    }
-
     // Ensure that the type is declared.
     if case .userDefinedType(let typeIdentifier) = variableDeclaration.type.rawType,
       !environment.isTypeDeclared(typeIdentifier) {
