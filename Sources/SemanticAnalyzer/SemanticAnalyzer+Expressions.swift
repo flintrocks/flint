@@ -124,6 +124,20 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
   }
 
+  public func process(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
+    let environment = passContext.environment!
+    var diagnostics = [Diagnostic]()
+
+    if environment.isInitializerCall(functionCall),
+      !passContext.inAssignment,
+      !passContext.isPropertyDefaultAssignment,
+      functionCall.arguments.isEmpty {
+      diagnostics.append(.noReceiverForStructInitializer(functionCall))
+    }
+
+    return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
+  }
+
   public func postProcess(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
     guard !Environment.isRuntimeFunctionCall(functionCall) else {
       return ASTPassResult(element: functionCall, diagnostics: [], passContext: passContext)
