@@ -1,0 +1,36 @@
+// RUN: %flintc %s --verify
+
+contract Contract {
+
+}
+
+Contract :: (any) {
+  func someFunc() {
+
+  }
+
+  func someReturningFunc() -> Int {
+    return 42
+  }
+
+  public init() {
+    do {
+      call! self.someFunc() // expected-error {{Cannot use `call!` inside do-catch block.}}     
+    } catch is Error {
+
+    }
+
+    do {
+
+    } catch is Error {
+
+    } // expected-error {{No `call` found in do-catch block.}}
+
+    do {
+      let x: Int = call? self.someReturningFunc()
+      call self.someFunc()
+    } catch is Error {
+
+    }
+  }
+}
