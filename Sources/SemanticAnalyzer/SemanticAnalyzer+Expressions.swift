@@ -163,18 +163,16 @@ extension SemanticAnalyzer {
           }
         }
 
-        if functionCall.isOuterExternalCallFunctionCall {
-          if let externalCall = passContext.externalCallContext {
+        if let externalCall = passContext.externalCallContext {
 
-            // check value parameter (appropriate usage)
-            if !matchingFunction.declaration.isPayable {
-              if externalCall.hasHyperParameter(parameterName: "value") {
-                diagnostics.append(.valueParameterForUnpayableFunction(externalCall))
-              }
-            } else {
-              if !externalCall.hasHyperParameter(parameterName: "value") {
-                diagnostics.append(.missingValueParameterForPayableFunction(externalCall))
-              }
+          // check value parameter (appropriate usage)
+          if !matchingFunction.declaration.isPayable {
+            if externalCall.hasHyperParameter(parameterName: "value") {
+              diagnostics.append(.valueParameterForUnpayableFunction(externalCall))
+            }
+          } else {
+            if !externalCall.hasHyperParameter(parameterName: "value") {
+              diagnostics.append(.missingValueParameterForPayableFunction(externalCall))
             }
           }
         }

@@ -139,34 +139,33 @@ extension TypeChecker {
                                     callerProtections: callerProtections,
                                     scopeContext: passContext.scopeContext!) {
 
-      if functionCall.isOuterExternalCallFunctionCall {
-        if let externalCall = passContext.externalCallContext {
-          // check value parameter (type)
-          if matchingFunction.declaration.isPayable {
-            if let valueParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "value") {
-              let parameterType = environment.type(of: valueParameter.expression,
+
+      if let externalCall = passContext.externalCallContext {
+        // check value parameter (type)
+        if matchingFunction.declaration.isPayable {
+          if let valueParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "value") {
+            let parameterType = environment.type(of: valueParameter.expression,
                 enclosingType: enclosingType,
                 typeStates: typeStates,
                 callerProtections: callerProtections,
                 scopeContext: passContext.scopeContext!)
 
-              if parameterType != .userDefinedType(RawType.StdlibType.wei.rawValue) {
-                diagnostics.append(.valueParameterWithWrongType(valueParameter))
-              }
+            if parameterType != .userDefinedType(RawType.StdlibType.wei.rawValue) {
+              diagnostics.append(.valueParameterWithWrongType(valueParameter))
             }
           }
+        }
 
-          // check gas parameter (type)
-          if let gasParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "gas") {
-            let parameterType = environment.type(of: gasParameter.expression,
+        // check gas parameter (type)
+        if let gasParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "gas") {
+          let parameterType = environment.type(of: gasParameter.expression,
               enclosingType: enclosingType,
               typeStates: typeStates,
               callerProtections: callerProtections,
               scopeContext: passContext.scopeContext!)
 
-            if parameterType != .basicType(.int) {
-              diagnostics.append(.gasParameterWithWrongType(gasParameter))
-            }
+          if parameterType != .basicType(.int) {
+            diagnostics.append(.gasParameterWithWrongType(gasParameter))
           }
         }
       }
