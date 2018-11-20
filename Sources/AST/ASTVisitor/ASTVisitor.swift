@@ -456,11 +456,9 @@ public struct ASTVisitor {
     var passContext = passContext
     var processResult = pass.process(ifStatement: ifStatement, passContext: passContext)
 
-    processResult.passContext.isInsideIfCondition = true
     processResult.element.condition =
       processResult.combining(visit(processResult.element.condition,
                                     passContext: processResult.passContext))
-    processResult.passContext.isInsideIfCondition = false
 
     let scopeContext = passContext.scopeContext
     processResult.element.body = processResult.element.body.map { statement in
