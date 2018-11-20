@@ -102,6 +102,12 @@ Contract :: (any) {
         let x: Int = call self.someReturningFunc()
 
         let y: Bool = call self.someReturningFunc() // expected-error {{Incompatible assignment between values of type 'Bool' and 'Int'}}
+
+      do {
+        call self.someFunc()   
+      } catch is Error {
+        call self.someFunc()
+      }
     } catch is Error {
 
     }
