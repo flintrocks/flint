@@ -139,16 +139,15 @@ extension TypeChecker {
                                     callerProtections: callerProtections,
                                     scopeContext: passContext.scopeContext!) {
 
-
       if let externalCall = passContext.externalCallContext {
         // check value parameter (type)
         if matchingFunction.declaration.isPayable {
           if let valueParameter: FunctionArgument = externalCall.getHyperParameter(parameterName: "value") {
             let parameterType = environment.type(of: valueParameter.expression,
-                enclosingType: enclosingType,
-                typeStates: typeStates,
-                callerProtections: callerProtections,
-                scopeContext: passContext.scopeContext!)
+                                                 enclosingType: enclosingType,
+                                                 typeStates: typeStates,
+                                                 callerProtections: callerProtections,
+                                                 scopeContext: passContext.scopeContext!)
 
             if parameterType != .userDefinedType(RawType.StdlibType.wei.rawValue) {
               diagnostics.append(.valueParameterWithWrongType(valueParameter))
