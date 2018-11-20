@@ -156,12 +156,6 @@ extension ASTPassContext {
     set { self[ExternalCallContext.self] = newValue }
   }
 
-  /// When inside an if statement condition, this property is set to `true`.
-  public var isInsideIfCondition: Bool {
-    get { return self[IsInsideIfCondition.self] ?? false }
-    set { self[IsInsideIfCondition.self] = newValue }
-  }
-
   /// When inside a do-block, this property is set to `true`.
   public var isInsideDoBlock: Bool {
     get { return self[IsInsideDoBlock.self] ?? false }
@@ -303,10 +297,6 @@ private struct IsFunctionCallContextEntry: PassContextEntry {
 }
 
 private struct IsExternalFunctionCallContextEntry: PassContextEntry {
-  typealias Value = Bool
-}
-
-private struct IsInsideIfCondition: PassContextEntry {
   typealias Value = Bool
 }
 
