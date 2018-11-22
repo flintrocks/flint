@@ -128,7 +128,7 @@ final class ASTPreprocessorTests: XCTestCase {
             lhs: namedIdentifier("b"),
             op: Token(kind: .punctuation(.plus), sourceLocation: .DUMMY),
             rhs: namedIdentifier("c"))))
-    
+
     // When
     let result = f.pass.process(binaryExpression: tree, passContext: ASTPassContext())
 
@@ -142,6 +142,10 @@ final class ASTPreprocessorTests: XCTestCase {
     ("testBinaryExpression_doesNotNeedLeftRotation_leftRotationNotApplied",
      testBinaryExpression_doesNotNeedLeftRotation_leftRotationNotApplied),
     ("testBinaryExpression_childrenNotTreelike_leftRotationNotApplied",
-     testBinaryExpression_childrenNotTreelike_leftRotationNotApplied)
+     testBinaryExpression_childrenNotTreelike_leftRotationNotApplied),
+    ("testBinaryExpression_notDotKind_leftRotationNotApplied",
+     testBinaryExpression_notDotKind_leftRotationNotApplied),
+    ("testBinaryExpression_rightChildNotDotKind_leftRotationNotApplied",
+     testBinaryExpression_rightChildNotDotKind_leftRotationNotApplied)
   ]
 }
