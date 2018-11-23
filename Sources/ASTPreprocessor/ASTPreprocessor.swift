@@ -38,4 +38,16 @@ public struct ASTPreprocessor: ASTPass {
     return ASTPassResult(element: newBinaryExpression, diagnostics: [], passContext: passContext)
   }
 
+  public func postProcess(forStatement: ForStatement, passContext: ASTPassContext) -> ASTPassResult<ForStatement> {
+    var forStatement = forStatement
+    // The current ASTVisitor assumes that we walk through the entire tree and set up a scope context that includes
+    // all VariableDeclarations, which is stored in forBodyScopeContext as part of the visit to ForStatement.
+    // Since this pass DOES NOT do this, we end up passing forward an empty ScopeContext
+    // which means that loop variables are not visible. Adding any pass at all before one that visits the
+    // VariableDeclarations requires the forBodyScopeContext to be set to nil.
+    // This is a flaw in the implementation of visit(_:passContext) for ForStatement.
+    forStatement.forBodyScopeContext = nil
+    return ASTPassResult(element: forStatement, diagnostics: [], passContext: passContext)
+  }
+
 }
