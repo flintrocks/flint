@@ -13,7 +13,8 @@ public struct EnclosingTypeAssigner: ASTPass {
 
   public init() {}
 
-  public func process(variableDeclaration: VariableDeclaration, passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
+  public func process(variableDeclaration: VariableDeclaration,
+                      passContext: ASTPassContext) -> ASTPassResult<VariableDeclaration> {
     var passContext = passContext
     if passContext.inFunctionOrInitializer {
         // We're in a function. Record the local variable declaration.
@@ -22,7 +23,8 @@ public struct EnclosingTypeAssigner: ASTPass {
     return ASTPassResult(element: variableDeclaration, diagnostics: [], passContext: passContext)
   }
 
-  public func postProcess(binaryExpression: BinaryExpression, passContext: ASTPassContext) -> ASTPassResult<BinaryExpression> {
+  public func postProcess(binaryExpression: BinaryExpression,
+                          passContext: ASTPassContext) -> ASTPassResult<BinaryExpression> {
     var binaryExpression = binaryExpression
     let environment = passContext.environment!
 
