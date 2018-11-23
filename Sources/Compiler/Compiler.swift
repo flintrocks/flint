@@ -20,6 +20,7 @@ import IRGen
 public struct Compiler {
   public static let defaultASTPasses: [ASTPass] = [
     ASTPreprocessor(),
+    EnclosingTypeAssigner(),
     SemanticAnalyzer(),
     TypeChecker(),
     Optimizer(),
