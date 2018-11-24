@@ -28,11 +28,11 @@ public struct ASTPreprocessor: ASTPass {
       return ASTPassResult(element: binaryExpression, diagnostics: [], passContext: passContext)
     }
 
-    let transformedLHS = BinaryExpression(lhs: binaryExpression.lhs, op: pivot.op, rhs: pivot.lhs)
+    let transformedLHS = BinaryExpression(lhs: binaryExpression.lhs, op: binaryExpression.op, rhs: pivot.lhs)
     let transformedRHS = pivot.rhs
 
     let newBinaryExpression = BinaryExpression(lhs: .binaryExpression(transformedLHS),
-                                               op: binaryExpression.op,
+                                               op: pivot.op,
                                                rhs: transformedRHS)
 
     return ASTPassResult(element: newBinaryExpression, diagnostics: [], passContext: passContext)
