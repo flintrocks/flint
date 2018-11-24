@@ -11,7 +11,7 @@ struct IRPropertyOffset {
   var expression: Expression
   var enclosingType: RawType
 
-  func rendered(functionContext: FunctionContext) -> String {
+  func rendered(functionContext: FunctionContext) -> GeneratedCode {
     if case .binaryExpression(let binaryExpression) = expression {
       return IRPropertyAccess(lhs: binaryExpression.lhs, rhs: binaryExpression.rhs, asLValue: true)
         .rendered(functionContext: functionContext)
@@ -28,6 +28,9 @@ struct IRPropertyOffset {
     default: fatalError()
     }
 
-    return "\(functionContext.environment.propertyOffset(for: identifier.name, enclosingType: structIdentifier)!)"
+    return GeneratedCode(
+      "",
+      "\(functionContext.environment.propertyOffset(for: identifier.name, enclosingType: structIdentifier)!)"
+    )
   }
 }
