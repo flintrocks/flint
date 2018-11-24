@@ -458,7 +458,7 @@ public class ASTDumper {
   func dump(_ typeConversionExpression: TypeConversionExpression) {
     writeNode("TypeConversionExpression") {
       self.dump(typeConversionExpression.expression)
-      self.writeLine(typeConversionExpression.kind.description)
+      self.writeLine("kind: \(typeConversionExpression.kind.description)")
       self.dump(typeConversionExpression.type)
     }
   }
