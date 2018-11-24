@@ -888,7 +888,7 @@ public struct ASTVisitor {
     processResult.passContext.externalCallContext = oldExternalCallContext
     processResult.passContext.isExternalFunctionCall = oldIsExternalCall
 
-    let postProcessResult = pass.postProcess(externalCall: externalCall,
+    let postProcessResult = pass.postProcess(externalCall: processResult.element,
                                              passContext: processResult.passContext)
 
     return ASTPassResult(element: postProcessResult.element,
