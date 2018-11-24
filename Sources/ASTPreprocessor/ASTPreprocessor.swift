@@ -50,4 +50,18 @@ public struct ASTPreprocessor: ASTPass {
     return ASTPassResult(element: forStatement, diagnostics: [], passContext: passContext)
   }
 
+  public func postProcess(ifStatement: IfStatement, passContext: ASTPassContext) -> ASTPassResult<IfStatement> {
+    var ifStatement = ifStatement
+    // The current ASTVisitor assumes that we walk through the entire tree and set up a scope context that includes
+    // all VariableDeclarations, which is stored in ifBodyScopeContext & elseBodyScopeContext as part of the visit to
+    // IfStatement.
+    // Since this pass DOES NOT do this, we end up passing forward an empty ScopeContext
+    // which means that if and else body variables are not visible. Adding any pass at all before one that visits the
+    // VariableDeclarations requires the ifBodyScopeContext & elseBodyScopeContext to be set to nil.
+    // This is a flaw in the implementation of visit(_:passContext) for IfStatement.
+    ifStatement.ifBodyScopeContext = nil
+    ifStatement.elseBodyScopeContext = nil
+    return ASTPassResult(element: ifStatement, diagnostics: [], passContext: passContext)
+  }
+
 }
