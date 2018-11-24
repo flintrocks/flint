@@ -46,13 +46,9 @@ public class Environment {
     return types[enclosingType]!.orderedProperties
   }
 
-  /// The list of property declarations in a type, in order.
+  /// The list of property declarations in a type.
   public func propertyDeclarations(in enclosingType: RawTypeIdentifier) -> [Property] {
-    guard let typeInformation = types[enclosingType] else {
-      return []
-    }
-
-    return typeInformation.orderedProperties.compactMap { typeInformation.properties[$0]?.property }
+    return types[enclosingType]?.properties.values.map { $0.property } ?? []
   }
 
   // MARK: - Accessors of type properties
