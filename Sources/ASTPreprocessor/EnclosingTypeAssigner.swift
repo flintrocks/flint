@@ -9,6 +9,8 @@ import AST
 import Diagnostic
 
 /// The Enclosing Type Assignment pass for the AST.
+/// Sets the `enclosingType` property of expressions to enable type resolution later on.
+/// This is the 'parent' type for variable access (e.g. the enclosing type of x is the type of b in the expression b.x)
 public struct EnclosingTypeAssigner: ASTPass {
 
   public init() {}

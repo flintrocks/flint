@@ -7,7 +7,7 @@
 
 import AST
 
-/// The Preprocessing pass for the AST.
+/// Performs left-rotations on binary expressions that should be left-associative
 public struct ASTPreprocessor: ASTPass {
 
   public init() {}
