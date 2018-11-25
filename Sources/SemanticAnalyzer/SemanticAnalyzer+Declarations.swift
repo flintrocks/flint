@@ -274,7 +274,7 @@ extension SemanticAnalyzer {
        } else if variableDeclaration.isVariable {
           diagnostics.append(.mutatingVariable(variableDeclaration))
        }
-     }
+    }
 
     if variableDeclaration.isPublic {
        if variableDeclaration.isConstant {
@@ -283,7 +283,7 @@ extension SemanticAnalyzer {
        if variableDeclaration.isVisible {
          diagnostics.append(.publicAndVisible(variableDeclaration))
        }
-     }
+    }
 
     // Ensure that the type is declared.
     if case .userDefinedType(let typeIdentifier) = variableDeclaration.type.rawType,

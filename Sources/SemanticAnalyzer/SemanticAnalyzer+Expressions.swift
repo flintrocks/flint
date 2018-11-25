@@ -12,19 +12,40 @@ extension SemanticAnalyzer {
 
   public func process(binaryExpression: BinaryExpression,
                       passContext: ASTPassContext) -> ASTPassResult<BinaryExpression> {
+    var binaryExpression = binaryExpression
     let environment = passContext.environment!
     var diagnostics = [Diagnostic]()
 
-    if case .dot = binaryExpression.opToken {
+    switch binaryExpression.opToken {
+    case .dot:
+      // The identifier explicitly refers to a state property, such as in `self.foo`.
+      // We set its enclosing type to the type it is declared in.
       let enclosingType = passContext.enclosingTypeIdentifier!
       let lhsType = environment.type(of: binaryExpression.lhs,
                                      enclosingType: enclosingType.name,
                                      scopeContext: passContext.scopeContext!)
       if case .identifier(let enumIdentifier) = binaryExpression.lhs,
         environment.isEnumDeclared(enumIdentifier.name) {
-      } else if lhsType == .selfType, passContext.traitDeclarationContext == nil {
-        diagnostics.append(.useOfSelfOutsideTrait(at: binaryExpression.lhs.sourceLocation))
+        binaryExpression.rhs = binaryExpression.rhs.assigningEnclosingType(type: enumIdentifier.name)
+      } else if lhsType == .selfType {
+        if let traitDeclarationContext = passContext.traitDeclarationContext {
+          binaryExpression.rhs =
+            binaryExpression.rhs.assigningEnclosingType(type: traitDeclarationContext.traitIdentifier.name)
+        } else {
+          diagnostics.append(.useOfSelfOutsideTrait(at: binaryExpression.lhs.sourceLocation))
+        }
+      } else {
+        binaryExpression.rhs = binaryExpression.rhs.assigningEnclosingType(type: lhsType.name)
       }
+    case .equal:
+      // Check if `call?` assignment
+      if case .externalCall(let externalCall) = binaryExpression.rhs,
+        externalCall.mode == .returnsGracefullyOptional {
+        diagnostics.append(.externalCallOptionalAssignmentNotImplemented(binaryExpression))
+      }
+
+    default:
+      break
     }
 
     return ASTPassResult(element: binaryExpression, diagnostics: diagnostics, passContext: passContext)
