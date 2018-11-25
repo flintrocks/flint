@@ -104,18 +104,24 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: attemptExpression, diagnostics: diagnostics, passContext: passContext)
   }
 
-  public func process(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
-    let environment = passContext.environment!
+  public func process(arrayLiteral: ArrayLiteral, passContext: ASTPassContext) -> ASTPassResult<AST.ArrayLiteral> {
+    return ASTPassResult(element: arrayLiteral, diagnostics: [], passContext: passContext)
+  }
+
+  public func process(rangeExpression: AST.RangeExpression,
+                      passContext: ASTPassContext) -> ASTPassResult<AST.RangeExpression> {
     var diagnostics = [Diagnostic]()
 
-    if environment.isInitializerCall(functionCall),
-      !passContext.inAssignment,
-      !passContext.isPropertyDefaultAssignment,
-      functionCall.arguments.isEmpty {
-      diagnostics.append(.noReceiverForStructInitializer(functionCall))
+    if case .literal(let startToken) = rangeExpression.initial,
+      case .literal(let endToken) = rangeExpression.bound {
+      if startToken.kind == endToken.kind, rangeExpression.op.kind == .punctuation(.halfOpenRange) {
+        diagnostics.append(.emptyRange(rangeExpression))
+      }
+    } else {
+      diagnostics.append(.invalidRangeDeclaration(rangeExpression.initial))
     }
 
-    return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
+    return ASTPassResult(element: rangeExpression, diagnostics: diagnostics, passContext: passContext)
   }
 
   public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
@@ -151,24 +157,18 @@ extension SemanticAnalyzer {
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
   }
 
-  public func process(arrayLiteral: ArrayLiteral, passContext: ASTPassContext) -> ASTPassResult<AST.ArrayLiteral> {
-    return ASTPassResult(element: arrayLiteral, diagnostics: [], passContext: passContext)
-  }
-
-  public func process(rangeExpression: AST.RangeExpression,
-                      passContext: ASTPassContext) -> ASTPassResult<AST.RangeExpression> {
+  public func process(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
+    let environment = passContext.environment!
     var diagnostics = [Diagnostic]()
 
-    if case .literal(let startToken) = rangeExpression.initial,
-      case .literal(let endToken) = rangeExpression.bound {
-      if startToken.kind == endToken.kind, rangeExpression.op.kind == .punctuation(.halfOpenRange) {
-        diagnostics.append(.emptyRange(rangeExpression))
-      }
-    } else {
-      diagnostics.append(.invalidRangeDeclaration(rangeExpression.initial))
+    if environment.isInitializerCall(functionCall),
+      !passContext.inAssignment,
+      !passContext.isPropertyDefaultAssignment,
+      functionCall.arguments.isEmpty {
+      diagnostics.append(.noReceiverForStructInitializer(functionCall))
     }
 
-    return ASTPassResult(element: rangeExpression, diagnostics: diagnostics, passContext: passContext)
+    return ASTPassResult(element: functionCall, diagnostics: diagnostics, passContext: passContext)
   }
 
   public func postProcess(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
