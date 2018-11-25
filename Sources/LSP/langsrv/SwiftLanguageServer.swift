@@ -32,6 +32,8 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     private var canExit: Bool = false
     private var transport: TransportType
 
+    private var lastTimeInterval: TimeInterval = 0
+
     // cached goodness... maybe abstract this.
     private var openDocuments: [DocumentUri: String] = [:]
     // Settings that are not updated until a workspaceDidChangeConfiguration request comes in.
@@ -73,7 +75,7 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
             return nil
         }
 
-        RunLoop.main.run()
+        RunLoop.current.run()
     }
 
     public func diagnose(inputFiles: [URL]) throws -> [Diagnostic] {
@@ -96,9 +98,9 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
 
         case .workspaceDidChangeConfiguration(let params):
             try doWorkspaceDidChangeConfiguration(params)
-// TODO(ethan), the cases commented are beyond our first demoable implementation, hence not supported.
-//        case .workspaceDidChangeWatchedFiles(let params):
-//            return try doWatchedFilesChanged(params)
+
+        case .textDocumentDidSave(let params):
+          return try doDocumentDidSave(params)
 
         case .textDocumentDidOpen(let params):
             return try doDocumentDidOpen(params)
@@ -135,18 +137,32 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     private func doDocumentDidOpen(_ params: DidOpenTextDocumentParams) throws -> LanguageServerResponse {
         log("command: documentDidOpen - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
         return doCompile(inputFile: params.textDocument.uri)
-
     }
 
-    private func doDocumentDidChange(_ params: DidChangeTextDocumentParams) throws -> LanguageServerResponse {
+    private func doDocumentDidChange(_ params: DidChangeTextDocumentParams) throws -> LanguageServerResponse? {
         log("command: documentDidChange - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
-        return doCompile(inputFile: params.textDocument.uri)
+
+        // Saving the date of the change in shared state
+        let date = Date().timeIntervalSince1970
+        lastTimeInterval = date
+
+        // Waiting for other changes to the document to occur, we are in async context here
+        sleep(2)
+
+        // Checking if other changes have occured in the meantime
+        if lastTimeInterval == date {
+            let originalFile = params.textDocument.uri
+            let sourceCode = params.contentChanges[0].text
+            return doCompile(originalFile: originalFile, sourceCode: sourceCode)
+        }
+
+        return nil
     }
 
-//    private func doWatchedFilesChanged(_ params: DidChangeWatchedFilesParams) throws -> LanguageServerResponse {
-//        log("command: watchedFilesChanged - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
-//        return doCompile(inputFile: params.changes.)
-//    }
+    private func doDocumentDidSave(_ params: DidSaveTextDocumentParams) throws -> LanguageServerResponse {
+      log("command: documentDidSave - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
+      return doCompile(inputFile: params.textDocument.uri)
+    }
 
     private func doInitialize(_ requestId: RequestId, _ params: InitializeParams) throws -> LanguageServerResponse {
         var capabilities = ServerCapabilities()
@@ -187,21 +203,44 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         // TODO(owensd): handle targets...
     }
 
-    private func doCompile(inputFile: DocumentUri) -> LanguageServerResponse {
+    private func doCompile(originalFile: DocumentUri, temporaryFile: String) -> LanguageServerResponse {
         var flintDiagnostics: [FlintDiagnostic]!
         do {
-            let config = DiagnoserConfiguration(inputFiles: [URL(string: inputFile)!])
+            let config = DiagnoserConfiguration(inputFiles: [URL(string: temporaryFile)!])
             flintDiagnostics = try Compiler.diagnose(config: config)
         } catch let err {
             flintDiagnostics = [Diagnostic(severity: .error,
-                                        sourceLocation: nil,
-                                        message: err.localizedDescription)]
+                                           sourceLocation: nil,
+                                           message: err.localizedDescription)]
         }
 
         let lspDiagnostic = flintDiagnostics.compactMap(translateDiagnostic)
-        let params = PublishDiagnosticsParams(uri: inputFile, diagnostics: lspDiagnostic)
+        let params = PublishDiagnosticsParams(uri: originalFile, diagnostics: lspDiagnostic)
 
         return .textDocumentPublishDiagnostics(params: params)
+    }
+
+    private func doCompile(originalFile: DocumentUri, sourceCode: String) -> LanguageServerResponse {
+        let url = URL(fileURLWithPath: originalFile)
+        let filename = url.lastPathComponent + "-" + UUID().uuidString
+
+        let tempDirectoryTemplate = (NSTemporaryDirectory() as NSString).appendingPathComponent(filename)
+        let fileManager = FileManager.default
+        fileManager.createFile(atPath: tempDirectoryTemplate, contents: sourceCode.data(using: .utf8), attributes: nil)
+
+        let response = doCompile(originalFile: originalFile, temporaryFile: "file://" + tempDirectoryTemplate)
+
+        do {
+            try fileManager.removeItem(atPath: tempDirectoryTemplate)
+        } catch {
+            log("could not remove temporary file", category: languageServerLogCategory)
+        }
+
+        return response
+    }
+
+    private func doCompile(inputFile: DocumentUri) -> LanguageServerResponse {
+        return doCompile(originalFile: inputFile, temporaryFile: inputFile)
     }
 
     func kind(_ value: String?) -> CompletionItemKind {
