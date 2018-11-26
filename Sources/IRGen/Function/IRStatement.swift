@@ -283,7 +283,8 @@ struct IREmitStatement {
   var emitStatement: EmitStatement
 
   func rendered(functionContext: FunctionContext) -> String {
-    return IRFunctionCall(functionCall: emitStatement.functionCall).rendered(functionContext: functionContext).rendered()
+    return IRFunctionCall(functionCall: emitStatement.functionCall)
+      .rendered(functionContext: functionContext).rendered()
   }
 }
 
