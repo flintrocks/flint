@@ -112,6 +112,8 @@ extension SemanticAnalyzer {
       "gas": false
     ]
     var diagnostics = [Diagnostic]()
+    let environment = passContext.environment!
+    let enclosingType = passContext.enclosingTypeIdentifier!.name
 
     // ensure only one instance of value and gas hyper-parameters
     for parameter in externalCall.hyperParameters {
@@ -130,9 +132,21 @@ extension SemanticAnalyzer {
       }
     }
 
-    // Ensure `call` is only used inside do-catch block
-    if externalCall.mode == .normal && passContext.doBlockNestingCount <= 0 {
-      diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
+    switch externalCall.mode {
+    case .normal:
+      // Ensure `call` is only used inside do-catch block
+      if passContext.doBlockNestingCount <= 0 {
+        diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
+      }
+    case .returnsGracefullyOptional:
+      // Ensure 'call?' is only called with a returning function
+      if environment.type(of: externalCall.functionCall.rhs,
+                          enclosingType: enclosingType,
+                          scopeContext: passContext.scopeContext!) == .basicType(.void) {
+        diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall: externalCall))
+      }
+    default:
+      break
     }
 
     return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)

@@ -482,21 +482,6 @@ extension Diagnostic {
                       message: "Cannot declare variable '\(identName)' both public and visible")
   }
 
-  static func invalidExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: identifier.sourceLocation,
-                      message: "'\(identifier.name)' is not a valid external call hyper-parameter")
-  }
-
-  static func duplicateExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: identifier.sourceLocation,
-                      message: "'\(identifier.name)' hyper-parameter was already specified")
-  }
-
-  static func unlabeledExternalCallHyperParameter(_ externalCall: ExternalCall) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "External call hyper-parameter was not labeled")
-  }
-
   static func renderGroup(_ protections: [CallerProtection]) -> String {
     return "\(protections.map({ $0.name }).joined(separator: ", "))"
   }
@@ -515,6 +500,26 @@ extension Diagnostic {
   static func externalCallOptionalAssignmentNotImplemented(_ variableDeclarationExpr: BinaryExpression) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: variableDeclarationExpr.sourceLocation,
                       message: "Assignment to the optional result of 'call?' is not yet implemented")
+  }
+
+  static func optionalExternalCallWithoutReturnType(externalCall: ExternalCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+                      message: "Cannot use 'call?' with external function that has no return type")
+  }
+
+  static func invalidExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: identifier.sourceLocation,
+                      message: "'\(identifier.name)' is not a valid external call hyper-parameter")
+  }
+
+  static func duplicateExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: identifier.sourceLocation,
+                      message: "'\(identifier.name)' hyper-parameter was already specified")
+  }
+
+  static func unlabeledExternalCallHyperParameter(_ externalCall: ExternalCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+                      message: "External call hyper-parameter was not labeled")
   }
 
 }
