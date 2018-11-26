@@ -100,7 +100,7 @@ struct IRFunctionSelector {
 struct IRTypeStateChecks {
   var typeStates: [TypeState]
 
-  func rendered(enclosingType: RawTypeIdentifier, environment: Environment) -> GeneratedCode {
+  func rendered(enclosingType: RawTypeIdentifier, environment: Environment) -> ExpressionFragment {
     var preamble = [String]()
     let checks = typeStates.compactMap { typeState -> String? in
       guard !typeState.isAny else { return nil }
@@ -132,8 +132,8 @@ struct IRTypeStateChecks {
     }
 
     if !checks.isEmpty {
-      return GeneratedCode(
-        preamble.joined(separator: "\n"),
+      return ExpressionFragment(
+        pre: preamble.joined(separator: "\n"),
         """
       let _flintStateCheck := 0
       \(checks.joined(separator: "\n"))
@@ -141,6 +141,6 @@ struct IRTypeStateChecks {
       """ + "\n")
     }
 
-    return GeneratedCode("", "")
+    return ExpressionFragment(pre: "", "")
   }
 }

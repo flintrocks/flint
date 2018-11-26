@@ -12,7 +12,7 @@ struct IRPropertyAccess {
   var rhs: Expression
   var asLValue: Bool
 
-  func rendered(functionContext: FunctionContext) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     let environment = functionContext.environment
     let scopeContext = functionContext.scopeContext
     let enclosingTypeName = functionContext.enclosingTypeName
@@ -35,7 +35,7 @@ struct IRPropertyAccess {
     switch lhsType {
     case .fixedSizeArrayType(_, let size):
       if case .identifier(let identifier) = rhs, identifier.name == "size" {
-        return GeneratedCode("", "\(size)")
+        return ExpressionFragment(pre: "", "\(size)")
       } else {
         fatalError()
       }
@@ -98,16 +98,18 @@ struct IRPropertyAccess {
     }
 
     if asLValue {
-      return GeneratedCode(rhsPreamble + preamble, offset)
+      return ExpressionFragment(pre: rhsPreamble + preamble, offset)
     }
 
     if isInStructFunction, !isMemoryAccess {
       let lhsEnclosingIdentifier = lhs.enclosingIdentifier?.name.mangled ?? "flintSelf".mangled
-      return GeneratedCode(rhsPreamble + preamble,
-                           IRRuntimeFunction
-                            .load(address: offset, inMemory: Mangler.isMem(for: lhsEnclosingIdentifier)))
+      return ExpressionFragment(pre: rhsPreamble + preamble,
+                                IRRuntimeFunction.load(
+                                  address: offset,
+                                  inMemory: Mangler.isMem(for: lhsEnclosingIdentifier)))
     }
 
-    return GeneratedCode(rhsPreamble + preamble, IRRuntimeFunction.load(address: offset, inMemory: isMemoryAccess))
+    return ExpressionFragment(pre: rhsPreamble + preamble,
+                              IRRuntimeFunction.load(address: offset, inMemory: isMemoryAccess))
   }
 }

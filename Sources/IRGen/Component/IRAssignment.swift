@@ -11,7 +11,7 @@ struct IRAssignment {
   var lhs: Expression
   var rhs: Expression
 
-  func rendered(functionContext: FunctionContext, asTypeProperty: Bool = false) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext, asTypeProperty: Bool = false) -> ExpressionFragment {
     let rhsIr = IRExpression(expression: rhs).rendered(functionContext: functionContext)
     let rhsCode = rhsIr.expression
 
@@ -20,11 +20,11 @@ struct IRAssignment {
       let mangledName = Mangler.mangleName(variableDeclaration.identifier.name)
       // Shadowed variables shouldn't be redeclared
       if mangledName == rhsCode {
-        return GeneratedCode(rhsIr.preamble, "")
+        return ExpressionFragment(pre: rhsIr.preamble, "")
       }
-      return GeneratedCode(rhsIr.preamble, "let \(mangledName) := \(rhsCode)")
+      return ExpressionFragment(pre: rhsIr.preamble, "let \(mangledName) := \(rhsCode)")
     case .identifier(let identifier) where identifier.enclosingType == nil:
-      return GeneratedCode(rhsIr.preamble, "\(identifier.name.mangled) := \(rhsCode)")
+      return ExpressionFragment(pre: rhsIr.preamble, "\(identifier.name.mangled) := \(rhsCode)")
     default:
       // LHS refers to a property in storage or memory.
 
@@ -39,19 +39,19 @@ struct IRAssignment {
         } else {
           enclosingName = "flintSelf"
         }
-        return GeneratedCode(
-          rhsIr.preamble + "\n" + lhsCode.preamble,
+        return ExpressionFragment(
+          pre: "\(rhsIr.preamble)\n\(lhsCode.preamble)",
           IRRuntimeFunction.store(address: lhsCode.expression,
                                   value: rhsCode,
                                   inMemory: Mangler.isMem(for: enclosingName).mangled))
 
       } else if let enclosingIdentifier = lhs.enclosingIdentifier,
         functionContext.scopeContext.containsVariableDeclaration(for: enclosingIdentifier.name) {
-        return GeneratedCode(rhsIr.preamble + "\n" + lhsCode.preamble,
-                             IRRuntimeFunction.store(address: lhsCode.expression, value: rhsCode, inMemory: true))
+        return ExpressionFragment(pre: "\(rhsIr.preamble)\n\(lhsCode.preamble)",
+          IRRuntimeFunction.store(address: lhsCode.expression, value: rhsCode, inMemory: true))
       } else {
-        return GeneratedCode(rhsIr.preamble + "\n" + lhsCode.preamble,
-                             IRRuntimeFunction.store(address: lhsCode.expression, value: rhsCode, inMemory: false))
+        return ExpressionFragment(pre: "\(rhsIr.preamble)\n\(lhsCode.preamble)",
+          IRRuntimeFunction.store(address: lhsCode.expression, value: rhsCode, inMemory: false))
       }
     }
   }

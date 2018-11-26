@@ -10,7 +10,7 @@ import AST
 struct IRAttemptExpression {
   var attemptExpression: AttemptExpression
 
-  func rendered(functionContext: FunctionContext) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     let functionCall = attemptExpression.functionCall
     let functionName = functionCall.mangledIdentifier ?? functionCall.identifier.name
 
@@ -28,6 +28,6 @@ struct IRAttemptExpression {
       return (preamble + "\n" + e.preamble, code + "\n" + e.expression)
     })
 
-    return GeneratedCode(preamble, "\(callName)(\(args))")
+    return ExpressionFragment(pre: preamble, "\(callName)(\(args))")
   }
 }

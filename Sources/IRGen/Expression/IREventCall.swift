@@ -11,7 +11,7 @@ struct IREventCall {
   var eventCall: FunctionCall
   var eventDeclaration: EventDeclaration
 
-  func rendered(functionContext: FunctionContext) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     let types = eventDeclaration.variableDeclarations.map { $0.type }
 
     var preambles = [String]()
@@ -33,8 +33,8 @@ struct IREventCall {
     let eventHash = "\(eventCall.identifier.name)(\(typeList))".sha3(.keccak256)
     let log = "log1(0, \(totalSize), 0x\(eventHash))"
 
-    return GeneratedCode(
-      preambles.joined(separator: "\n"),
+    return ExpressionFragment(
+      pre: preambles.joined(separator: "\n"),
       """
       \(stores.joined(separator: "\n"))
       \(log)

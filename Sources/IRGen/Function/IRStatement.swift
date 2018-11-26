@@ -39,7 +39,7 @@ struct IRIfStatement {
   func rendered(functionContext: FunctionContext) -> String {
     let condition0 = IRExpression(expression: ifStatement.condition).rendered(functionContext: functionContext)
 
-    var functionContext = functionContext
+    let functionContext = functionContext
     functionContext.scopeContext = ifStatement.ifBodyScopeContext!
 
     let body = ifStatement.body.map { statement in
@@ -82,7 +82,7 @@ struct IRForStatement {
   var forStatement: ForStatement
 
   func rendered(functionContext: FunctionContext) -> String {
-    var functionContext = functionContext
+    let functionContext = functionContext
     functionContext.scopeContext = forStatement.forBodyScopeContext!
 
     let setup: String

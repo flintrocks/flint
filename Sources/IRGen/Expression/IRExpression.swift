@@ -8,11 +8,11 @@
 import AST
 import Lexer
 
-struct GeneratedCode {
-  var preamble: String
-  var expression: String
+struct ExpressionFragment {
+  let preamble: String
+  let expression: String
 
-  init(_ preamble: String, _ expression: String) {
+  init(pre preamble: String, _ expression: String) {
     self.preamble = preamble
     self.expression = expression
   }
@@ -32,7 +32,7 @@ struct IRExpression {
     self.asLValue = asLValue
   }
 
-  func rendered(functionContext: FunctionContext) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     let preamble = ""
 
     switch expression {
@@ -54,23 +54,23 @@ struct IRExpression {
     case .externalCall:
       fatalError()
     case .identifier(let identifier):
-      return GeneratedCode(preamble, IRIdentifier(identifier: identifier, asLValue: asLValue)
+      return ExpressionFragment(pre: preamble, IRIdentifier(identifier: identifier, asLValue: asLValue)
         .rendered(functionContext: functionContext))
     case .variableDeclaration(let variableDeclaration):
-      return GeneratedCode(preamble, IRVariableDeclaration(variableDeclaration: variableDeclaration)
+      return ExpressionFragment(pre: preamble, IRVariableDeclaration(variableDeclaration: variableDeclaration)
         .rendered(functionContext: functionContext))
     case .literal(let literal):
-      return GeneratedCode(preamble, IRLiteralToken(literalToken: literal).rendered())
+      return ExpressionFragment(pre: preamble, IRLiteralToken(literalToken: literal).rendered())
     case .arrayLiteral(let arrayLiteral):
       for e in arrayLiteral.elements {
         guard case .arrayLiteral(_) = e else {
           fatalError("Cannot render non-empty array literals yet")
         }
       }
-      return GeneratedCode(preamble, "0")
+      return ExpressionFragment(pre: preamble, "0")
     case .dictionaryLiteral(let dictionaryLiteral):
       guard dictionaryLiteral.elements.count == 0 else { fatalError("Cannot render non-empty dictionary literals yet") }
-      return GeneratedCode(preamble, "0")
+      return ExpressionFragment(pre: preamble, "0")
     case .self(let `self`):
       return IRSelf(selfToken: self, asLValue: asLValue)
         .rendered(functionContext: functionContext)
@@ -84,9 +84,9 @@ struct IRExpression {
         let e = IRExpression(expression: $1, asLValue: asLValue).rendered(functionContext: functionContext)
         return (pre + "\n" + e.preamble, code + "\n" + e.expression)
       })
-      return GeneratedCode(p, c)
+      return ExpressionFragment(pre: p, c)
     case .rawAssembly(let assembly, _):
-      return GeneratedCode(preamble, assembly)
+      return ExpressionFragment(pre: preamble, assembly)
     case .range: fatalError("Range shouldn't be rendered directly")
     }
 

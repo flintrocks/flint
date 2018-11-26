@@ -16,7 +16,7 @@ struct IRBinaryExpression {
     self.asLValue = asLValue
   }
 
-  func rendered(functionContext: FunctionContext) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     if case .dot = binaryExpression.opToken {
       if case .functionCall(let functionCall) = binaryExpression.rhs {
         return IRFunctionCall(functionCall: functionCall).rendered(functionContext: functionContext)
@@ -33,8 +33,8 @@ struct IRBinaryExpression {
     var preamble = lhs.preamble + "\n" + rhs.preamble
     let lhsExp = lhs.expression
     let rhsExp = rhs.expression
-    var code = ""
 
+    let code: String
     switch binaryExpression.opToken {
     case .equal:
       let assign = IRAssignment(lhs: binaryExpression.lhs, rhs: binaryExpression.rhs)
@@ -59,6 +59,6 @@ struct IRBinaryExpression {
     default: fatalError("opToken not supported")
     }
 
-    return GeneratedCode(preamble, code)
+    return ExpressionFragment(pre: preamble, code)
   }
 }

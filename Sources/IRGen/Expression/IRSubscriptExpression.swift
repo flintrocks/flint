@@ -57,7 +57,7 @@ struct IRSubscriptExpression {
     }
   }
 
-  func rendered(functionContext: FunctionContext) -> GeneratedCode {
+  func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     guard let identifier = baseIdentifier(.subscriptExpression(subscriptExpression)),
       let enclosingType = identifier.enclosingType,
       let baseOffset = functionContext.environment.propertyOffset(for: identifier.name,
@@ -70,9 +70,9 @@ struct IRSubscriptExpression {
                                                   functionContext: functionContext)
 
     if asLValue {
-      return GeneratedCode(preamble, memLocation)
+      return ExpressionFragment(pre: preamble, memLocation)
     } else {
-      return GeneratedCode(preamble, "sload(\(memLocation))")
+      return ExpressionFragment(pre: preamble, "sload(\(memLocation))")
     }
   }
 }
