@@ -15,7 +15,7 @@ struct IRStatement {
   func rendered(functionContext: FunctionContext) -> String {
     switch statement {
     case .expression(let expression):
-      return IRExpression(expression: expression, asLValue: false).rendered(functionContext: functionContext).render()
+      return IRExpression(expression: expression, asLValue: false).rendered(functionContext: functionContext).rendered()
     case .ifStatement(let ifStatement):
       return IRIfStatement(ifStatement: ifStatement).rendered(functionContext: functionContext)
     case .returnStatement(let returnStatement):
@@ -161,7 +161,7 @@ struct IRForStatement {
 
     let variableUse = IRAssignment(lhs: .identifier(forStatement.variable.identifier),
                                    rhs: .rawAssembly(toAssign, resultType: nil))
-      .rendered(functionContext: functionContext, asTypeProperty: false).render()
+      .rendered(functionContext: functionContext, asTypeProperty: false).rendered()
 
     return """
     {
@@ -208,7 +208,7 @@ struct IRForStatement {
                        rhs: .literal(Token(kind: .literal(.decimal(.integer(1))),
                                            sourceLocation: forStatement.sourceLocation))))
     let update = IRAssignment(lhs: .identifier(forStatement.variable.identifier), rhs: change)
-      .rendered(functionContext: functionContext, asTypeProperty: false).render()
+      .rendered(functionContext: functionContext, asTypeProperty: false).rendered()
 
     // Change <= into (< || ==)
     if [.lessThanOrEqual, .greaterThanOrEqual].contains(condition.opToken) {
@@ -274,7 +274,7 @@ struct IRBecomeStatement {
                        op: Token(kind: .punctuation(.equal), sourceLocation: sl),
                        rhs: becomeStatement.expression))
 
-    return IRExpression(expression: assignState).rendered(functionContext: functionContext).render()
+    return IRExpression(expression: assignState).rendered(functionContext: functionContext).rendered()
   }
 }
 
@@ -283,7 +283,7 @@ struct IREmitStatement {
   var emitStatement: EmitStatement
 
   func rendered(functionContext: FunctionContext) -> String {
-    return IRFunctionCall(functionCall: emitStatement.functionCall).rendered(functionContext: functionContext).render()
+    return IRFunctionCall(functionCall: emitStatement.functionCall).rendered(functionContext: functionContext).rendered()
   }
 }
 

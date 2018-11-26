@@ -17,8 +17,8 @@ struct ExpressionFragment {
     self.expression = expression
   }
 
-  func render() -> String {
-    return preamble + "\n" + expression
+  func rendered() -> String {
+    return "\(preamble)\n\(expression)"
   }
 }
 
