@@ -12,6 +12,7 @@ public struct FunctionDeclaration: ASTNode {
   public var signature: FunctionSignatureDeclaration
   public var body: [Statement]
   public var closeBraceToken: Token
+  public var isExternal: Bool
 
   public var mangledIdentifier: String?
   public var externalSignatureHash: [UInt8]?
@@ -22,11 +23,13 @@ public struct FunctionDeclaration: ASTNode {
   public init(signature: FunctionSignatureDeclaration,
               body: [Statement],
               closeBraceToken: Token,
-              scopeContext: ScopeContext? = nil) {
+              scopeContext: ScopeContext? = nil,
+              isExternal: Bool = false) {
     self.signature = signature
     self.body = body
     self.closeBraceToken = closeBraceToken
     self.scopeContext = scopeContext
+    self.isExternal = isExternal
   }
 
   public var isMutating: Bool {

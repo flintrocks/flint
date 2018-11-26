@@ -51,7 +51,7 @@ struct IRExternalCall {
 
     for (parameterType, parameter) in zip(matchingFunction.parameterTypes, functionCall.arguments) {
       switch parameterType {
-      case .basicType:
+      case .basicType, .solidityType:
         inputSize += 32
         fixedSlots.append(IRExpression(expression: parameter.expression, asLValue: false).rendered(functionContext: functionContext))
       default:
