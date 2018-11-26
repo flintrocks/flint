@@ -91,8 +91,9 @@ struct IRFunctionSelector {
       }
     }
 
-    return typeStateChecks.preamble + "\n" + callerProtectionChecks + "\n" +
-      "\(typeStateChecks.expression)\n\(callerProtectionChecks)\n\(valueChecks)\(call)"
+    // swiftlint:disable line_length
+    return "\(typeStateChecks.preamble)\n\(typeStateChecks.expression)\n\(callerProtectionChecks)\n\(valueChecks)\(call)"
+    // swiftlint:enable line_length
   }
 }
 
