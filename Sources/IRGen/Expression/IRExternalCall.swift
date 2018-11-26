@@ -68,10 +68,11 @@ struct IRExternalCall {
 
     // render input stack storage
     var currentPosition = 4
-    let fixedSlotsRendered = fixedSlots.map { (slot: String) -> String in
+    let fixedSlotsPreambles = fixedSlots.map { $0.preamble }
+    let fixedSlotsExpressions = fixedSlots.map { (slot: ExpressionFragment) -> String in
       let storedPosition = currentPosition
       currentPosition += 32
-      return "mstore(flint$callInput + \(storedPosition), \(slot))"
+      return "mstore(flint$callInput + \(storedPosition), \(slot.expression))"
     }
 
     // The output is simply memory suitable for the declared return type.
@@ -82,12 +83,13 @@ struct IRExternalCall {
         \(gasExpression.preamble)
         \(valueExpression.preamble)
         \(addressExpression.preamble)
+        \(fixedSlotsPreambles.joined(separator: "\n"))
         let flint$callInput := flint$allocateMemory(\(inputSize))
         mstore8(flint$callInput, 0x\([functionSelector[0]].toHexString()))
         mstore8(flint$callInput + 1, 0x\([functionSelector[1]].toHexString()))
         mstore8(flint$callInput + 2, 0x\([functionSelector[2]].toHexString()))
         mstore8(flint$callInput + 3, 0x\([functionSelector[3]].toHexString()))
-        \(fixedSlotsRendered.joined(separator: "\n"))
+        \(fixedSlotsExpressions.joined(separator: "\n"))
         let flint$callOutput := flint$allocateMemory(\(outputSize))
         let flint$callSuccess := call(
             \(gasExpression.expression),
