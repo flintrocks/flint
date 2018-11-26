@@ -51,8 +51,8 @@ struct IRExpression {
       return IRAttemptExpression(attemptExpression: attemptExpression).rendered(functionContext: functionContext)
     case .functionCall(let functionCall):
       return IRFunctionCall(functionCall: functionCall).rendered(functionContext: functionContext)
-    case .externalCall:
-      fatalError()
+    case .externalCall(let externalCall):
+      return IRExternalCall(externalCall: externalCall).rendered(functionContext: functionContext)
     case .identifier(let identifier):
       return ExpressionFragment(pre: preamble, IRIdentifier(identifier: identifier, asLValue: asLValue)
         .rendered(functionContext: functionContext))

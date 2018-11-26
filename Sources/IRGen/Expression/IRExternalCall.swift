@@ -8,11 +8,7 @@ import AST
 
 /// Generates code for an external call.
 struct IRExternalCall {
-  var externalCall: ExternalCall
-
-  init(_ externalCall: ExternalCall) {
-    self.externalCall = externalCall
-  }
+  let externalCall: ExternalCall
 
   func rendered(functionContext: FunctionContext) -> ExpressionFragment {
     // hyper-parameter defaults
@@ -39,7 +35,7 @@ struct IRExternalCall {
     // - fixed-size data
     // - dynamic-size data
     var fixedSlots: [ExpressionFragment] = []
-    var dynamicSlots: [ExpressionFragment] = []
+//    var dynamicSlots: [ExpressionFragment] = []
     var inputSize = 4
     guard case .functionCall(let functionCall) = externalCall.functionCall.rhs else {
       fatalError("cannot match external call with function")
