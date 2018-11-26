@@ -46,13 +46,9 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     /// Runs the language server. This waits for input via `source`, parses it, and then triggers
     /// the appropriately registered handler.
     public func run(source: InputOutputBuffer) {
-        log("Starting the language server.", category: languageServerLogCategory)
         source.run { message in
-            log("message received:\n%{public}@", category: languageServerLogCategory, message.description)
             do {
                 let command = try self.transport.translate(message: message)
-                log("message translated to command: %{public}@",
-                    category: languageServerLogCategory, String(describing: command))
 
                 guard let response = try self.process(command: command) else { return nil }
                 return try self.transport.translate(response: response)
@@ -64,11 +60,11 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
                 do {
                     return try self.transport.translate(response: response)
                 } catch {
-                    log("unable to convert error message: %{public}@",
+                    log("Error: unable to convert error message: %{public}@",
                         category: languageServerLogCategory, String(describing: error))
                 }
             } catch {
-                log("unable to convert message into a command: %{public}@",
+                log("Error: unable to convert message into a command: %{public}@",
                     category: languageServerLogCategory, String(describing: error))
             }
 
@@ -96,8 +92,8 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         case .exit:
             doExit()
 
-        case .workspaceDidChangeConfiguration(let params):
-            try doWorkspaceDidChangeConfiguration(params)
+//      case .workspaceDidChangeConfiguration(let params):
+//          try doWorkspaceDidChangeConfiguration(params)
 
         case .textDocumentDidSave(let params):
           return try doDocumentDidSave(params)
@@ -135,13 +131,10 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     }
 
     private func doDocumentDidOpen(_ params: DidOpenTextDocumentParams) throws -> LanguageServerResponse {
-        log("command: documentDidOpen - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
         return doCompile(inputFile: params.textDocument.uri)
     }
 
     private func doDocumentDidChange(_ params: DidChangeTextDocumentParams) throws -> LanguageServerResponse? {
-        log("command: documentDidChange - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
-
         // Saving the date of the change in shared state
         let date = Date().timeIntervalSince1970
         lastTimeInterval = date
@@ -160,7 +153,6 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
     }
 
     private func doDocumentDidSave(_ params: DidSaveTextDocumentParams) throws -> LanguageServerResponse {
-      log("command: documentDidSave - %{public}@", category: languageServerLogCategory, params.textDocument.uri)
       return doCompile(inputFile: params.textDocument.uri)
     }
 
@@ -194,15 +186,6 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
       return .windowShowMessage(params: params)
     }
 
-    private func doWorkspaceDidChangeConfiguration(_ params: DidChangeConfigurationParams) throws {
-        log("onWorkspaceDidChangeConfig", category: languageServerLogCategory)
-    }
-
-    private func configureWorkspace(settings: JSValue?) throws {
-        log("configureWorkspace", category: languageServerLogCategory)
-        // TODO(owensd): handle targets...
-    }
-
     private func doCompile(originalFile: DocumentUri, temporaryFile: String) -> LanguageServerResponse {
         var flintDiagnostics: [FlintDiagnostic]!
         do {
@@ -224,16 +207,16 @@ public final class SwiftLanguageServer<TransportType: MessageProtocol> {
         let url = URL(fileURLWithPath: originalFile)
         let filename = url.lastPathComponent + "-" + UUID().uuidString
 
-        let tempDirectoryTemplate = (NSTemporaryDirectory() as NSString).appendingPathComponent(filename)
+        let tempSourceFile = (NSTemporaryDirectory() as NSString).appendingPathComponent(filename)
         let fileManager = FileManager.default
-        fileManager.createFile(atPath: tempDirectoryTemplate, contents: sourceCode.data(using: .utf8), attributes: nil)
+        fileManager.createFile(atPath: tempSourceFile, contents: sourceCode.data(using: .utf8), attributes: nil)
 
-        let response = doCompile(originalFile: originalFile, temporaryFile: "file://" + tempDirectoryTemplate)
+        let response = doCompile(originalFile: originalFile, temporaryFile: "file://" + tempSourceFile)
 
         do {
-            try fileManager.removeItem(atPath: tempDirectoryTemplate)
+            try fileManager.removeItem(atPath: tempSourceFile)
         } catch {
-            log("could not remove temporary file", category: languageServerLogCategory)
+            log("Error: could not remove temporary file", category: languageServerLogCategory)
         }
 
         return response
