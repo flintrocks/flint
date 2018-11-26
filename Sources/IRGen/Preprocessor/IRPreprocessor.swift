@@ -124,6 +124,16 @@ public struct IRPreprocessor: ASTPass {
     }
 
     functionDeclaration.scopeContext?.parameters = functionDeclaration.signature.parameters
+
+    if let traitDeclarationContext = passContext.traitDeclarationContext,
+      traitDeclarationContext.traitKind.kind == .external {
+      let args = functionDeclaration.signature.parameters.map { $0.type.rawType.name }.joined(separator: ",")
+
+      let name = functionDeclaration.identifier.name
+      functionDeclaration.externalSignatureHash =
+        String("\(name)(\(args))".bytes.sha3(.keccak256).toHexString().prefix(8))
+    }
+
     return ASTPassResult(element: functionDeclaration, diagnostics: [], passContext: passContext)
   }
 
