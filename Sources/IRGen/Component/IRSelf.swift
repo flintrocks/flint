@@ -15,6 +15,6 @@ struct IRSelf {
       fatalError("Unexpected token \(selfToken.kind)")
     }
 
-    return ExpressionFragment(pre: "", functionContext.isInStructFunction ? "_flintSelf" : asLValue ? "0" : "")
+    return ExpressionFragment(pre: "", functionContext.isInStructFunction ? "_flintSelf" : (asLValue ? "0" : ""))
   }
 }
