@@ -34,10 +34,6 @@ struct IRExternalCall {
     // Render the address of the external contract.
     let addressExpression = IRExpression(expression: externalCall.functionCall.lhs, asLValue: false).rendered(functionContext: functionContext)
 
-    // Calculate the function selector.
-    let abiSignature = "baz(uint32,bool)"
-    let functionSelector = abiSignature.bytes.sha3(.keccak256)
-
     // The input stack consists of three parts:
     // - function selector (4 bytes of Keccak-256 hash of the signature)
     // - fixed-size data
@@ -56,6 +52,7 @@ struct IRExternalCall {
                                                     scopeContext: functionContext.scopeContext) else {
       fatalError("cannot match function signature in external call")
     }
+
     for (parameterType, parameter) in zip(matchingFunction.parameterTypes, functionCall.arguments) {
       switch parameterType {
       case .basicType:
@@ -77,6 +74,9 @@ struct IRExternalCall {
 
     // The output is simply memory suitable for the declared return type.
     let outputSize = 32
+    guard let functionSelector = (matchingFunction.declaration.externalSignatureHash?.map { [$0].toHexString() }) else {
+      fatalError("cannot find function selector for function")
+    }
 
     return ExpressionFragment(
         pre: """
@@ -85,10 +85,10 @@ struct IRExternalCall {
         \(addressExpression.preamble)
         \(fixedSlotsPreambles.joined(separator: "\n"))
         let flint$callInput := flint$allocateMemory(\(inputSize))
-        mstore8(flint$callInput, 0x\([functionSelector[0]].toHexString()))
-        mstore8(flint$callInput + 1, 0x\([functionSelector[1]].toHexString()))
-        mstore8(flint$callInput + 2, 0x\([functionSelector[2]].toHexString()))
-        mstore8(flint$callInput + 3, 0x\([functionSelector[3]].toHexString()))
+        mstore8(flint$callInput, 0x\(functionSelector[0]))
+        mstore8(flint$callInput + 1, 0x\(functionSelector[1]))
+        mstore8(flint$callInput + 2, 0x\(functionSelector[2]))
+        mstore8(flint$callInput + 3, 0x\(functionSelector[3]))
         \(fixedSlotsExpressions.joined(separator: "\n"))
         let flint$callOutput := flint$allocateMemory(\(outputSize))
         let flint$callSuccess := call(

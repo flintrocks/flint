@@ -14,7 +14,7 @@ public struct FunctionDeclaration: ASTNode {
   public var closeBraceToken: Token
 
   public var mangledIdentifier: String?
-  public var externalSignatureHash: String?
+  public var externalSignatureHash: [UInt8]?
 
   // Contextual information for the scope defined by the function.
   public var scopeContext: ScopeContext?
