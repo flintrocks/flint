@@ -15,7 +15,8 @@ extension SemanticAnalyzer {
     let environment = passContext.environment!
     var diagnostics = [Diagnostic]()
 
-    if case .dot = binaryExpression.opToken {
+    switch binaryExpression.opToken {
+    case .dot:
       let enclosingType = passContext.enclosingTypeIdentifier!
       let lhsType = environment.type(of: binaryExpression.lhs,
                                      enclosingType: enclosingType.name,
@@ -25,6 +26,14 @@ extension SemanticAnalyzer {
       } else if lhsType == .selfType, passContext.traitDeclarationContext == nil {
         diagnostics.append(.useOfSelfOutsideTrait(at: binaryExpression.lhs.sourceLocation))
       }
+    case .equal:
+      // Check if `call?` assignment
+      if case .externalCall(let externalCall) = binaryExpression.rhs,
+        externalCall.mode == .returnsGracefullyOptional {
+        diagnostics.append(.externalCallOptionalAssignmentNotImplemented(binaryExpression))
+      }
+    default:
+      break
     }
 
     return ASTPassResult(element: binaryExpression, diagnostics: diagnostics, passContext: passContext)
@@ -147,16 +156,6 @@ extension SemanticAnalyzer {
     }
 
     return ASTPassResult(element: rangeExpression, diagnostics: diagnostics, passContext: passContext)
-  }
-
-  public func process(externalCall: ExternalCall, passContext: ASTPassContext) -> ASTPassResult<ExternalCall> {
-    var diagnostics = [Diagnostic]()
-
-    if externalCall.mode == .normal && !passContext.isInsideDo {
-      diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
-    }
-
-    return ASTPassResult(element: externalCall, diagnostics: diagnostics, passContext: passContext)
   }
 
   public func postProcess(functionCall: FunctionCall, passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
