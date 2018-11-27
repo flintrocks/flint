@@ -65,7 +65,7 @@ struct IRExternalCall {
     let fixedSlotsExpressions = fixedSlots.map { (slot: ExpressionFragment) -> String in
       let storedPosition = currentPosition
       currentPosition += 32
-      return "mstore(flint$callInput + \(storedPosition), \(slot.expression))"
+      return "mstore(add(flint$callInput, \(storedPosition)), \(slot.expression))"
     }
 
     // The output is simply memory suitable for the declared return type.
@@ -82,20 +82,21 @@ struct IRExternalCall {
         \(fixedSlotsPreambles.joined(separator: "\n"))
         let flint$callInput := flint$allocateMemory(\(inputSize))
         mstore8(flint$callInput, 0x\(functionSelector[0]))
-        mstore8(flint$callInput + 1, 0x\(functionSelector[1]))
-        mstore8(flint$callInput + 2, 0x\(functionSelector[2]))
-        mstore8(flint$callInput + 3, 0x\(functionSelector[3]))
+        mstore8(add(flint$callInput, 1), 0x\(functionSelector[1]))
+        mstore8(add(flint$callInput, 2), 0x\(functionSelector[2]))
+        mstore8(add(flint$callInput, 3), 0x\(functionSelector[3]))
         \(fixedSlotsExpressions.joined(separator: "\n"))
         let flint$callOutput := flint$allocateMemory(\(outputSize))
         let flint$callSuccess := call(
             \(gasExpression.expression),
             \(addressExpression.expression),
             \(valueExpression.expression),
-            \(inputSize),
             flint$callInput,
-            \(outputSize),
-            flint$callOutput
+            \(inputSize),
+            flint$callOutput,
+            \(outputSize)
           )
+        flint$callOutput := mload(flint$callOutput)
         """,
         "flint$callOutput"
       )

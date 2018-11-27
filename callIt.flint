@@ -1,15 +1,20 @@
 external trait Test {
-  func echo(message: string) -> string
+  func echo(message: int256) -> int256
 }
 
-contract Caller {  }
+contract Caller {
+  event DankTest(message: Int)
+}
 
 Caller :: (any) {
   public init() {}
 
-  public func callThem(message: String) -> String {
-    let test: Test = Test(address: 0x692a70d2e424a56d2c6c27aa97d1a86395877b3a)
-    let theMessage: String = (call! test.echo(message: "Hello World" as! string)) as! String
+  public func callThem() -> Int {
+    let test: Test = Test(address: 0x5c3c1540dfcd795b0aca58a496e3c30fe2405b07)
+    let theMessage: Int = (call! test.echo(message: 69 as! int256)) as! Int
+
+    emit DankTest(message: theMessage)
+
     return theMessage
   }
 }
