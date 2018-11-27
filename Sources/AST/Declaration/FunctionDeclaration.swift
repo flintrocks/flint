@@ -6,6 +6,7 @@
 //
 import Source
 import Lexer
+import CryptoSwift
 
 /// The declaration of a function.
 public struct FunctionDeclaration: ASTNode {
@@ -30,6 +31,13 @@ public struct FunctionDeclaration: ASTNode {
     self.closeBraceToken = closeBraceToken
     self.scopeContext = scopeContext
     self.isExternal = isExternal
+
+    if isExternal {
+      let args = signature.parameters.map { $0.type.rawType.name }.joined(separator: ",")
+
+      let name = signature.identifier.name
+      self.externalSignatureHash = Array("\(name)(\(args))".bytes.sha3(.keccak256).prefix(4))
+    }
   }
 
   public var isMutating: Bool {
