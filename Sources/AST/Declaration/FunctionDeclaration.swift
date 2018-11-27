@@ -6,7 +6,7 @@
 //
 import Source
 import Lexer
-import CryptoSwift
+import ABI
 
 /// The declaration of a function.
 public struct FunctionDeclaration: ASTNode {
@@ -36,7 +36,7 @@ public struct FunctionDeclaration: ASTNode {
       let args = signature.parameters.map { $0.type.rawType.name }.joined(separator: ",")
 
       let name = signature.identifier.name
-      self.externalSignatureHash = Array("\(name)(\(args))".bytes.sha3(.keccak256).prefix(4))
+      self.externalSignatureHash = ABI.soliditySelectorRaw(of: "\(name)(\(args))")
     }
   }
 
