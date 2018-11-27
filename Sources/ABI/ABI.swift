@@ -17,5 +17,3 @@ public func soliditySelectorRaw(of signature: String) -> [UInt8] {
 public func soliditySelectorHex(of signature: String) -> String {
   return "0x\(signature.bytes.sha3(.keccak256).toHexString().prefix(8))"
 }
-
-// encode / decode input / output memory regions
