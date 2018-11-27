@@ -1,58 +1,19 @@
 contract XCall {
-  var a: Int
-  var b: Address
-  var s: String
-  var s1: String = "foo"
-  var t: T = T(0, false)
+  var contractToCall: Address
+}
+
+external trait ExternalContract {
+  func emitCheck(value: uint8) -> uint8 
 }
 
 XCall :: caller <- (any) {
-  public init(a: Int, s: String) {
-    self.a = a
-    self.b = caller
-    self.s = s
+  public init(contractToCall: Address) {
+    self.contractToCall = contractToCall
   }
 
-  public func getA() -> Int {
-    return a
-  }
-
-  public func getB() -> Address {
-    return b
-  }
-
-  public func getS() -> String {
-    return s
-  }
-
-  public func getS1() -> String {
-    return s1
-  }
-
-  public mutating func setT(x: Int, y: Bool) {
-    t = T(x, y)
-  }
-
-  public func getTx() -> Int {
-    return t.x
-  }
-
-  public func getTy() -> Bool {
-    return t.y
-  }
-
-  public func getTs() -> String {
-    return t.s
-  }
+  public func callExternal() {
+    let externalContract: ExternalContract = ExternalContract(addresss: contractToCall) 
+    let ret: Int = (call! externalContract.emitCheck(value: 0 as! uint8)) as! Int
+  } 
 }
 
-struct T {
-  var x: Int
-  var y: Bool
-  let s: String = "test"
-  
-  public init(x: Int, y: Bool) {
-    self.x = x
-    self.y = y
-  }
-}
