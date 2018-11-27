@@ -19,6 +19,9 @@ public struct DoCatchStatement: ASTNode {
     self.error = error
   }
 
+  // Does the do-body contain a call on this level of nesting, may be overwritten while visiting the doBody statement
+  public var containsExternalCall = false
+
   // MARK: - ASTNode
   public var sourceLocation: SourceLocation {
     return SourceLocation.spanning(doBody[0], to: catchBody[catchBody.count-1])
