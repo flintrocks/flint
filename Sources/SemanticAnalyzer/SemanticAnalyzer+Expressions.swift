@@ -143,7 +143,12 @@ extension SemanticAnalyzer {
       if environment.type(of: externalCall.functionCall.rhs,
                           enclosingType: enclosingType,
                           scopeContext: passContext.scopeContext!) == .basicType(.void) {
-        diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall: externalCall))
+        diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall))
+      }
+    case .isForced:
+      // Ensure 'call!' is never used inside a do-catch block
+      if passContext.doBlockNestingCount > 0 {
+        diagnostics.append(.forcedExternalCallInsideDoCatch(externalCall))
       }
     default:
       break
