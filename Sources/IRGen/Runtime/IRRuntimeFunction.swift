@@ -38,7 +38,7 @@ enum IRRuntimeFunction {
     case mul
     case div
     case power
-    case checkRange
+    case lessThan
 
     var mangled: String {
       return "\(Environment.runtimeFunctionPrefix)\(self)"
@@ -166,7 +166,7 @@ enum IRRuntimeFunction {
   }
 
   static func lessThan(value: String, max: String) -> String {
-    return "\(Identifiers.checkRange.mangled)(\(value), \(max))"
+    return "\(Identifiers.lessThan.mangled)(\(value), \(max))"
   }
 
   static let allDeclarations: [String] = [
