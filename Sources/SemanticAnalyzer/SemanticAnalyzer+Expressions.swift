@@ -135,7 +135,7 @@ extension SemanticAnalyzer {
     switch externalCall.mode {
     case .normal:
       // Ensure `call` is only used inside do-catch block
-      if passContext.doBlockNestingCount <= 0 {
+      if passContext.doCatchStatementStack.count <= 0 {
         diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
       }
     case .returnsGracefullyOptional:
@@ -147,7 +147,7 @@ extension SemanticAnalyzer {
       }
     case .isForced:
       // Ensure 'call!' is never used inside a do-catch block
-      if passContext.doBlockNestingCount > 0 {
+      if passContext.doCatchStatementStack.count > 0 {
         diagnostics.append(.forcedExternalCallInsideDoCatch(externalCall))
       }
     default:

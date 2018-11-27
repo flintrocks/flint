@@ -518,12 +518,18 @@ public struct ASTVisitor {
     var passContext = passContext
     var processResult = pass.process(doCatchStatement: doCatchStatement, passContext: passContext)
 
-    processResult.passContext.doBlockNestingCount += 1
+    processResult.passContext = processResult.passContext.withUpdates {
+      $0.doCatchStatementStack.append(doCatchStatement)
+    }
+
     let scopeContext = passContext.scopeContext
     processResult.element.doBody = processResult.element.doBody.map { statement in
       return processResult.combining(visit(statement, passContext: processResult.passContext))
     }
-    processResult.passContext.doBlockNestingCount -= 1
+
+    processResult.passContext = processResult.passContext.withUpdates {
+      _ = $0.doCatchStatementStack.popLast()
+    }
 
     processResult.passContext.scopeContext = scopeContext
     processResult.element.catchBody = processResult.element.catchBody.map { statement in

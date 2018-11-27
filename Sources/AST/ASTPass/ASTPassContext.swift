@@ -156,10 +156,10 @@ extension ASTPassContext {
     set { self[ExternalCallContext.self] = newValue }
   }
 
-  /// When inside a do-block, this property is set to `true`.
-  public var doBlockNestingCount: Int {
-    get { return self[DoBlockNestingCount.self] ?? 0 }
-    set { self[DoBlockNestingCount.self] = newValue }
+  /// Stack of do-catch statements
+  public var doCatchStatementStack: [DoCatchStatement] {
+    get { return self[DoCatchStatementStack.self] ?? [DoCatchStatement]() }
+    set { self[DoCatchStatementStack.self] = newValue }
   }
 
   /// When visiting argument labels in a function call, this property is set to `true`.
@@ -300,8 +300,8 @@ private struct IsExternalFunctionCallContextEntry: PassContextEntry {
   typealias Value = Bool
 }
 
-private struct DoBlockNestingCount: PassContextEntry {
-  typealias Value = Int
+private struct DoCatchStatementStack: PassContextEntry {
+  typealias Value = [DoCatchStatement]
 }
 
 private struct IsAssignment: PassContextEntry {
