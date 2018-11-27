@@ -6,39 +6,23 @@ var Contract = artifacts.require("./" + config.contractName + ".sol");
 var Interface = artifacts.require("./_Interface" + config.contractName + ".sol");
 Contract.abi = Interface.abi
 
+var ExternalContract = artifacts.require("./Emitter.sol");
+
 contract(config.contractName, function(accounts) {
-  it("should correctly set initializer arguments for contracts", async function() {
-    const instance = await Contract.deployed();
-    let t;
+  it("should correctly call external contract", async function() {
+    const externalContract = await ExternalContract.deployed();
 
-    t = await instance.getA();
-    assert.equal(t.valueOf(), 4);
-    
-    t = await instance.getB();
-    assert.equal(t.valueOf(), accounts[0]);
-
-    t = await instance.getS();
-    assert.equal(web3.toUtf8(t.valueOf()), "hello");
-
-    t = await instance.getS1();
-    assert.equal(web3.toUtf8(t.valueOf()), "foo");
-  });
-
-  it("should correctly set initializer arguments for structs", async function() {
-    const instance = await Contract.deployed();
-    let t;
-
-    await instance.setT(10, 1);
-
-    t = await instance.getTx();
-    assert.equal(t.valueOf(), 10);
-    
-    t = await instance.getTy();
-    assert.equal(t.valueOf(), 1);
-
-    t = await instance.getTs();
-    assert.equal(web3.toUtf8(t.valueOf()), "test");
+    await Contract.deployed().then(function (instance) {
+      meta = instance;
+      return meta.callExternal(externalContract.address);
+    }).then(function (result) {
+      assert.equal(result.logs.length, 1); 
+        
+      var log = result.logs[0];
+      assert.equal(log.event, "EmitCheck");
+      assert.equal(_.size(log.args), 1); 
+      assert.equal(log.args.a.c[0], 0); 
+    });
   });
 });
-
 
