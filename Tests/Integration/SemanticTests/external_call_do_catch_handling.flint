@@ -80,6 +80,18 @@ Contract :: (any) {
     } 
 
     do {
+      if let x: Int = call self.someReturningFunc() { // expected-error {{'if let' construct may only be used with 'call?'}}
+
+      }
+    } catch is Error {
+
+    }
+
+    if let y: Int = call! self.someReturningFunc() { // expected-error {{'if let' construct may only be used with 'call?'}}
+
+    }
+
+    do {
       call self.someReturningFunc() // expected-error {{Return value of external call cannot be ignored.}}
     } catch is Error {
 

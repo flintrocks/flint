@@ -511,6 +511,11 @@ extension Diagnostic {
                       message: "Only inside 'if let ... = call?' may 'call?' be used")
   }
 
+  static func ifLetConstructWithoutOptionalExternalCall(_ binaryExpression: BinaryExpression) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: binaryExpression.sourceLocation,
+                      message: "'if let' construct may only be used with 'call?'")
+  }
+
   static func externalCallReturnValueIgnored(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
                       message: "Return value of external call cannot be ignored.")
