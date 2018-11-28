@@ -595,7 +595,6 @@ public struct ASTVisitor {
       // Create an empty scope context.
       processResult.passContext.scopeContext = ScopeContext()
       processResult.passContext.isPropertyDefaultAssignment = true
-      // Check if this is an 'if let' construct
       processResult.element.assignedExpression = processResult.combining(visit(assignedExpression,
                                                                                passContext: processResult.passContext))
       processResult.passContext.isPropertyDefaultAssignment = false
