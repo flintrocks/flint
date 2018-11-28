@@ -11,9 +11,11 @@ XCall :: caller <- (any) {
 
   }
 
-  public func callExternal(contractToCall: Address) {
+  public func callExternal(contractToCall: Address) -> Int{
     let externalContract: ExternalContract = ExternalContract(address: contractToCall) 
     let ret: Int = (call! externalContract.emitCheck(value: 0 as! uint8)) as! Int
+
+    return ret
   } 
 }
 

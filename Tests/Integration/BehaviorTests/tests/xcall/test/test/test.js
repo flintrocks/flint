@@ -12,17 +12,11 @@ contract(config.contractName, function(accounts) {
   it("should correctly call external contract", async function() {
     const externalContract = await ExternalContract.deployed();
 
-    await Contract.deployed().then(function (instance) {
-      meta = instance;
-      return meta.callExternal(externalContract.address);
-    }).then(function (result) {
-      assert.equal(result.logs.length, 1); 
-        
-      var log = result.logs[0];
-      assert.equal(log.event, "EmitCheck");
-      assert.equal(_.size(log.args), 1); 
-      assert.equal(log.args.a.c[0], 0); 
-    });
+    const instance = await Contract.deployed();
+
+
+    let t = await instance.callExternal(externalContract.address);
+    assert.equal(t.valueOf(), 7);
   });
 });
 
