@@ -94,7 +94,7 @@ Contract :: (any) {
 
     call? self.someFunc() // expected-error {{Only inside 'if let ... = call?' may 'call?' be used}}
 
-    if let x: Int = call? self.someReturningFunc() { // expected-error {{Assignment to the optional result of 'call?' is not yet implemented}}
+    if let x: Int = call? self.someReturningFunc() { 
 
     }
   }

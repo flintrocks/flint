@@ -26,12 +26,6 @@ extension SemanticAnalyzer {
       } else if lhsType == .selfType, passContext.traitDeclarationContext == nil {
         diagnostics.append(.useOfSelfOutsideTrait(at: binaryExpression.lhs.sourceLocation))
       }
-    case .equal:
-      // Check if `call?` assignment
-      if case .externalCall(let externalCall) = binaryExpression.rhs,
-        externalCall.mode == .returnsGracefullyOptional {
-        diagnostics.append(.externalCallOptionalAssignmentNotImplemented(binaryExpression))
-      }
     default:
       break
     }

@@ -496,12 +496,6 @@ extension Diagnostic {
                       message: "Cannot use 'call' outside do-catch block")
   }
 
-  // As there are currently no optional types, we cannot assign to an optional return type.
-  static func externalCallOptionalAssignmentNotImplemented(_ variableDeclarationExpr: BinaryExpression) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: variableDeclarationExpr.sourceLocation,
-                      message: "Assignment to the optional result of 'call?' is not yet implemented")
-  }
-
   static func forcedExternalCallInsideDoCatch(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
                       message: "Cannot use 'call!' inside do-catch block")
