@@ -15,5 +15,5 @@ public func soliditySelectorRaw(of signature: String) -> [UInt8] {
 /// Returns the hex-digest of 4 bytes of the Keccak-256 hash of the given
 /// signature, in the format "0x12345678".
 public func soliditySelectorHex(of signature: String) -> String {
-  return "0x\(signature.bytes.sha3(.keccak256).toHexString().prefix(8))"
+  return "0x\(soliditySelectorRaw(of: signature).toHexString())"
 }
