@@ -7,7 +7,6 @@ final class ABITests: XCTestCase {
   }
 
   static var allTests = [
-    ("testDummy",
-     testDummy),
+    ("testDummy", testDummy)
   ]
 }

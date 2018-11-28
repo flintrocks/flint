@@ -19,21 +19,24 @@ struct IRExternalCall {
     for parameter in externalCall.hyperParameters {
       switch parameter.identifier!.name {
       case "gas":
-        gasExpression = IRExpression(expression: parameter.expression, asLValue: false).rendered(functionContext: functionContext)
+        gasExpression = IRExpression(expression: parameter.expression, asLValue: false)
+          .rendered(functionContext: functionContext)
       case "value":
-        valueExpression = IRExpression(expression: parameter.expression, asLValue: false).rendered(functionContext: functionContext)
+        valueExpression = IRExpression(expression: parameter.expression, asLValue: false)
+          .rendered(functionContext: functionContext)
       default:
         break
       }
     }
-    
+
     // Match on the function call so we know the argument types.
     guard case .functionCall(let functionCall) = externalCall.functionCall.rhs else {
       fatalError("cannot match external call with function")
     }
     guard case .matchedFunction(let matchingFunction) =
       functionContext.environment.matchFunctionCall(functionCall,
-                                                    enclosingType: functionCall.identifier.enclosingType ?? functionContext.enclosingTypeName,
+                                                    enclosingType: functionCall.identifier.enclosingType ??
+                                                      functionContext.enclosingTypeName,
                                                     typeStates: [],
                                                     callerProtections: [],
                                                     scopeContext: functionContext.scopeContext) else {
@@ -44,7 +47,8 @@ struct IRExternalCall {
     }
 
     // Render the address of the external contract.
-    let addressExpression = IRExpression(expression: externalCall.functionCall.lhs, asLValue: false).rendered(functionContext: functionContext)
+    let addressExpression = IRExpression(expression: externalCall.functionCall.lhs, asLValue: false)
+      .rendered(functionContext: functionContext)
 
     // The input stack consists of three parts:
     // - function selector (4 bytes of Keccak-256 hash of the signature)
@@ -75,10 +79,12 @@ struct IRExternalCall {
         staticSlots.append(ExpressionFragment(pre: "", "\(staticSize + dynamicSize)"))
         // TODO: figure out the actual length of the string at runtime
         dynamicSlots.append(ExpressionFragment(pre: "", "32"))
-        dynamicSlots.append(IRExpression(expression: parameter.expression, asLValue: false).rendered(functionContext: functionContext))
+        dynamicSlots.append(IRExpression(expression: parameter.expression, asLValue: false)
+          .rendered(functionContext: functionContext))
         dynamicSize += 32
       case .basicType, .solidityType:
-        staticSlots.append(IRExpression(expression: parameter.expression, asLValue: false).rendered(functionContext: functionContext))
+        staticSlots.append(IRExpression(expression: parameter.expression, asLValue: false)
+          .rendered(functionContext: functionContext))
       default:
         fatalError("cannot use non-basic type in external call")
       }
@@ -123,16 +129,5 @@ struct IRExternalCall {
         """,
         "flint$callOutput"
       )
-    
-    /*
-    // TODO
-    
-    // enter external call state
-    let previousState = self.flintState$
-    self.flintState$ = "$externalCall"
-
-    // restore state
-    self.flintState$ = previousState
-    */
   }
 }
