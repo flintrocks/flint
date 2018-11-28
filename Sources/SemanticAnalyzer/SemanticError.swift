@@ -509,7 +509,12 @@ extension Diagnostic {
 
   static func forcedExternalCallInsideDoCatch(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "Cannot use `call!` inside do-catch block.")
+                      message: "Cannot use 'call!' inside do-catch block.")
+  }
+
+  static func doCatchStatementContainsNoExternalCall(_ doCatchStatement: DoCatchStatement) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: doCatchStatement.sourceLocation,
+                      message: "No 'call' found in do-catch block.")
   }
 
   static func invalidExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {

@@ -138,7 +138,11 @@ extension SemanticAnalyzer {
       // Ensure `call` is only used inside the do-body of do-catch statement
       if passContext.doCatchStatementStack.last != nil {
         // Update containsExternallCall value of doCatchStatement
-        passContext.doCatchStatementStack[passContext.doCatchStatementStack.count - 1].containsExternalCall = true
+        var doCatchStatementStack = passContext.doCatchStatementStack
+        doCatchStatementStack[doCatchStatementStack.count - 1].containsExternalCall = true
+        passContext = passContext.withUpdates {
+          $0.doCatchStatementStack = doCatchStatementStack
+        }
       } else {
         diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
       }

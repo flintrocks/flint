@@ -14,20 +14,52 @@ Contract :: (any) {
   }
 
   public init() {
-    do {
-      call! self.someFunc() // expected-error {{Cannot use `call!` inside do-catch block.}}     
+    do { // expected-error {{No 'call' found in do-catch block.}}
+      do {
+        call self.someFunc()
+      } catch is Error {
+
+      }
+    } catch is Error {
+
+    } 
+
+    do { 
+      call self.someFunc()
+      do { // expected-error {{No 'call' found in do-catch block.}}
+
+      } catch is Error {
+
+      } 
     } catch is Error {
 
     }
 
     do {
+      call self.someFunc()
+      do {
+        call self.someFunc()
+      } catch is Error {
+
+      } 
+    } catch is Error {
+
+    }
+
+    do { // expected-error {{No 'call' found in do-catch block.}}
+      call! self.someFunc() // expected-error {{Cannot use 'call!' inside do-catch block.}}     
+    } catch is Error {
+
+    } 
+
+    do { // expected-error {{No 'call' found in do-catch block.}}
 
     } catch is Error {
 
-    } // expected-error {{No `call` found in do-catch block.}}
+    } 
 
     do {
-      let x: Int = call? self.someReturningFunc()
+      let x: Int = call? self.someReturningFunc() // expected-error {{Assignment to the optional result of 'call?' is not yet implemented}}
       call self.someFunc()
     } catch is Error {
 

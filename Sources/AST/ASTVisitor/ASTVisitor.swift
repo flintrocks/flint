@@ -527,6 +527,9 @@ public struct ASTVisitor {
       return processResult.combining(visit(statement, passContext: processResult.passContext))
     }
 
+    processResult.element.containsExternalCall =
+      processResult.passContext.doCatchStatementStack.last!.containsExternalCall
+
     processResult.passContext = processResult.passContext.withUpdates {
       _ = $0.doCatchStatementStack.popLast()
     }

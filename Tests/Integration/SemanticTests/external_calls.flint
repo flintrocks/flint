@@ -78,7 +78,7 @@ Contract :: (any) {
       do {
         call self.someFunc()   
       } catch is Error {
-        call self.someFunc()
+
       }
     } catch is Error {
 
