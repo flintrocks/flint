@@ -517,6 +517,11 @@ extension Diagnostic {
                       message: "Only inside 'if let ... = call?' may 'call?' be used")
   }
 
+  static func externalCallReturnValueIgnored(_ externalCall: ExternalCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+                      message: "Return value of external call cannot be ignored.")
+  }
+
   static func invalidExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: identifier.sourceLocation,
                       message: "'\(identifier.name)' is not a valid external call hyper-parameter")

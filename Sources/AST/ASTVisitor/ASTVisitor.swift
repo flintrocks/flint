@@ -1087,8 +1087,10 @@ public struct ASTVisitor {
     }
     processResult.passContext.isFunctionCallArgumentLabel = false
 
+    processResult.passContext.isFunctionCallArgument = true
     processResult.element.expression = processResult.combining(visit(processResult.element.expression,
                                                                      passContext: processResult.passContext))
+    processResult.passContext.isFunctionCallArgument = false
 
     let postProcessResult = pass.postProcess(functionArgument: processResult.element,
                                              passContext: processResult.passContext)

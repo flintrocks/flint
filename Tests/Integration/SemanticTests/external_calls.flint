@@ -64,14 +64,14 @@ Contract :: (any) {
     // RETURN/TYPE CHECKS
     call self.someFunc() // expected-error {{Cannot use 'call' outside do-catch block}}
 
-    call self.someReturningFunc() // expected-error {{Cannot use 'call' outside do-catch block}}
+    let i1: Int = call self.someReturningFunc() // expected-error {{Cannot use 'call' outside do-catch block}}
 
     do {
         call self.someFunc()
 
-        call self.someReturningFunc()
+        let i2: Int = call self.someReturningFunc()
 
-        let x: Int = call self.someReturningFunc()
+        let i3: Int = call self.someReturningFunc()
 
         let y: Bool = call self.someReturningFunc() // expected-error {{Incompatible assignment between values of type 'Bool' and 'Int'}}
 
@@ -86,7 +86,7 @@ Contract :: (any) {
 
     call! self.someFunc()
 
-    call! self.someReturningFunc()
+    let i4: Int = call! self.someReturningFunc()
 
     let x2: Int = call! self.someReturningFunc()
 

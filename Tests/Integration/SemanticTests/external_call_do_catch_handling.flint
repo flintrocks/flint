@@ -13,6 +13,10 @@ Contract :: (any) {
     return 42
   }
 
+  func someFuncWithParam(param: Int) {
+
+  }
+
   public init() {
     do { // expected-error {{No 'call' found in do-catch block}}
       do {
@@ -74,6 +78,23 @@ Contract :: (any) {
     if let x: Int = call? self.someReturningFunc() { // expected-error {{Assignment to the optional result of 'call?' is not yet implemented}}
 
     } 
+
+    do {
+      call self.someReturningFunc() // expected-error {{Return value of external call cannot be ignored.}}
+    } catch is Error {
+
+    }
+
+    do {
+      let x: Int = call self.someReturningFunc()
+      self.someFuncWithParam(param: call self.someReturningFunc())
+    } catch is Error {
+
+    }
+
+    call! self.someReturningFunc() // expected-error {{Return value of external call cannot be ignored.}} 
+    self.someFuncWithParam(param: call! self.someReturningFunc())
     
+    let x: Int = call! self.someReturningFunc() 
   }
 }

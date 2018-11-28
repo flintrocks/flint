@@ -180,6 +180,12 @@ extension ASTPassContext {
     set { self[IsFunctionCallArgumentLabel.self] = newValue }
   }
 
+  /// When visiting arguments in a function call, this property is set to `true`.
+  public var isFunctionCallArgument: Bool {
+    get { return self[IsFunctionCallArgument.self] ?? false }
+    set { self[IsFunctionCallArgument.self] = newValue }
+  }
+
   /// When visiting an external configuration parameter, this property is set to `true`.
   /// External configuration params are hyper-parameters to the call, like the gas, the
   /// wei used for the external call or reentrancy.
@@ -333,6 +339,10 @@ private struct IsPropertyDefaultAssignment: PassContextEntry {
 }
 
 private struct IsFunctionCallArgumentLabel: PassContextEntry {
+  typealias Value = Bool
+}
+
+private struct IsFunctionCallArgument: PassContextEntry {
   typealias Value = Bool
 }
 
