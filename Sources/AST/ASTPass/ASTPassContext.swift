@@ -162,6 +162,18 @@ extension ASTPassContext {
     set { self[DoCatchStatementStack.self] = newValue }
   }
 
+  /// When inside the condition of an if statement, this property is set to `true`
+  public var isInsideIfCondition: Bool {
+    get { return self[IsInsideIfCondition.self] ?? false }
+    set { self[IsInsideIfCondition.self] = newValue }
+  }
+
+  /// When inside an 'if let ...' construct, this property is set to `true`
+  public var isIfLetConstruct: Bool {
+    get { return self[IsIfLetConstruct.self] ?? false }
+    set { self[IsIfLetConstruct.self] = newValue }
+  }
+
   /// When visiting argument labels in a function call, this property is set to `true`.
   public var isFunctionCallArgumentLabel: Bool {
     get { return self[IsFunctionCallArgumentLabel.self] ?? false }
@@ -302,6 +314,14 @@ private struct IsExternalFunctionCallContextEntry: PassContextEntry {
 
 private struct DoCatchStatementStack: PassContextEntry {
   typealias Value = [DoCatchStatement]
+}
+
+private struct IsInsideIfCondition: PassContextEntry {
+  typealias Value = Bool
+}
+
+private struct IsIfLetConstruct: PassContextEntry {
+  typealias Value = Bool
 }
 
 private struct IsAssignment: PassContextEntry {

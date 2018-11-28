@@ -456,9 +456,13 @@ public struct ASTVisitor {
     var passContext = passContext
     var processResult = pass.process(ifStatement: ifStatement, passContext: passContext)
 
+    processResult.passContext.isInsideIfCondition = true
+
     processResult.element.condition =
       processResult.combining(visit(processResult.element.condition,
                                     passContext: processResult.passContext))
+
+    processResult.passContext.isInsideIfCondition = false
 
     let scopeContext = passContext.scopeContext
     processResult.element.body = processResult.element.body.map { statement in
@@ -591,6 +595,7 @@ public struct ASTVisitor {
       // Create an empty scope context.
       processResult.passContext.scopeContext = ScopeContext()
       processResult.passContext.isPropertyDefaultAssignment = true
+      // Check if this is an 'if let' construct
       processResult.element.assignedExpression = processResult.combining(visit(assignedExpression,
                                                                                passContext: processResult.passContext))
       processResult.passContext.isPropertyDefaultAssignment = false
@@ -819,8 +824,12 @@ public struct ASTVisitor {
       if case .punctuation(let punctuation) = binaryExpression.op.kind, punctuation.isAssignment {
         processResult.passContext.inAssignment = true
       }
+      if case .variableDeclaration(let variableDeclaration) = binaryExpression.lhs, variableDeclaration.isConstant {
+        processResult.passContext.isIfLetConstruct = processResult.passContext.isInsideIfCondition
+      }
       processResult.element.rhs = processResult.combining(visit(processResult.element.rhs,
                                                                 passContext: processResult.passContext))
+      processResult.passContext.isIfLetConstruct = false
       processResult.passContext.inAssignment = false // Allowed as nested assignments do not exist.
     }
 

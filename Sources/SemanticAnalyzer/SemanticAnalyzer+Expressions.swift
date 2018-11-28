@@ -112,8 +112,6 @@ extension SemanticAnalyzer {
       "gas": false
     ]
     var diagnostics = [Diagnostic]()
-    let environment = passContext.environment!
-    let enclosingType = passContext.enclosingTypeIdentifier!.name
     var passContext = passContext
 
     // ensure only one instance of value and gas hyper-parameters
@@ -147,11 +145,9 @@ extension SemanticAnalyzer {
         diagnostics.append(.normalExternalCallOutsideDoCatch(externalCall))
       }
     case .returnsGracefullyOptional:
-      // Ensure 'call?' is only called with a returning function
-      if environment.type(of: externalCall.functionCall.rhs,
-                          enclosingType: enclosingType,
-                          scopeContext: passContext.scopeContext!) == .basicType(.void) {
-        diagnostics.append(.optionalExternalCallWithoutReturnType(externalCall))
+      // Ensure 'call?' is only used in an 'if let ... = call? ...' construct
+      if !passContext.isIfLetConstruct {
+        diagnostics.append(.optionalExternalCallOutsideIfLet(externalCall))
       }
     case .isForced:
       // Ensure 'call!' is never used inside a do-catch block

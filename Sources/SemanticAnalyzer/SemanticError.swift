@@ -502,19 +502,19 @@ extension Diagnostic {
                       message: "Assignment to the optional result of 'call?' is not yet implemented")
   }
 
-  static func optionalExternalCallWithoutReturnType(_ externalCall: ExternalCall) -> Diagnostic {
-    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "Cannot use 'call?' with external function that has no return type")
-  }
-
   static func forcedExternalCallInsideDoCatch(_ externalCall: ExternalCall) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
-                      message: "Cannot use 'call!' inside do-catch block.")
+                      message: "Cannot use 'call!' inside do-catch block")
   }
 
   static func doCatchStatementContainsNoExternalCall(_ doCatchStatement: DoCatchStatement) -> Diagnostic {
     return Diagnostic(severity: .error, sourceLocation: doCatchStatement.sourceLocation,
-                      message: "No 'call' found in do-catch block.")
+                      message: "No 'call' found in do-catch block")
+  }
+
+  static func optionalExternalCallOutsideIfLet(_ externalCall: ExternalCall) -> Diagnostic {
+    return Diagnostic(severity: .error, sourceLocation: externalCall.sourceLocation,
+                      message: "Only inside 'if let ... = call?' may 'call?' be used")
   }
 
   static func invalidExternalCallHyperParameter(_ identifier: Identifier) -> Diagnostic {

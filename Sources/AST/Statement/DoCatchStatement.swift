@@ -23,12 +23,11 @@ public struct DoCatchStatement: ASTNode {
     self.endToken = endToken
   }
 
-  // Does the do-body contain a call on this level of nesting, may be overwritten while visiting the doBody statement
+  // Does the do-body contain a call on this level of nesting, may be set while visiting a statement in doBody
   public var containsExternalCall = false
 
   // MARK: - ASTNode
   public var sourceLocation: SourceLocation {
-    // Out of bounds error
     return SourceLocation.spanning(startToken, to: endToken)
   }
 

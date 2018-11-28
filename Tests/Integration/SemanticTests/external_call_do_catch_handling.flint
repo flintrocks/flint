@@ -14,7 +14,7 @@ Contract :: (any) {
   }
 
   public init() {
-    do { // expected-error {{No 'call' found in do-catch block.}}
+    do { // expected-error {{No 'call' found in do-catch block}}
       do {
         call self.someFunc()
       } catch is Error {
@@ -26,7 +26,7 @@ Contract :: (any) {
 
     do { 
       call self.someFunc()
-      do { // expected-error {{No 'call' found in do-catch block.}}
+      do { // expected-error {{No 'call' found in do-catch block}}
 
       } catch is Error {
 
@@ -46,23 +46,34 @@ Contract :: (any) {
 
     }
 
-    do { // expected-error {{No 'call' found in do-catch block.}}
-      call! self.someFunc() // expected-error {{Cannot use 'call!' inside do-catch block.}}     
+    do { // expected-error {{No 'call' found in do-catch block}}
+      call! self.someFunc() // expected-error {{Cannot use 'call!' inside do-catch block}}     
     } catch is Error {
 
     } 
 
-    do { // expected-error {{No 'call' found in do-catch block.}}
+    do { // expected-error {{No 'call' found in do-catch block}}
 
     } catch is Error {
 
     } 
 
     do {
-      let x: Int = call? self.someReturningFunc() // expected-error {{Assignment to the optional result of 'call?' is not yet implemented}}
+      if let x: Int = call? self.someReturningFunc() { // expected-error {{Assignment to the optional result of 'call?' is not yet implemented}}
+
+      } else {
+
+      }
       call self.someFunc()
     } catch is Error {
 
     }
+
+    call? self.someReturningFunc() // expected-error {{Only inside 'if let ... = call?' may 'call?' be used}}
+
+    if let x: Int = call? self.someReturningFunc() { // expected-error {{Assignment to the optional result of 'call?' is not yet implemented}}
+
+    } 
+    
   }
 }
