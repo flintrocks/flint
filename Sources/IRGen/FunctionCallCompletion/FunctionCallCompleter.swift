@@ -18,7 +18,7 @@ public struct FunctionCallCompleter: ASTPass {
                       passContext: ASTPassContext) -> ASTPassResult<FunctionCall> {
     let environment = passContext.environment!
     var functionCall = functionCall
-    let enclosingType = passContext.enclosingTypeIdentifier!.name // TODO: should this be functionCall.enclosingType ?
+    let enclosingType = passContext.enclosingTypeIdentifier!.name
 
     if case .matchedEvent(let eventInformation) =
       environment.matchEventCall(functionCall,
