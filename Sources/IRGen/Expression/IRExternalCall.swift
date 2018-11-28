@@ -93,8 +93,9 @@ struct IRExternalCall {
     // Render input stack storage.
     let inputSize = 4 + staticSize + dynamicSize
     var currentPosition = 4
-    let argumentPreambles = (staticSlots + dynamicSlots).map { $0.preamble }
-    let argumentExpressions = (staticSlots + dynamicSlots).map { (slot: ExpressionFragment) -> String in
+    let slots = staticSlots + dynamicSlots
+    let argumentPreambles = slots.map { $0.preamble }
+    let argumentExpressions = slots.map { (slot: ExpressionFragment) -> String in
       let storedPosition = currentPosition
       currentPosition += 32
       return "mstore(add(flint$callInput, \(storedPosition)), \(slot.expression))"
