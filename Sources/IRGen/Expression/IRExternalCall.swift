@@ -77,7 +77,7 @@ struct IRExternalCall {
         // Flint only supports <32 byte strings, however, because they are in
         // stack, not in memory.
         staticSlots.append(ExpressionFragment(pre: "", "\(staticSize + dynamicSize)"))
-        // TODO: figure out the actual length of the string at runtime
+        // TODO: figure out the actual length of the string at runtime (flintrocks issue #133)
         dynamicSlots.append(ExpressionFragment(pre: "", "32"))
         dynamicSlots.append(IRExpression(expression: parameter.expression, asLValue: false)
           .rendered(functionContext: functionContext))
