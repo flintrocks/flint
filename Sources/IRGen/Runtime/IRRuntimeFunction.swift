@@ -38,7 +38,7 @@ enum IRRuntimeFunction {
     case mul
     case div
     case power
-    case lessThan
+    case revertIfGreater
 
     var mangled: String {
       return "\(Environment.runtimeFunctionPrefix)\(self)"
@@ -165,8 +165,8 @@ enum IRRuntimeFunction {
     return "\(Identifiers.power.mangled)(\(b), \(e))"
   }
 
-  static func lessThan(value: String, max: String) -> String {
-    return "\(Identifiers.lessThan.mangled)(\(value), \(max))"
+  static func revertIfGreater(value: String, max: String) -> String {
+    return "\(Identifiers.revertIfGreater.mangled)(\(value), \(max))"
   }
 
   static let allDeclarations: [String] = [
@@ -196,7 +196,7 @@ enum IRRuntimeFunction {
     IRRuntimeFunctionDeclaration.mul,
     IRRuntimeFunctionDeclaration.div,
     IRRuntimeFunctionDeclaration.power,
-    IRRuntimeFunctionDeclaration.lessThan
+    IRRuntimeFunctionDeclaration.revertIfGreater
   ]
 }
 
@@ -471,9 +471,9 @@ struct IRRuntimeFunctionDeclaration {
   """
 
   // Ensure that a <= b
-  static let lessThan =
+  static let revertIfGreater =
   """
-  function flint$lessThan(a, b) -> ret {
+  function flint$revertIfGreater(a, b) -> ret {
     if gt(a, b) { revert(0, 0) }
 
     ret := a

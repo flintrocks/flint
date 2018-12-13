@@ -32,7 +32,7 @@ struct IRTypeConversionExpression {
 
     // The maximum value of the target type
     let targetMax = IRTypeConversionExpression.maximumValue[targetTypeInformation.size]!
-    let code = IRRuntimeFunction.lessThan(value: expressionCode.expression, max: targetMax)
+    let code = IRRuntimeFunction.revertIfGreater(value: expressionCode.expression, max: targetMax)
 
     return ExpressionFragment(pre: expressionCode.preamble, code)
   }
