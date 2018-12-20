@@ -25,8 +25,7 @@ contract(config.contractName, function() {
     let t;
     const value = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
     t = await instance.testIncrease(value, external.address);
-    const bnVal = new web3.BigNumber(value);
-    assert.equal(JSON.stringify(t), JSON.stringify(bnVal));
+    assert.equal(`0x${t.toString(16).toUpperCase()}`, value);
   });
 
   it("should not be possible to cast from a lower bit type to a higher bit type", async function() {
