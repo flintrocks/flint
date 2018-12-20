@@ -6,7 +6,6 @@ disabled_rules:
   - function_body_length
   - cyclomatic_complexity
   - large_tuple
-  - legacy_hashing
 included:
   - Sources
   - Tests
