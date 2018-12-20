@@ -23,15 +23,16 @@ contract(config.contractName, function() {
     const instance = await Contract.deployed();
 
     let t;
-    const value = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF / 2;
+    const value = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
     t = await instance.testIncrease(value, external.address);
-    assert.equal(t.valueOf(), value);
+    const bnVal = new web3.BigNumber(value);
+    assert.equal(JSON.stringify(t), JSON.stringify(bnVal));
   });
 
   it("should not be possible to cast from a lower bit type to a higher bit type", async function() {
     const external = await ExternalContract.deployed();
     const instance = await Contract.deployed();
-    const value = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+    const value = "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
 
     try {
       await instance.testIncrease(value, external.address);
