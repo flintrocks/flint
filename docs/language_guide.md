@@ -4,7 +4,7 @@
 
 Even though the [Ethereum](https://www.ethereum.org/) platform requires smart contract programmers to ensure the correct behaviour of their program before deployment, it has not seen a language designed with safety in mind. Solidity and others do not tailor for Ethereum’s unique programming model and instead, mimic existing popular languages like JavaScript, Python, or C, without providing additional safety mechanisms.
 
-Flint changes that, as a new programming language built for easily writing safe Ethereum smart contracts. Flint is approachable to both experienced and new Ethereum developers, and presents a variety of security features. The core of the syntax is based around [the Swift language](https://swift.org/).
+Flint changes that, as a new programming language built for easily writing safe Ethereum smart contracts. Flint is approachable to both experienced and new Ethereum developers, and presents a variety of security features. Much of the language syntax is inspired by [the Swift language](https://swift.org/), making it more approachable than Solidity.
 
 For a quick start, please have a look at the [Installation](#installation) section first, followed by the [Example](#example) section.
 
@@ -47,7 +47,7 @@ For a quick start, please have a look at the [Installation](#installation) secti
    - [Structs](#structs)
      - [Declaration](#declaration)
      - [Instances](#instances)
-     - [Accessing properties/functions](#accessing-propertiesfunctions)
+     - [Accessing properties/methods](#accessing-propertiesmethods)
      - [Structs as function arguments](#structs-as-function-arguments)
    - [Contracts](#contracts)
      - [Declaration](#declaration-1)
@@ -64,6 +64,8 @@ For a quick start, please have a look at the [Installation](#installation) secti
    - [Traits](#traits)
      - [Struct traits](#struct-traits)
      - [Contract traits](#contract-traits)
+     - [External traits](#external-traits)
+     - [Polymorphic self](#polymorphic-self)
    - [Expressions](#expressions)
      - [Function calls](#function-calls)
    - [Literals](#literals)
@@ -134,13 +136,14 @@ The latest releases are available on the [GitHub releases page](https://github.c
 
 The Flint compiler is written in [Swift](https://swift.org/), and requires the Swift compiler to be installed. See the [Swift download page](https://swift.org/download/#releases) for latest releases.
 
- > For older macOS machines and some Linux distributions it may be easier to use `swiftenv`. See the [`swiftenv` website](https://swiftenv.fuller.li/en/latest/) for installation instructions. After installing `swiftenv`, run `swiftenv install 4.2`.
+ > For older macOS machines and some Linux distributions it may be easier to use `swiftenv`. See the [`swiftenv` website](https://swiftenv.fuller.li/en/latest/) for installation instructions.
 
 Once Swift is installed, Flint can be compiled by cloning the GitHub repository and invoking `make`:
 
 ```bash
 $ git clone https://github.com/flintlang/flint.git
 $ cd flint
+$ swiftenv install # only if using swiftenv
 $ make
 ```
 
@@ -150,7 +153,7 @@ The built binary will be available in `.build/debug/flintc`. You can then add `f
 $ export PATH=$PATH:`pwd`/.build/debug/flintc
 ```
 
-If you are planning to contribute to the Flint project, please also install:
+If you are planning to contribute to the Flint project or wish to run the tests, please also install:
 
  - [Node.js](https://nodejs.org/en/)
  - [The Truffle suite](https://truffleframework.com) - for testing contracts and running the integration tests
@@ -200,19 +203,35 @@ Counter :: (any) {
 
 ### Compiling `Counter`
 
-We can compile `Counter` to the Solidity contract file `bin/main.sol` using the terminal command:
+We can compile `Counter` to the Solidity contract file `contracts/main.sol` using the terminal command:
 
 ```bash
-$ flintc main.flint --emit-ir --ir-output bin
+$ flintc main.flint --emit-ir --ir-output contracts
 ```
 
 ### Testing `Counter`
 
-Even though `Counter` is extremely simple, we should test it against some unit tests before deploying it to the Ethereum network – this practice is crucial when developing proper contracts.
+Even though `Counter` is extremely simple, we should test it before deploying it to the Ethereum network.
 
 During early iterations, it may be useful to debug a contract directly with the Remix IDE. This is detailed in a [separate section](#remix-integration).
 
-Writing unit tests for Solidity (and hence Flint) contracts is possible with the Truffle framework. We can create a `test.js` file with the unit tests:
+Writing unit tests for Solidity (and hence Flint) contracts is possible with the Truffle framework. Unfortunately, it is necessary to provide some boilerplate code for the tests to work. This consists of:
+
+ 1. Create a `Migrations.sol` file in the `contracts` directory (alongside the Flint-generated `main.sol`) with the content:
+    ```solidity
+    pragma solidity ^0.4.2; contract Migrations {}
+    ```
+ 2. Create a `1.js` file in a new directory called `migrations` with the content:
+    ```javascript
+    var Contract = artifacts.require("./Counter.sol");
+    module.exports = (deployer) => deployer.deploy(Contract);
+    ```
+  3. Create a `truffle.js` file with the content:
+    ```javascript
+    module.exports = {};
+    ```
+
+Finally, we can create a `test.js` file with the unit tests:
 
 ```javascript
 var Contract = artifacts.require("./Counter.sol");
@@ -276,11 +295,11 @@ Since Flint produces Solidity contracts, they can be deployed by following a sta
 
 ## IDE integration
 
-The Flint compiler has options to integrate with [VS Code](#vs-code), [Vim](#vim), and [Atom](#atom), although Vim and Atom only support syntax highlighting, not inline error / warning display.
+The Flint compiler has options to integrate with [VS Code](#vs-code), [Vim](#vim), and [Atom](#atom), although Vim and Atom currently only support syntax highlighting, not inline error / warning display.
 
 ### VS Code
 
-TODO
+Experimental support is provided for VS Code via a [LSP](https://langserver.org/) plugin available at https://github.com/flintrocks/vscode-flint. The `vscode-flint` repository needs to be opened in VS Code as a project, then run in debug mode. Assuming the Flint compiler was built and the `langsrv` executable was created, this should provide errors and diagnostics in Flint files.
 
 ### Vim
 
@@ -296,7 +315,7 @@ Syntax highlighting in Atom can be obtained by installing the [`language-flint` 
 
 ## Compilation
 
-Flint compiles Flint source code to YUL IR wrapped in Solidity contracts. These can then be compiled into EVM bytecode using the Solidity compiler, and deployed to the Ethereum blockchain using a standard client or the Truffle framework.
+Flint compiles Flint source code to [YUL IR](https://solidity.readthedocs.io/en/latest/yul.html) wrapped in Solidity contracts. These can then be compiled into EVM bytecode using the Solidity compiler, and deployed to the Ethereum blockchain using a standard client or the Truffle framework.
 
 A Flint source file named `main.flint` containing a contract `Counter` can be compiled to a Solidity file using:
 
@@ -339,11 +358,11 @@ After [compiling](#compilation) the `Counter` contract, we can obtain the Solidi
 
 ## File structure
 
-Flint files consist of one [contract declaration](#contracts), and optionally [struct declarations](#structs), [trait declarations](#traits), [external contract declarations](#external-calls), and/or [enumerations](#enumerations).
+Flint files consist of one or more [contract declarations](#contracts), and optionally [struct declarations](#structs), [trait declarations](#traits), [external contract declarations](#external-calls), and/or [enumerations](#enumerations).
 
 ### Comments
 
-Comments may be used throughout the source code. Comments are started with a double solidus `//` and continue to the end of that line.
+Comments may be used throughout the source code. Comments are started with a double slash `//` and continue to the end of that line.
 
 ## Types
 
@@ -353,7 +372,7 @@ Flint is a statically-typed language with a simple type system, with basic suppo
  > 
  > Currently, the types of all constants, variables, function arguments, etc. have to be explicitly declared. Type inference is a planned feature.
 
-Flint is a type-safe language. A type safe language encourages clarity about the type of values your code can work with. It performs type checks when compiling code and flags any mismatched types as errors. This enables you to catch and fix errors as early as possible in the development process.
+Flint is a type-safe language. A type safe language encourages clarity about the types of values your code can work with. It performs type checks when compiling code and flags any mismatched types as errors. This enables you to catch and fix errors as early as possible in the development process.
 
 ### Basic types
 
@@ -372,7 +391,8 @@ Flint is a type-safe language. A type safe language encourages clarity about the
 | Dynamic-size list | `[T]` | A list of elements of type `T`. Elements can be added to it or removed from it. |
 | Fixed-size list | `T[n]` | A list containing `n` elements of type `T`. It cannot have a different number of elements than its declared capacity `n`. |
 | Dictionary | `[K: V]` | Dynamic-size mappings from one key type `K` to a value type `V`. Each stored key of type `K` is associated with one value of type `V`. |
-| Structs | | Structs, including [user-defined structs](#structs). |
+| Polymorphic self | `Self` | See [polymorphic self](#polymorphic-self). |
+| Structs | | Structs (structures), including [user-defined structs](#structs). |
 
 ### Range types
 
@@ -393,6 +413,12 @@ for let i: Int in (0...5) {
   // i will be 0, 1, 2, 3, 4, 5 on separate iteratons
 }
 ```
+
+At the moment, both `a` and `b` must be integer literals, not variables!
+
+ > **Planned feature**
+ > 
+ > In the future, it will be possible to iterate up to an arbitrary value. See https://github.com/flintlang/flint/issues/397.
 
 ### Solidity types
 
@@ -428,15 +454,14 @@ let unity: Int = 1
 let answer: Int = 7 * 6
 let usingFlint: Bool = true
 let digitsOfPi: [Int] = [3, 1, 4, 1, 5, 9, 2, 6]
+let structExample: Rectangle = Rectangle(width: 30, height: 40)
 ```
 
-Alternatively, a constant may be given no initial value:
+If a constant is a state property of a contract, it may be given no initial value, but in that case it must be set in each initialiser of that contract:
 
 ```swift
 let <name>: <type>
 ```
-
-Similarly to Swift, a constant with no initial value cannot be used until it has been assigned a value, and once the value has been assigned, it cannot be changed.
 
 To declare a variable with the name `<name>` of the type `<type>` with the initial value being the result of `<expression>` (see [expressions](#expressions)), the syntax is the same, but `var` is used instead of `let`:
 
@@ -455,7 +480,7 @@ The value of a variable or a constant can be used in expressions once it is decl
 
 ## Functions
 
-Functions are self-contained blocks of code that perform a specific task, which is called using its identifier. They are defined with the keyword `func` followed by the identifier and the set of parameters and optional return type:
+Functions are self-contained blocks of code that perform a specific task, which are called using their identifier. They are defined with the keyword `func` followed by the identifier and the set of parameters and optional return type:
 
 To declare a function with the name `<name>` returning a value of type `<type>`, taking the list of [parameters `<parameters>`](#function-parameters), optionally with [modifiers `<modifiers>`](#function-modifiers) and [attributes `<attributes>`](#function-attributes):
 
@@ -525,7 +550,7 @@ Counter :: (any) {
 
 ### Function parameters
 
-Functions can also take parameters which can be used within the function. These must be declared in the function signature. Flint also supports parameters that take default values, but these must be declared at the end of the signature.
+Functions can also take parameters which can be used within the function. These must be declared in the function signature. Flint also supports parameters that take default values, but no non-defaulted parameter may follow one that has a default value.
 
 Each parameter has the syntax:
 
@@ -551,7 +576,7 @@ AddressBook :: caller <- (any) {
 
 ### Return values
 
-You can indicate the return type of a function with the return arrow `->`, which is followed by the return type. Inside the function, a `return` statement must be used, to return a value of the same type as the declared return type.
+You can optionally indicate the return type of a function with the return arrow `->`, which is followed by the return type. Inside the function, a `return` statement must be used, to return a value of the same type as the declared return type.
 
 Example:
 
@@ -560,6 +585,8 @@ func hello() -> String {
   return "Hello, world!"
 }
 ```
+
+If the return type is omitted, the function is considered a `Void` function, and a call to it cannot be used in expressions as a value.
 
 ### Initialisers
 
@@ -579,7 +606,7 @@ The statements that can be used in initialisers are limited to "simple" statemen
 
 When a user creates a transaction to call a function, they can attach Wei to send to the contract. Functions which expect Wei to be attached when called must be annotated with the `@payable` annotation, otherwise the transaction will revert when the function is called.
 
-When adding the annotation, a parameter marked `implicit` of type `Wei` must be declared. `implicit` parameters are a mechanism to expose information from the Ethereum transaction to the developer of the smart contract, without using globally accessible variables defined by the language, such as `msg.value` in Solidity. This mechanism allows developers to name `implicit` variables themselves, and do not need to remember the name of a global variable.
+When adding the annotation, a parameter marked `implicit` of type `Wei` must be declared. `implicit` parameters are a mechanism to expose information from the Ethereum transaction to the developer of the smart contract, without using globally accessible variables defined by the language, such as `msg.value` in Solidity. This mechanism allows developers to name `implicit` variables themselves, and they need not remember the name of a global variable.
 
 Functions in Flint can be marked as payable using the `@payable` attribute. The amount of Wei sent is bound to an implicit variable:
 
@@ -596,7 +623,7 @@ Payable functions may have an arbitrary amount of parameters, but exactly one ne
 
 (Contract-specific.)
 
-Fallback functions are another special kind of functions, with a slightly modified declaration syntax:
+Fallback functions are another special kind of function, with a slightly modified declaration syntax:
 
 ```swift
 public fallback() {
@@ -604,11 +631,11 @@ public fallback() {
 }
 ```
 
-Fallback functions should only contain "simple" statements, just like initialisers. They are called whenever an attempt has been made to call a non-existent function of the containing contract. This may happen e.g. if the caller used an incorrect signature for the call.
+Fallback functions should only contain "simple" statements, just like initialisers. They are called whenever an attempt has been made to call a non-existent function of the containing contract. This may happen e.g. if the caller used an incorrect signature for the call. Oftentimes the Gas allocation for fallback execution is very low (`2300`), which only allows an [event](#events) to be logged.
 
 ## Structs
 
-Structs in Flint are general-purpose constructs that group state and functions that can be used as self-contained blocks. They use the same syntax as defining constants and variables for properties. Structure functions are not protected as they can only be called by contract functions, and are required to be annotated `mutating` if they mutate the struct's state.
+Structs in Flint are general-purpose constructs that group state and methods that can be used as self-contained blocks. They use the same syntax as defining constants and variables for properties. Structure methods are not protected as they can only be called by contract functions, and are required to be annotated `mutating` if they mutate the struct's state.
 
 ### Declaration
 
@@ -616,7 +643,7 @@ The syntax of a struct declaration is:
 
 ```swift
 struct <name> {
-  // variables, constants, functions
+  // variables, constants, methods
 }
 ```
 
@@ -635,11 +662,15 @@ struct Rectangle {
 
 ### Instances
 
-The declaration of a struct only describes what types of variables it contains, what their initial values are, and what functions may be used to modify or access the struct data. To create concrete instances, each with individual data values, an instance has to be created, by calling the initialiser of a struct.
+The declaration of a struct only describes what types of variables it contains, what their initial values are, and what methods may be used to modify or access the struct data. To create concrete instances, each with individual data values, an instance has to be created, by calling the initialiser of a struct.
 
 ```swift
 <struct-name>(<initialiser-parameter-values>)
 ```
+
+ > **Bug**
+ > 
+ > Unlike for [function calls](#function-calls), it is not required to write the labels for struct initialiser parameters.
 
 Example:
 
@@ -647,7 +678,7 @@ Example:
 let someRectangle: Rectangle = Rectangle()
 ```
 
-When an instance is created, it is initialised with its initial values – in this case a width and heigth of `0`. This process can also be done manually using an [initialiser](#initialisers). You can access the properties of the current struct with the special keyword `self`.
+When an instance is created, it is initialised with its initial values – in this case a width and height of `0`. This process can also be done manually using an [initialiser](#initialisers). Defining initialisers is also required when default values are not specified for all properties of a struct. You can access the properties of the current struct with the special keyword [`self`](#self).
 
 Example:
 
@@ -665,14 +696,14 @@ struct Rectangle {
 let bigRectangle = Rectangle(width: 400, height: 10000)
 ```
 
-### Accessing properties/functions
+### Accessing properties/methods
 
-Properties/functions of a struct instance can be accessed using dot syntax. In dot syntax, the property name is written immediately after the instance name, separated by a period `.`:
+Properties/methods of a struct instance can be accessed by writing the property/method name immediately after the instance identifier, separated by a period `.`:
 
 ```swift
 <struct-instance>.<variable-name>
 <struct-instance>.<constant-name>
-<struct-instance>.<function-name>(<function-parameter-values>)
+<struct-instance>.<method-name>(<function-parameter-values>)
 ```
 
 Examples:
@@ -682,31 +713,15 @@ bigRectangle.width // 400
 bigRectangle.area() // evaluates to 4000000 by calling the `area` function
 ```
 
-In Flint, functions of a struct can also be called without creating an instance – as long as they do not use any instance properties.
-
-Example:
-
-```swift
-struct Square {
-  public shapeName() -> String {
-    return "Square"
-  }
-}
-```
-
-```swift
-Square.shapeName() // evaluates to "Square"
-```
-
  > **Planned feature**
  > 
- > In the future a `static` keyword will be added to indicate struct functions which are callable without a specific instance.
+ > In the future a `static` keyword will be added to indicate struct functions which are callable without creating a specific instance. See https://github.com/flintlang/flint/issues/419
 
 ### Structs as function arguments
 
-Structs can be passed by reference using the `inout` type modifier. The struct is then treated as an implicit reference to the value in the caller. Any modifications done to the struct will still be visible after the function is called.
+Structs can be passed by reference using the `inout` type modifier. The struct is then treated as an implicit reference to the value in the caller. Any modifications made to the struct will still be visible after the function is called.
 
-When calling a function with an `inout` parameter, the given struct must be prefixed with `&` to indicate it is being passed by reference.
+When calling a function with an `inout` parameter, the given struct instance must be prefixed with `&` to indicate it is being passed by reference.
 
 Example:
 
@@ -774,7 +789,7 @@ contract Bank {
 
 Flint introduces the concept of type states. Insufficient and incorrect state management in Solidity code have led to security vulnerabilities and unexpected behaviour in widely deployed smart contracts. Avoiding these vulnerabilities by the design of the language is a strong advantage.
 
-Type states of a contract represent the possible states it can be in. At any point of time, the contract on the network can only exist in a single state. Special `become` statements can be used withing functions to move the contract to a different type state.
+Type states of a contract represent the possible states it can be in. At any point of time, the contract on the network can only exist in a single state. Special [`become` statements](#become-statements) can be used within functions to move the contract to a different type state.
 
 A contract declaration may optionally include a list of its type states:
 
@@ -792,70 +807,7 @@ Example:
 contract Auction (Preparing, InProgress, Terminated) {}
 ```
 
-In Flint, states of a contract are declared within protection blocks, which protect the enclosed function from invalid calls.
-
-```swift
-// Anyone can deposit into the Bank iff the state is Deposit
-Bank @(Deposit) :: (any) { // Deposit is a state identifier.
-  func deposit(address: Address) {
-    // body
-  }
-}
-```
-States are identifiers declared in the contract's declaration.
-```swift
-contract Auction (Preparing, InProgress, Terminated) {}
-// Preparing, InProgress, Terminated are State Identifiers
-```
-
-Note: The special state identifier `any` allows execution of the function in the group in any state.
-
-Calls to Flint functions are validated both at compile-time and runtime.
-
-```swift
-contract Auction (Preparing, InProgress, Terminated) { // Enumeration of states.
-  var beneficiary: Address
-  var highestBidder: Address
-  var highestBid: Wei
-}
-
-Auction @(any) :: caller <- (any) {
-  public init() {
-    self.beneficiary = caller
-    self.highestBidder = caller
-    self.highestBid = Wei(0)
-    become Preparing
-  }
-}
-
-Auction @(Preparing) :: (beneficiary) {
-  public mutating func setBeneficiary(beneficiary: Address) {
-    self.beneficiary = beneficiary
-  }
-
-  mutating func openAuction() -> Bool {
-    // ...
-    return true
-    become InProgress
-  }
-}
-Auction @(InProgress) :: (beneficiary) {
-
-  mutating func endAuction() {
-    // ...
-    become Terminated
-  }
-}
-
-Auction @(InProgress) :: (any) {
-  @payable
-  func bid(implicit value: Wei) -> Bool{
-    // ...
-    // State is not explicitly changed.
-    return Bool
-  }
-}
-```
+Using [type state protection](#type-state-protection), it is possible to specify that only certain functions will be callable when the contract is in a given type state.
 
 ### Protection blocks
 
@@ -1119,7 +1071,7 @@ In Flint, events are declared in contract declarations. They use a similar synta
 event <event-name>(<event-parameter-1>, <event-parameter-2>, ...)
 ```
 
-Like functions, some of the parameters can have default values, but these must be declared at the end of the signature.
+Like functions, some of the parameters can have default values, but these must be declared at the end of the parameter list.
 
 Events can then be emitted using the keyword `emit` followed by an event call. An event call is similar to a function call (parameters must be provided in order, and they must have the correct label and type; if any optional parameters are omitted, their default value will be used automatically).
 
@@ -1290,6 +1242,61 @@ ToyWallet :: (getOwner) {
 }
 ```
 
+### External traits
+
+Traits can be declared for external contracts using the syntax:
+
+```swift
+contract trait <trait-name> {
+  // trait members
+}
+```
+
+See the [specifying the interface of external calls](#specifying-the-interface) section for more information.
+
+### Polymorphic self
+
+`Self` (note the capital 'S') is a special type available only in struct and contract traits. It refers to the type that implements the current trait, but not any other type that conforms to that trait. This is particularly useful when providing default implementations for functions in a trait. See [assets](#assets) for an example in the standard library.
+
+Example without `Self`:
+
+```swift
+struct trait Unit {
+  func add(source: inout Unit)
+}
+
+struct Metre: Unit {
+  var length: Int = 0
+  func add(source: inout Unit) {
+    length += source.length // compilation error here
+  }
+}
+```
+
+In the above example, we only want to be able to add metres to metres. Accessing `source.length` is invalid, because `length` is only declared in `Metre`. Instead, using `Self`:
+
+```swift
+struct trait Unit {
+  mutating func add(source: inout Self)
+}
+
+struct Metre: Unit {
+  var length: Int = 0
+  mutating func add(source: inout Metre) {
+    length += source.length
+  }
+}
+
+struct Litre: Unit {
+  var volume: Int = 0
+  mutating func add(source: inout Litre) {
+    volume += source.volume
+  }
+}
+```
+
+In this example, both `Metre` and `Litre` are valid. But it would a call like `aMetreInstance.add(source: &aLitreInstance)` would cause a compile-time error.
+
 ## Expressions
 
 Expressions are at the core of any computation done in Flint code. Evaluating an expression results in a single value of a given type. Expressions can be nested to arbitrary layers.
@@ -1301,7 +1308,8 @@ The expressions available in Flint are:
 | Literal | `1`, `"hello"`, `false`, etc. | Constant value; see [literals](#literals). |
 | Range | `<expr-1>..<<expr-2>`, `<expr-1>...<expr-2>` | See [ranges](#range-types). |
 | Binary expression | `<expr-1> <op> <expr-2>` | A binary operation `<op>` applied to the expressions `<expr-1>` and `<expr-2>`; see [operators](#operators). |
-| Function call | `<function-name>(<param-1>: <expr-1>, <param-2>: <expr-2>, ...)` | Call to the function `<function-name>` with the results of the given expressions `<expr-1,2,...>` as parameters. |
+| Struct reference | `&<expr>` | See [structs as function arguments](#structs-as-function-arguments). |
+| Function call | `<function-name>(<param-1>: <expr-1>, <param-2>: <expr-2>, ...)` | Call to the function `<function-name>` with the results of the given expressions `<expr-1,2,...>` as parameters. See [function calls](#function-calls). |
 | Dot access | `<expr-1>.<field>` | Access to the `<field>` field (variable, constant, function) or the result of `<expr-1>`. |
 | Index / key access | `<expr-1>[<expr-2>]` | Access to the given key of a list or dictionary. |
 | External call | `call <external-contract>.<function-name>(<param-1>: <expr-1>, <param-2>: <expr-2>, ...)` | Call to the function of an external contract; see [external calls](#external-calls). |
@@ -1310,7 +1318,7 @@ The expressions available in Flint are:
 
 ### Function calls
 
-Functions can then be called from within a contract protection block with the same identifier. The call arguments must be provided in the same order as the one they are declared in (in the function signature), and they must be labeled accordingly. If any of the optional parameters are not provided, then their default values are going to be used automatically.
+Functions can then be called from within a contract protection block with the same identifier. The call arguments must be provided in the same order as the one they are declared in (in the function signature), and they must be labeled accordingly (the exception for this is [struct initialisers](#instances)). If any of the optional parameters are not provided, then their default values are going to be used automatically.
 
 ## Literals
 
@@ -1318,25 +1326,27 @@ Literals represent fixed values in the source code that can be assigned to const
 
 ### Integer literals
 
-Integer literals (Flint type `Int`) can be written as decimal numbers. The size of the `Int` type in Flint is 256 bits (32 bytes), so the highest allowed integer is quite large (`2^256`, more than 76 decimal degits).
+Integer literals (Flint type `Int`) can be written as decimal numbers. The size of the `Int` type in Flint is 256 bits (32 bytes), so the highest allowed integer is quite large (`2^256 - 1`, more than 76 decimal degits). Underscores can be used to separate digits of integer literals.
 
 Examples:
 
 ```swift
 42
 2019
-100000000000000000000000000
+1_22_333
+1_000_000_000_000_000_000_000_000
 ```
 
 ### Address literals
 
-Address literals (Flint type `Address`) are written as 40 hexadecimal digits prefixed by a `0x`. Addresses are an important concept in Ethereum, referring to other contracts and accounts.
+Address literals (Flint type `Address`) are written as 40 hexadecimal digits prefixed by a `0x`. Addresses are an important concept in Ethereum, referring to other contracts and accounts. Underscores can be used to separate digits of address literals.
 
 Examples:
 
 ```swift
 0x1234123412341234123412341234123412341234
-0x0CB1DB10A4820BD10823AE0101F02198018231FC
+0x0CB1DB10A4820BD10823AE0101F02198CAFEBABE
+0xCAFEBABE_CAFEBABE_CAFEBABE_CAFEBABE_CAFEBABE
 ```
 
 ### Boolean literals
@@ -1357,7 +1367,7 @@ Examples:
 
  > **Bug**
  > 
- > Due to the fact that `Strings` are currently stored in a single EVM memory slot, they cannot be longer than 32 bytes.
+ > Due to the fact that `Strings` are currently stored in a single EVM memory slot, they cannot be longer than 32 bytes. See https://github.com/flintrocks/flint/issues/133.
 
 ### List literals
 
@@ -1365,7 +1375,7 @@ List literals (Flint type `[T]` or `T[n]` for some Flint type `T`) currently onl
 
  > **Planned feature**
  > 
- > In the future, Flint will have non-empty list literals written as `[x, y, z, ...]` where `x`, `y`, `z`, etc. are literals of type `T`.
+ > In the future, Flint will have non-empty list literals written as `[x, y, z, ...]` where `x`, `y`, `z`, etc. are literals of type `T`. See https://github.com/flintlang/flint/issues/420.
 
 ### Dictionary literals
 
@@ -1373,7 +1383,7 @@ Dictionary literals (Flint type `[T: U]` for some Flint types `T` and `U`) curre
 
  > **Planned feature**
  > 
- > In the future, Flint will have non-empty dictionary literals written as `[x: a, y: b, z: c, ...]` where `x`, `y`, `z`, etc. are literals of type `T` and `a`, `b`, `c`, etc. are literals of type `U`.
+ > In the future, Flint will have non-empty dictionary literals written as `[x: a, y: b, z: c, ...]` where `x`, `y`, `z`, etc. are literals of type `T` and `a`, `b`, `c`, etc. are literals of type `U`. See https://github.com/flintlang/flint/issues/420.
 
 ### Self
 
@@ -1607,7 +1617,7 @@ However, external contracts include their own set of possible risks and security
 
  > **Planned feature**
  > 
- > In the future, external calls will include automatic re-entrancy attack protection, where no function of a Flint contract will be callable during the execution of an external call.
+ > In the future, external calls will include automatic re-entrancy attack protection, where no function of a Flint contract will be callable during the execution of an external call. See https://github.com/flintrocks/flint/issues/74.
 
 ### Specifying the interface
 
@@ -1689,6 +1699,10 @@ X :: (any) {
 }
 ```
 
+ > **Planned feature**
+ > 
+ > A third mode will be available in the future, `call?`. It will return an `Optional` type, like in Swift, intended to be used with the (also planned) `if let ...` construct. See https://github.com/flintrocks/flint/issues/140.
+
 ### Specifying hyper-parameters
 
 In addition to function parameters, there are two more "hyper-parameters" that need to be set when performing an external call.
@@ -1739,7 +1753,7 @@ The forced cast (`as!`) expression converts Flint types to Solidity types and vi
 
  > **Planned feature**
  > 
- > In the future, casting failures will be possible to handle using `do-catch` blocks.
+ > In the future, casting failures will be possible to handle using `do-catch` blocks or an optional cast mode `as?`.
 
 ## Enumerations
 
@@ -1895,7 +1909,7 @@ struct MyWei : Asset {
 }
 ```
 
-The `transfer` functions are declared in the `Asset` trait and are inherited automatically. For the time being, traits do not support default implementations for initialisers or variables, so custom assets have to include the code above.
+The `transfer` functions are declared in the `Asset` trait and are inherited automatically. For the time being, traits do not support default implementations for initialisers or variables, so custom assets have to include the code above. Struct traits also do not support variables as part of the conformance, which is why `setRawValue` and `getRawValue` are required.
 
 ## Global Functions
 
@@ -1929,4 +1943,4 @@ if x == 2 {
 
 ### Send
 
-`send(address: Address, value: inout Wei)` sends the `value` Wei to the Ethereum address `address`, and clears the contents of `value`. It is a simpler way to perform a money transfer compared to [external calls](#external-calls), but it does not allow e.g. specifying function parameters.
+`send(address: Address, value: inout Wei)` sends the `value` Wei to the Ethereum address `address`, and clears the contents of `value`. It is a simpler way to perform a money transfer compared to [external calls](#external-calls), but does not allow hyper-parameters to be specified.
